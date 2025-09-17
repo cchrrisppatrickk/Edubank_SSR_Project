@@ -1,0 +1,806 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categorías</title>
+
+</head>
+<body>
+    <!-- ---------- UI: Titulo centrado y en negrita (sin subtítulo) ---------- -->
+    <div class="container-fluid py-4">
+        <div class="d-flex align-items-center justify-content-center mb-4">
+            <h1 class="display-6 fw-bold text-center">Categorías</h1>
+        </div>
+
+        <!-- Contenedor de pestañas y contenido -->
+        <div class="card shadow-sm card-surface">
+            <div class="card-header p-0 bg-transparent border-0">
+                <ul class="nav nav-tabs justify-content-center px-3" id="categoriasTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active d-flex align-items-center" id="gastos-tab" data-bs-toggle="tab" data-bs-target="#gastos" type="button" role="tab">
+                            Gastos
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link d-flex align-items-center" id="ingresos-tab" data-bs-toggle="tab" data-bs-target="#ingresos" type="button" role="tab">
+                            Ingresos
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card-body p-3">
+                <div class="tab-content" id="categoriasTabsContent">
+                    <!-- Gastos -->
+                    <div class="tab-pane fade show active" id="gastos" role="tabpanel" aria-labelledby="gastos-tab">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <h2 class="h6 mb-0 section-title">Gastos Registrados</h2>
+                            <div>
+                                <button class="btn btn-success btn-sm" onclick="mostrarFormNuevo('Gasto')">
+                                    <i class="bi bi-plus-circle me-1"></i> Agregar
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 row-cols-xl-6 g-3 mb-3" id="gastos-grid"></div>
+                    </div>
+
+                    <!-- Ingresos -->
+                    <div class="tab-pane fade" id="ingresos" role="tabpanel" aria-labelledby="ingresos-tab">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <h2 class="h6 mb-0 section-title">Ingresos Registrados</h2>
+                            <div>
+                                <button class="btn btn-success btn-sm" onclick="mostrarFormNuevo('Ingreso')">
+                                    <i class="bi bi-plus-circle me-1"></i> Agregar
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 row-cols-xl-6 g-3 mb-3" id="ingresos-grid"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para edición de categorías -->
+    <div class="modal fade" id="modalEdicion" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitulo">Editar Categoría</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="formCategoria" novalidate>
+                    <div class="modal-body">
+                        <input type="hidden" id="txtCategoriaId" value="0" />
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="txtNombre" class="form-label required-field">Nombre</label>
+                                <input type="text" id="txtNombre" class="form-control" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label for="txtDescripcion" class="form-label">Descripción</label>
+                                <input type="text" id="txtDescripcion" class="form-control" />
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label required-field">Tipo</label>
+                                <div class="d-flex gap-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="tipoCategoria" id="radTipoGasto" value="Gasto" checked />
+                                        <label class="form-check-label" for="radTipoGasto">Gasto</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="tipoCategoria" id="radTipoIngreso" value="Ingreso" />
+                                        <label class="form-check-label" for="radTipoIngreso">Ingreso</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Icono</label>
+                                <button type="button" id="btnSeleccionarIcono" class="btn btn-outline-secondary w-100 d-flex align-items-center">
+                                    <div class="icono-seleccionado-preview me-2" id="iconoPreview">
+                                        <i class="bi bi-emoji-smile"></i>
+                                    </div>
+                                    <span>Seleccionar icono</span>
+                                </button>
+                                <input type="hidden" id="txtIcono" />
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Color</label>
+                                <button type="button" id="btnSeleccionarColor" class="btn btn-outline-secondary w-100 d-flex align-items-center">
+                                    <div class="color-seleccionado-preview me-2" id="colorPreview" style="background-color: #10b981;"></div>
+                                    <span>Seleccionar color</span>
+                                </button>
+                                <input type="hidden" id="txtColor" value="#10b981" />
+                            </div>
+                            <div class="col-md-6 d-flex align-items-center">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="chkActivo" checked />
+                                    <label class="form-check-label" for="chkActivo">Activo</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                        <button type="button" id="btnDesactivar" class="btn btn-outline-secondary">Desactivar</button>
+                        <button type="button" id="btnEliminar" class="btn btn-danger">Eliminar</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para selección de iconos -->
+    <div class="modal fade" id="modalIconos" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Seleccionar Icono</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row row-cols-4 row-cols-sm-5 row-cols-md-6 g-3" id="gridIconos">
+                        <!-- Los iconos se cargarán dinámicamente con JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para selección de colores -->
+    <div class="modal fade" id="modalColores" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Seleccionar Color</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row row-cols-4 row-cols-sm-5 row-cols-md-6 g-3" id="gridColores">
+                        <!-- Los colores se cargarán dinámicamente con JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    <script>
+        $(function(){
+            // Variables globales
+            let categoriaSeleccionadaId = 0;
+                    let iconosDisponibles = [
+                // Finanzas
+                'bi bi-wallet2',        // Billetera
+                'bi bi-cash-coin',      // Moneda efectivo
+                'bi bi-currency-exchange', // Cambio de divisas
+                'bi bi-graph-up',       // Gráfico subiendo (crecimiento)
+                'bi bi-graph-down',     // Gráfico bajando
+                'bi bi-piggy-bank',     // Alcancía
+                'bi bi-coin',           // Moneda
+                'bi bi-cash-stack',     // Pila de efectivo
+                'bi bi-bank',           // Banco
+                'bi bi-credit-card',    // Tarjeta de crédito
+                'bi bi-receipt',        // Recibo
+                'bi bi-calculator',     // Calculadora
+
+                // Transporte
+                'bi bi-car',            // Coche
+                'bi bi-airplane',       // Avión
+                'bi bi-bicycle',        // Bicicleta
+                'bi bi-bus-front',      // Autobús
+                'bi bi-train-freight',  // Tren
+                'bi bi-rocket',         // Cohete
+                'bi bi-speedometer',    // Velocímetro
+                'bi bi-geo',            // Ubicación (para GPS)
+                'bi bi-signpost',       // Señal de tráfico
+                'bi bi-fuel-pump',      // Surtidor de gasolina
+
+                // Compras
+                'bi bi-cart',           // Carrito de compras
+                'bi bi-bag',            // Bolsa
+                'bi bi-basket',         // Cesta
+                'bi bi-basket2',        // Cesta alternativa
+                'bi bi-basket3',        // Otra cesta
+                'bi bi-tag',            // Etiqueta de precio
+                'bi bi-tags',           // Múltiples etiquetas
+                'bi bi-receipt',        // Recibo de compra
+                'bi bi-gift',           // Regalo
+                'bi bi-credit-card',    // Tarjeta de crédito (pago)
+
+                // Comida y Bebidas
+                'bi bi-cup-straw',      // Bebida con pajita
+                'bi bi-cup',            // Taza
+                'bi bi-cup-hot',        // Taza caliente (café/té)
+                'bi bi-egg',            // Huevo
+                'bi bi-egg-fried',      // Huevo frito
+                'bi bi-apple',          // Manzana
+                'bi bi-basket',         // Cesta (para la compra)
+                'bi bi-utensils',       // Cubiertos
+                'bi bi-droplet',        // Gota (líquidos)
+                'bi bi-water',          // Agua
+
+                // Casa
+                'bi bi-house',          // Casa
+                'bi bi-house-door',     // Puerta de casa
+                'bi bi-lightbulb',      // Bombilla
+                'bi bi-lamp',           // Lámpara
+                'bi bi-door-closed',    // Puerta cerrada
+                'bi bi-window',         // Ventana
+                'bi bi-tree',           // Árbol (jardín)
+                'bi bi-flower1',        // Flor
+                'bi bi-key',            // Llave
+                'bi bi-shield',         // Escudo (seguridad)
+
+                // Salud
+                'bi bi-heart',          // Corazón (salud)
+                'bi bi-heart-pulse',    // Latido del corazón
+                'bi bi-bandaid',        // Tirita
+                'bi bi-capsule',        // Cápsula (medicina)
+                'bi bi-capsule-pill',   // Píldora
+                'bi bi-droplet',        // Gota (sangre/medicina)
+                'bi bi-hospital',       // Hospital
+                'bi bi-activity',       // Actividad (ritmo cardíaco)
+
+                // Belleza
+                'bi bi-droplet',        // Gota (crema/loción)
+                'bi bi-brush',          // Brocha de maquillaje
+                'bi bi-mirror',         // Espejo
+                'bi bi-scissors',       // Tijeras (peluquería)
+                'bi bi-gem',            // Gema (joyería)
+                'bi bi-eyedropper',     // Cuentagotas (cosméticos)
+
+                // Entretenimiento
+                'bi bi-tv',             // Televisor
+                'bi bi-laptop',         // Ordenador portátil
+                'bi bi-phone',          // Teléfono
+                'bi bi-controller',     // Mando de videojuegos
+                'bi bi-dice',           // Dado
+                'bi bi-dice-1',         // Dado 1
+                'bi bi-dice-2',         // Dado 2
+                'bi bi-dice-3',         // Dado 3
+                'bi bi-dice-4',         // Dado 4
+                'bi bi-dice-5',         // Dado 5
+                'bi bi-dice-6',         // Dado 6
+                'bi bi-music-note',     // Nota musical
+                'bi bi-music-note-beamed', // Notas musicales
+                'bi bi-film',           // Película
+                'bi bi-boombox',        // Radiocasete
+
+                // Cuentas y Contabilidad
+                'bi bi-calculator',     // Calculadora
+                'bi bi-file-text',      // Documento de texto
+                'bi bi-file-spreadsheet', // Hoja de cálculo
+                'bi bi-receipt',        // Recibo
+                'bi bi-archive',        // Archivo
+                'bi bi-folder',         // Carpeta
+                'bi bi-folder2',        // Carpeta alternativa
+                'bi bi-folder-symlink', // Carpeta con enlace
+
+                // Rutina
+                'bi bi-alarm',          // Alarma
+                'bi bi-calendar',       // Calendario
+                'bi bi-calendar-week',  // Calendario semanal
+                'bi bi-calendar-date',  // Fecha
+                'bi bi-clock',          // Reloj
+                'bi bi-clock-history',  // Reloj history (para tiempos)
+                'bi bi-watch',          // Reloj de pulsera
+
+                // Relajación
+                'bi bi-emoji-smile',    // Emoticono sonriente
+                'bi bi-emoji-sunglasses', // Emoticono con gafas de sol
+                'bi bi-flower1',        // Flor
+                'bi bi-tree',           // Árbol (naturaleza)
+                'bi bi-moon',           // Luna
+                'bi bi-cloud',          // Nube
+                'bi bi-water',          // Agua
+                'bi bi-wind',           // Viento
+
+                // Educación
+                'bi bi-book',           // Libro
+                'bi bi-journal',        // Revista
+                'bi bi-pencil',         // Lápiz
+                'bi bi-pen',            // Bolígrafo
+                'bi bi-eraser',         // Borrador
+                'bi bi-backpack',       // Mochila
+                'bi bi-trophy',         // Trofeo
+                'bi bi-award',          // Premio
+                'bi bi-mortarboard',    // Gorro de graduación
+
+                // Familia
+                'bi bi-people',         // Gente
+                'bi bi-person',         // Persona
+                'bi bi-person-plus',    // Añadir persona
+                'bi bi-person-heart',   // Persona con corazón
+                'bi bi-heart',          // Corazón (amor familiar)
+                'bi bi-house-heart',    // Casa con corazón
+                'bi bi-balloon',        // Globo (fiestas)
+                'bi bi-balloon-heart',  // Globo con corazón
+
+                // Granja y Mascotas
+                'bi bi-heart',          // Corazón (mascotas)
+                'bi bi-tree',           // Árbol (granja)
+                'bi bi-flower1',        // Flor (jardín)
+                'bi bi-egg',            // Huevo (gallinas)
+                'bi bi-egg-fried',      // Huevo frito
+                'bi bi-shield',         // Escudo (protección)
+
+                // Otros
+                'bi bi-star',           // Estrella
+                'bi bi-gear',           // Engranaje (configuración)
+                'bi bi-tools',          // Herramientas
+                'bi bi-envelope',       // Sobre (correo)
+                'bi bi-chat',           // Chat
+                'bi bi-bell',           // Campana (notificación)
+                'bi bi-lightning',      // Rayo
+                'bi bi-shield',         // Escudo
+                'bi bi-wrench',         // Llave inglesa
+                'bi bi-box'             // Caja
+            ];
+
+
+            let coloresDisponibles = [
+              // VIOLETAS Y LILAS (1–11)
+              { nombre: 'Violeta Oscuro', valor: '#4B0082' },
+              { nombre: 'Violeta Profundo', valor: '#6A0DAD' },
+              { nombre: 'Púrpura', valor: '#800080' },
+              { nombre: 'Amatista', valor: '#9966CC' },
+              { nombre: 'Violeta Medio', valor: '#8A2BE2' },
+              { nombre: 'Lavanda Oscuro', valor: '#7B68EE' },
+              { nombre: 'Orquídea', valor: '#DA70D6' },
+              { nombre: 'Orquídea Medio', valor: '#BA55D3' },
+              { nombre: 'Violeta Claro', valor: '#D8BFD8' },
+              { nombre: 'Lavanda', valor: '#E6E6FA' },
+              { nombre: 'Lila', valor: '#C8A2C8' },
+
+              // ROSAS Y FUCSIAS (12–22)
+              { nombre: 'Fucsia Oscuro', valor: '#C71585' },
+              { nombre: 'Fucsia', valor: '#FF00FF' },
+              { nombre: 'Magenta', valor: '#FF00FF' },
+              { nombre: 'Rosa Intenso', valor: '#FF1493' },
+              { nombre: 'Rosa Frambuesa', valor: '#E30B5D' },
+              { nombre: 'Rosa Medio', valor: '#FF69B4' },
+              { nombre: 'Rosa Coral', valor: '#F88379' },
+              { nombre: 'Rosa Pastel', valor: '#FFB6C1' },
+              { nombre: 'Rosa Claro', valor: '#FFD1DC' },
+              { nombre: 'Rosa Pálido', valor: '#FADADD' },
+              { nombre: 'Rosa Bebé', valor: '#F4C2C2' },
+
+              // ROJOS (23–33)
+              { nombre: 'Rojo Oscuro', valor: '#8B0000' },
+              { nombre: 'Granate', valor: '#800000' },
+              { nombre: 'Rojo Sangre', valor: '#A52A2A' },
+              { nombre: 'Rojo Vino', valor: '#800020' },
+              { nombre: 'Rojo Fuego', valor: '#B22222' },
+              { nombre: 'Rojo', valor: '#FF0000' },
+              { nombre: 'Rojo Carmesí', valor: '#DC143C' },
+              { nombre: 'Rojo Tomate', valor: '#FF6347' },
+              { nombre: 'Rojo Coral', valor: '#FF4040' },
+              { nombre: 'Rojo Salmón', valor: '#FA8072' },
+              { nombre: 'Rojo Claro', valor: '#FFA07A' },
+
+              // NARANJAS (34–44)
+              { nombre: 'Naranja Oscuro', valor: '#FF4500' },
+              { nombre: 'Rojo Naranja', valor: '#FF5349' },
+              { nombre: 'Naranja', valor: '#FFA500' },
+              { nombre: 'Naranja Calabaza', valor: '#FF7518' },
+              { nombre: 'Naranja Dorado', valor: '#FFB347' },
+              { nombre: 'Melón', valor: '#FDBCB4' },
+              { nombre: 'Durazno Oscuro', valor: '#FF9966' },
+              { nombre: 'Durazno', valor: '#FFDAB9' },
+              { nombre: 'Albaricoque', valor: '#FBCEB1' },
+              { nombre: 'Coral Claro', valor: '#F88379' },
+              { nombre: 'Naranja Pastel', valor: '#FFD580' },
+
+              // AMARILLOS (45–55)
+              { nombre: 'Amarillo Oscuro', valor: '#B8860B' },
+              { nombre: 'Amarillo Mostaza', valor: '#FFDB58' },
+              { nombre: 'Oro', valor: '#FFD700' },
+              { nombre: 'Ámbar', valor: '#FFBF00' },
+              { nombre: 'Amarillo', valor: '#FFFF00' },
+              { nombre: 'Amarillo Maíz', valor: '#FFF200' },
+              { nombre: 'Amarillo Limón', valor: '#FFF44F' },
+              { nombre: 'Amarillo Claro', valor: '#FFFF99' },
+              { nombre: 'Marfil', valor: '#FFFFF0' },
+              { nombre: 'Crema', valor: '#FFFDD0' },
+              { nombre: 'Champán', valor: '#F7E7CE' },
+
+              // VERDES (56–66)
+              { nombre: 'Verde Oscuro', valor: '#006400' },
+              { nombre: 'Verde Bosque', valor: '#228B22' },
+              { nombre: 'Verde', valor: '#008000' },
+              { nombre: 'Verde Esmeralda', valor: '#50C878' },
+              { nombre: 'Verde Lima Oscuro', valor: '#32CD32' },
+              { nombre: 'Verde Lima', valor: '#7FFF00' },
+              { nombre: 'Verde Pasto', valor: '#7CFC00' },
+              { nombre: 'Verde Primavera', valor: '#00FF7F' },
+              { nombre: 'Verde Claro', valor: '#90EE90' },
+              { nombre: 'Verde Pastel', valor: '#77DD77' },
+              { nombre: 'Verde Menta', valor: '#AAF0D1' },
+
+              // CIANES Y TURQUESAS (67–77)
+              { nombre: 'Cian Oscuro', valor: '#008B8B' },
+              { nombre: 'Turquesa Oscuro', valor: '#00CED1' },
+              { nombre: 'Verde Azulado', valor: '#008080' },
+              { nombre: 'Cian', valor: '#00FFFF' },
+              { nombre: 'Turquesa', valor: '#40E0D0' },
+              { nombre: 'Aguamarina', valor: '#7FFFD4' },
+              { nombre: 'Celeste Verdoso', valor: '#00FA9A' },
+              { nombre: 'Cian Claro', valor: '#E0FFFF' },
+              { nombre: 'Celeste Pastel', valor: '#AEEEEE' },
+              { nombre: 'Cian Pastel', valor: '#B2FFFF' },
+              { nombre: 'Menta Claro', valor: '#AAF0E0' },
+
+              // AZULES (78–88)
+              { nombre: 'Azul Marino', valor: '#000080' },
+              { nombre: 'Azul Oscuro', valor: '#00008B' },
+              { nombre: 'Azul Medianoche', valor: '#191970' },
+              { nombre: 'Azul Real', valor: '#4169E1' },
+              { nombre: 'Azul', valor: '#0000FF' },
+              { nombre: 'Azul Dodger', valor: '#1E90FF' },
+              { nombre: 'Azul Acero', valor: '#4682B4' },
+              { nombre: 'Azul Celeste', valor: '#87CEEB' },
+              { nombre: 'Azul Polvo', valor: '#B0E0E6' },
+              { nombre: 'Azul Pastel', valor: '#AEC6CF' },
+              { nombre: 'Celeste', valor: '#B2FFFF' },
+
+              // NEUTROS Y GRISES (89–99)
+              { nombre: 'Negro', valor: '#000000' },
+              { nombre: 'Gris Oscuro', valor: '#2F4F4F' },
+              { nombre: 'Gris Pizarra', valor: '#708090' },
+              { nombre: 'Gris Medio', valor: '#A9A9A9' },
+              { nombre: 'Gris Claro', valor: '#D3D3D3' },
+              { nombre: 'Gainsboro', valor: '#DCDCDC' },
+              { nombre: 'Plata', valor: '#C0C0C0' },
+              { nombre: 'Humo Blanco', valor: '#F5F5F5' },
+              { nombre: 'Blanco Antiguo', valor: '#FAEBD7' },
+              { nombre: 'Blanco Floral', valor: '#FFFAF0' },
+              { nombre: 'Blanco', valor: '#FFFFFF' }
+            ];
+
+
+            // traer token anti-forgery si está en layout (opcional)
+            const token = $('input[name="__RequestVerificationToken"]').val();
+
+            const ajaxOptions = (opts) => {
+                if (token) {
+                    opts.headers = opts.headers || {};
+                    opts.headers["RequestVerificationToken"] = token;
+                }
+                return opts;
+            };
+
+            const mostrarErrorFromXhr = (xhr) => {
+                try {
+                    const json = xhr.responseJSON || JSON.parse(xhr.responseText);
+                    const msg = json?.mensaje || json?.message || "Error en la solicitud";
+                    toastr.error(msg);
+                } catch (e) {
+                    toastr.error('Error en la solicitud');
+                }
+            };
+
+            // Inicializar modales
+            const inicializarModales = () => {
+                // Modal de iconos
+                const gridIconos = $('#gridIconos').empty();
+
+                iconosDisponibles.forEach(icono => {
+                    const partes = icono.split(' ');
+                    const nombreIcono = partes[partes.length - 1].replace('bi-', '');
+
+                    const item = $('<div>').addClass('col text-center')
+                        .attr('data-icono', icono)
+                        .css('cursor', 'pointer')
+                        .click(function() {
+                            $('.icono-seleccionado').removeClass('icono-seleccionado border-primary');
+                            $(this).addClass('icono-seleccionado border-primary');
+                            $('#txtIcono').val(icono);
+                            $('#iconoPreview').html(`<i class="${icono}"></i>`);
+                            $('#modalIconos').modal('hide');
+                        });
+
+                    const preview = $('<div>').addClass('mb-2').html(`<i class="${icono} fs-2"></i>`);
+                    const nombre = $('<div>').addClass('small text-truncate').text(nombreIcono);
+
+                    item.append(preview, nombre);
+                    gridIconos.append(item);
+                });
+
+                // Eventos del modal de iconos
+                $('#btnSeleccionarIcono').click(function() {
+                    $('#modalIconos').modal('show');
+                });
+
+                // Modal de colores
+                const gridColores = $('#gridColores').empty();
+
+                coloresDisponibles.forEach(color => {
+                    const item = $('<div>').addClass('col text-center')
+                        .attr('data-color', color.valor)
+                        .css('cursor', 'pointer')
+                        .click(function() {
+                            $('.color-seleccionado').removeClass('color-seleccionado border-primary');
+                            $(this).addClass('color-seleccionado border-primary');
+                            $('#txtColor').val(color.valor);
+                            $('#colorPreview').css('background-color', color.valor);
+                            $('#modalColores').modal('hide');
+                        });
+
+                    const preview = $('<div>').addClass('mx-auto rounded-circle mb-2')
+                        .css({
+                            'width': '50px',
+                            'height': '50px',
+                            'background-color': color.valor
+                        });
+                    const nombre = $('<div>').addClass('small text-truncate').text(color.nombre);
+
+                    item.append(preview, nombre);
+                    gridColores.append(item);
+                });
+
+                // Eventos del modal de colores
+                $('#btnSeleccionarColor').click(function() {
+                    $('#modalColores').modal('show');
+                });
+            };
+
+            // carga inicial
+            const cargarCategorias = async () => {
+                try {
+                    const data = await $.get('/Categoria/Lista');
+                    renderCategorias(data);
+                } catch (err) {
+                    mostrarErrorFromXhr(err);
+                }
+            };
+
+            // Render: 2 secciones: Gastos / Ingresos (sin 'Ambos')
+            const renderCategorias = (lista) => {
+                const gastosGrid = $('#gastos-grid').empty();
+                const ingresosGrid = $('#ingresos-grid').empty();
+
+                lista.forEach(c => {
+                    // Si el tipo viene distinto a 'Ingreso', lo tratamos como 'Gasto' (evita duplicados)
+                    if (c.tipo === 'Ingreso') {
+                        ingresosGrid.append(crearCard(c));
+                    } else {
+                        gastosGrid.append(crearCard(c));
+                    }
+                });
+            };
+
+            const crearCard = (c) => {
+                const card = $('<div>')
+                    .addClass('col')
+                    .attr('data-id', c.categoriaId)
+                    .attr('title', c.descripcion || c.nombre)
+                    .data('categoria', c);
+
+                const cardBody = $('<div>')
+                    .addClass('card h-100 categoria-card')
+                    .css('cursor', 'pointer')
+                    .toggleClass('border-primary', c.categoriaId === categoriaSeleccionadaId);
+
+                const circulo = $('<div>').addClass('rounded-circle mx-auto mt-3')
+                    .css({
+                        'width': '80px',
+                        'height': '80px',
+                        'background-color': c.color || '#e9ecef',
+                        'display': 'flex',
+                        'align-items': 'center',
+                        'justify-content': 'center'
+                    });
+
+                if (c.icono) {
+                    circulo.html(`<i class="${c.icono} fs-4 text-white fw-bold"></i>`);
+                } else {
+                    // mostrar inicial si no hay icono
+                    const inicial = (c.nombre || '').substring(0,1).toUpperCase();
+                    circulo.text(inicial).css('color', 'white').css('font-weight', 'bold');
+                }
+
+                const nombre = $('<div>').addClass('card-title text-center mt-2 mb-1').text(c.nombre);
+                const tipo = $('<div>').addClass('card-text small text-muted text-center').text(c.tipo);
+
+                cardBody.append(circulo, nombre, tipo);
+                card.append(cardBody);
+
+                // click en la tarjeta abre edición en modal
+                card.click(() => {
+                    $('.categoria-card').removeClass('border-primary');
+                    cardBody.addClass('border-primary');
+                    abrirEdicion(c.categoriaId);
+                });
+
+                return card;
+            };
+
+            // abrir edición: carga datos y muestra modal (sin 'Ambos' en radios)
+            const abrirEdicion = (id) => {
+                categoriaSeleccionadaId = id;
+
+                $.get(`/Categoria/ObtenerJson?id=${id}`).done(function(c){
+                    $('#modalTitulo').text('Editar Categoría: ' + c.nombre);
+                    $('#txtCategoriaId').val(c.categoriaId);
+                    $('#txtNombre').val(c.nombre);
+                    $('#txtDescripcion').val(c.descripcion || '');
+
+                    // Manejar radio buttons de tipo: si no es 'Gasto' usamos 'Ingreso' por defecto
+                    if (c.tipo === 'Gasto') {
+                        $('#radTipoGasto').prop('checked', true);
+                    } else {
+                        $('#radTipoIngreso').prop('checked', true);
+                    }
+
+                    $('#txtIcono').val(c.icono || '');
+                    if (c.icono) {
+                        $('#iconoPreview').html(`<i class="${c.icono}"></i>`);
+                    } else {
+                        $('#iconoPreview').html('<i class="bi bi-emoji-smile"></i>');
+                    }
+
+                    $('#txtColor').val(c.color || '#10b981');
+                    $('#colorPreview').css('background-color', c.color || '#10b981');
+
+                    $('#chkActivo').prop('checked', c.activo);
+
+                    // Mostrar botones de acción
+                    $('#btnDesactivar, #btnEliminar').show();
+                    $('#btnDesactivar').text(c.activo ? 'Desactivar' : 'Activar');
+
+                    $('#modalEdicion').modal('show');
+                }).fail(function(xhr){ mostrarErrorFromXhr(xhr); });
+            };
+
+            // mostrar modal para nuevo (solo Gasto/Ingreso)
+            window.mostrarFormNuevo = (tipo) => {
+                categoriaSeleccionadaId = 0;
+                $('.categoria-card').removeClass('border-primary');
+
+                $('#modalTitulo').text('Nueva Categoría de ' + tipo);
+                $('#txtCategoriaId').val('0');
+                $('#txtNombre').val('');
+                $('#txtDescripcion').val('');
+
+                // Manejar radio buttons de tipo según el parámetro
+                if (tipo === 'Gasto') {
+                    $('#radTipoGasto').prop('checked', true);
+                } else {
+                    $('#radTipoIngreso').prop('checked', true);
+                }
+
+                $('#txtIcono').val('');
+                $('#iconoPreview').html('<i class="bi bi-emoji-smile"></i>');
+                $('#txtColor').val('#10b981');
+                $('#colorPreview').css('background-color', '#10b981');
+                $('#chkActivo').prop('checked', true);
+
+                // Ocultar botones de acción para nuevo
+                $('#btnDesactivar, #btnEliminar').hide();
+
+                $('#modalEdicion').modal('show');
+            };
+
+            // submit guardar (insertar/actualizar) - SIN cambios
+            $('#formCategoria').submit(function(e){
+                e.preventDefault();
+                const $btn = $(this).find('button[type="submit"]').prop('disabled', true);
+
+                // Determinar el tipo basado en los radio buttons
+                let tipo = $('input[name="tipoCategoria"]:checked').val();
+
+                const modelo = {
+                    CategoriaId: parseInt($('#txtCategoriaId').val() || "0"),
+                    Nombre: $('#txtNombre').val(),
+                    Descripcion: $('#txtDescripcion').val(),
+                    Tipo: tipo,
+                    Icono: $('#txtIcono').val(),
+                    Color: $('#txtColor').val(),
+                    Activo: $('#chkActivo').is(':checked')
+                };
+
+                $.ajax(ajaxOptions({
+                    url: '/Categoria/Insertar',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(modelo)
+                })).done(function(res){
+                    if (res.valor) {
+                        toastr.success('Guardado correctamente');
+                        $('#modalEdicion').modal('hide');
+                        $('#formCategoria')[0].reset();
+                        $('#txtCategoriaId').val('0');
+                        categoriaSeleccionadaId = 0;
+                        $('.categoria-card').removeClass('border-primary');
+                        cargarCategorias();
+                    } else {
+                        toastr.error(res.mensaje || 'No se pudo guardar');
+                    }
+                }).fail(function(xhr){
+                    mostrarErrorFromXhr(xhr);
+                }).always(function(){
+                    $btn.prop('disabled', false);
+                });
+            });
+
+            // eliminar (sin cambios)
+            $('#btnEliminar').click(function(){
+                const id = $('#txtCategoriaId').val();
+                if (id === "0") return;
+
+                if (!confirm('¿Eliminar categoría?')) return;
+
+                $.ajax(ajaxOptions({ url: `/Categoria/Eliminar?id=${id}`, type:'DELETE' }))
+                    .done(function(res){
+                        if (res.valor) {
+                            toastr.success('Eliminado');
+                            $('#modalEdicion').modal('hide');
+                            $('#formCategoria')[0].reset();
+                            $('#txtCategoriaId').val('0');
+                            categoriaSeleccionadaId = 0;
+                            cargarCategorias();
+                        } else toastr.error(res.mensaje || 'No se pudo eliminar');
+                    })
+                    .fail(function(xhr){ mostrarErrorFromXhr(xhr); });
+            });
+
+            // cambiar estado (sin cambios)
+            $('#btnDesactivar').click(function(){
+                const id = $('#txtCategoriaId').val();
+                if (id === "0") return;
+
+                const activo = !$('#chkActivo').is(':checked');
+
+                $.ajax(ajaxOptions({
+                    url: '/Categoria/CambiarEstado',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ CategoriaId: id, Activo: activo })
+                })).done(function(res){
+                    if (res.valor) {
+                        toastr.success('Estado actualizado');
+                        $('#chkActivo').prop('checked', activo);
+                        $(this).text(activo ? 'Desactivar' : 'Activar');
+                        cargarCategorias();
+                    } else toastr.error(res.mensaje || 'No se pudo actualizar');
+                }).fail(function(xhr){ mostrarErrorFromXhr(xhr); });
+            });
+
+            // iniciar
+            inicializarModales();
+            cargarCategorias();
+
+            // Animación modal: fade + scale (JS de soporte para evitar flicker)
+            (function($){
+                $(document).on('show.bs.modal', '.modal', function (e) {
+                    const dlg = $(this).find('.modal-dialog');
+                    dlg.css('will-change','transform, opacity');
+                    window.requestAnimationFrame(()=> {
+                        dlg.addClass('modal-open-anim');
+                    });
+                });
+
+                $(document).on('hidden.bs.modal', '.modal', function (e) {
+                    const dlg = $(this).find('.modal-dialog');
+                    dlg.removeClass('modal-open-anim');
+                    dlg.css('will-change','auto');
+                });
+            })(jQuery);
+        });
+    </script>
+</body>
+</html>

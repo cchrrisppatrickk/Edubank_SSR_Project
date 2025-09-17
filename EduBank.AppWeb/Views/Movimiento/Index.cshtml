@@ -1,0 +1,1385 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard de Movimientos - Modal Form (Visual Update)</title>
+
+
+  
+</head>
+
+<body>
+    <div class="container mt-4">
+        <div class="text-center mb-3">
+            <h2 class="fw-bold">Dashboard de Movimientos</h2>
+        </div>
+
+        <!-- Top summary: Ingresos | Saldo (centro) | Gastos -->
+        <div class="row g-3 align-items-center mb-4">
+            <div class="col-md-3">
+                <div class="card shadow-sm border-0 h-100 summary-card">
+                    <div class="card-body text-center">
+                        <small class="text-muted">Ingresos</small>
+                        <div class="d-flex align-items-center justify-content-center mt-2">
+                            <i class="bi bi-arrow-up-circle-fill fs-3 text-success me-2"></i>
+                            <div><h5 class="mb-0" id="cardIngresos">S/ 0.00</h5></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SALDO CENTRAL -->
+            <div class="col-md-6">
+                <div class="card shadow-lg border-0 text-center h-100 saldo-card">
+                    <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                        <div class="icon-saldo mb-2">
+                            <i class="bi bi-cash-stack fs-2"></i>
+                        </div>
+                        <small class="text-muted">Saldo</small>
+                        <h1 class="display-6 fw-bold mb-0" id="cardSaldo">S/ 0.00</h1>
+                        <div class="text-muted small mt-1">Total disponible</div>
+
+                        <!-- BOTONES NUEVOS: ahora más grandes y con label debajo -->
+                        <div class="action-buttons-saldo d-flex justify-content-center gap-3 mt-3" role="group" aria-label="Agregar movimiento">
+                            <div class="text-center">
+                                <button class="btn btn-inc btn-mov-type" data-type="I" id="btnAgregarIngreso" title="Agregar ingreso" aria-label="Agregar ingreso">
+                                    <i class="bi bi-plus-lg"></i>
+                                </button>
+                                <span class="btn-mov-label">Ingreso</span>
+                            </div>
+
+                            <div class="text-center">
+                                <button class="btn btn-dec btn-mov-type" data-type="G" id="btnAgregarGasto" title="Agregar gasto" aria-label="Agregar gasto">
+                                    <i class="bi bi-dash-lg"></i>
+                                </button>
+                                <span class="btn-mov-label">Gasto</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card shadow-sm border-0 h-100 summary-card">
+                    <div class="card-body text-center">
+                        <small class="text-muted">Gastos</small>
+                        <div class="d-flex align-items-center justify-content-center mt-2">
+                            <i class="bi bi-arrow-down-circle-fill fs-3 text-danger me-2"></i>
+                            <div><h5 class="mb-0" id="cardGastos">S/ 0.00</h5></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenido principal: pestañas (Gastos / Ingresos) y gráficos -->
+        <div class="row g-4">
+            <div class="col-md-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header p-0 bg-transparent border-0">
+                        <ul class="nav nav-tabs justify-content-center px-3" id="movimientosTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active d-flex align-items-center" id="gastos-tab" data-bs-toggle="tab" data-bs-target="#pane-gastos" type="button" role="tab" aria-controls="pane-gastos" aria-selected="true">
+                                    <i class="bi bi-arrow-down-circle me-2"></i> Gastos
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link d-flex align-items-center" id="ingresos-tab" data-bs-toggle="tab" data-bs-target="#pane-ingresos" type="button" role="tab" aria-controls="pane-ingresos" aria-selected="false">
+                                    <i class="bi bi-arrow-up-circle me-2"></i> Ingresos
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="card-body p-3">
+                        <!-- Filtro por período -->
+                        <div class="period-filter">
+                            <div class="filter-container">
+                                <div class="period-title">Filtrar por período</div>
+                                <div class="filter-btn-group d-flex justify-content-center">
+                                    <button type="button" class="btn btn-period btn-primary active" data-period="day">
+                                        <i class="bi bi-calendar-day me-1"></i> Día
+                                    </button>
+                                    <button type="button" class="btn btn-period btn-outline-primary" data-period="week">
+                                        <i class="bi bi-calendar-week me-1"></i> Semana
+                                    </button>
+                                    <button type="button" class="btn btn-period btn-outline-primary" data-period="month">
+                                        <i class="bi bi-calendar-month me-1"></i> Mes
+                                    </button>
+                                    <button type="button" class="btn btn-period btn-outline-primary" data-period="year">
+                                        <i class="bi bi-calendar-year me-1"></i> Año
+                                    </button>
+                                </div>
+
+                                <!-- Selector de fecha con flechas -->
+                                <div class="date-selector mt-3">
+                                    <button class="date-arrow" id="prevDate">
+                                        <i class="bi bi-chevron-left"></i>
+                                    </button>
+
+                                    <div class="calendar-container">
+                                        <div class="date-display" id="dateDisplay">
+                                            Hoy, 6 de septiembre de 2025
+                                        </div>
+                                        <div class="calendar-popup" id="calendarPopup">
+                                            <div class="calendar-header">
+                                                <button class="date-arrow" id="prevMonth">
+                                                    <i class="bi bi-chevron-left"></i>
+                                                </button>
+                                                <span id="calendarMonthYear">Septiembre 2025</span>
+                                                <button class="date-arrow" id="nextMonth">
+                                                    <i class="bi bi-chevron-right"></i>
+                                                </button>
+                                            </div>
+                                            <div class="calendar-weekdays">
+                                                <div class="calendar-grid">
+                                                    <div class="calendar-weekday">Lu</div>
+                                                    <div class="calendar-weekday">Ma</div>
+                                                    <div class="calendar-weekday">Mi</div>
+                                                    <div class="calendar-weekday">Ju</div>
+                                                    <div class="calendar-weekday">Vi</div>
+                                                    <div class="calendar-weekday">Sá</div>
+                                                    <div class="calendar-weekday">Do</div>
+                                                    <div id="calendarDays" class="calendar-grid"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <button class="date-arrow" id="nextDate">
+                                        <i class="bi bi-chevron-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    <div class="card-body p-3">
+                        <div class="tab-content" id="movimientosTabsContent">
+                            <!-- PANE GASTOS -->
+                            <div class="tab-pane fade show active" id="pane-gastos" role="tabpanel" aria-labelledby="gastos-tab">
+                                <div class="d-flex flex-column align-items-stretch">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <strong class="mb-0">Gastos</strong>
+                                        <small class="text-muted" id="totalGastosLabel">S/ 0.00</small>
+                                    </div>
+
+                                    <div class="chart-area mb-2">
+                                        <canvas id="chartGastos"></canvas>
+                                    </div>
+
+                                    <div class="text-center small text-muted mt-2" id="noDataGastos" style="display:none;">No hay datos de gastos</div>
+
+                                    <div class="mt-3">
+                                        <strong class="small">Gastos recientes (gráfico)</strong>
+                                        <ul class="list-group list-group-flush mt-2" id="listaGastosChart"></ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- PANE INGRESOS -->
+                            <div class="tab-pane fade" id="pane-ingresos" role="tabpanel" aria-labelledby="ingresos-tab">
+                                <div class="d-flex flex-column align-items-stretch">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <strong class="mb-0">Ingresos</strong>
+                                        <small class="text-muted" id="totalIngresosLabel">S/ 0.00</small>
+                                    </div>
+
+                                    <div class="chart-area mb-2">
+                                        <canvas id="chartIngresos"></canvas>
+                                    </div>
+
+                                    <div class="text-center small text-muted mt-2" id="noDataIngresos" style="display:none;">No hay datos de ingresos</div>
+
+                                    <div class="mt-3">
+                                        <strong class="small">Ingresos recientes (gráfico)</strong>
+                                        <ul class="list-group list-group-flush mt-2" id="listaIngresosChart"></ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /Distribución -->
+            </div>
+        </div>
+
+       
+
+    <!-- MODAL (formulario) -->
+    <div class="modal fade" id="movModal" tabindex="-1" aria-labelledby="movModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title d-flex align-items-center" id="movModalLabel">Agregar movimiento&nbsp;<span id="movModalTypeBadge"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formMovimiento" class="needs-validation" novalidate>
+                        <input type="hidden" id="txtMovimientoId" value="0" />
+                        <!-- dentro del formMovimiento -->
+                        <input type="hidden" id="selTipo" value="G" />
+
+
+                        <!-- mantenemos un campo oculto para la categoria (compatibilidad con el resto del código) -->
+                        <select id="selCategoria" class="d-none"></select>
+
+
+                        <div class="mb-3">
+                            <label class="form-label">Categoría</label>
+                            <div class="d-flex flex-column gap-2">
+                                <button type="button"
+                                        id="btnCategoriaSelected"
+                                        class="btn btn-outline-secondary p-3 d-flex align-items-center justify-content-between"
+                                        aria-haspopup="dialog"
+                                        aria-controls="modalCategorias"
+                                        aria-label="Seleccionar categoría">
+                                    <span class="d-flex align-items-center">
+                                        <div id="btnCategoriaBadge" class="cat-icon-badge small me-2" style="background:#e9ecef;color:#6c757d;">
+                                            <i class="bi bi-palette" aria-hidden="true"></i>
+                                        </div>
+                                        <span id="btnCategoriaLabel">Categoría</span>
+                                    </span>
+                                    <i class="bi bi-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+
+
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Fecha</label>
+                                <input type="date" id="txtFechaOperacion" class="form-control p-3" required />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Monto</label>
+                                <input type="number" step="0.01" id="txtMonto" class="form-control p-3" min="0.01" inputmode="decimal" required />
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Comentario</label>
+                            <textarea id="txtComentario" class="form-control p-3" rows="3" placeholder="Agregar una descripción opcional"></textarea>
+                        </div>
+
+                        <div class="d-grid">
+                            <button class="btn btn-success p-3 fw-bold" type="submit" id="btnGuardarModal">Guardar movimiento</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para selección de Categorias - MÁS GRANDE Y MEJORADO -->
+    <div class="modal fade" id="modalCategorias" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title d-flex align-items-center">
+                        <i class="bi bi-tag me-2"></i>
+                        Seleccionar Categoría
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-3" id="gridCategorias">
+                        <!-- Las categorias se cargarán dinámicamente con JavaScript -->
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-center border-0 pt-0">
+                    <small class="text-muted">Selecciona una categoría para continuar</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- DEPENDENCIAS JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+            <script>
+
+                (function($){
+                    'use strict';
+
+                    // =============================================
+                    // SECCIÓN 1: CONFIGURACIÓN INICIAL Y UTILIDADES
+                    // =============================================
+
+                    // Función de seguridad para escapar HTML (previene XSS)
+                    const escapeHtml = (unsafe) => {
+                        if (unsafe === null || unsafe === undefined) return '';
+                        return String(unsafe)
+                            .replace(/&/g, '&amp;')
+                            .replace(/</g, '&lt;')
+                            .replace(/>/g, '&gt;')
+                            .replace(/"/g, '&quot;')
+                            .replace(/'/g, '&#039;');
+                    };
+
+                    $(function(){
+                        // Configuración de toastr (notificaciones)
+                        toastr.options = {
+                            "closeButton": true,
+                            "debug": false,
+                            "newestOnTop": true,
+                            "progressBar": true,
+                            "positionClass": "toast-top-right",
+                            "preventDuplicates": true,
+                            "timeOut": "3500",
+                            "extendedTimeOut": "1000",
+                            "showEasing": "swing",
+                            "hideEasing": "linear",
+                            "showMethod": "fadeIn",
+                            "hideMethod": "fadeOut"
+                        };
+
+                        // =============================================
+                        // SECCIÓN 2: ESTADO GLOBAL Y VARIABLES
+                        // =============================================
+
+                        // Mapa de categorías {id: {nombre, icono, color, tipo}}
+                        let categoriasMap = {};
+
+                        // Mapa de categorías por nombre (para búsquedas)
+                        let categoriasByName = {};
+
+                        // Referencias a los gráficos
+                        let chartGastos = null;
+                        let chartIngresos = null;
+
+                        // Control de peticiones AJAX
+                        let currentEstRequest = null;
+                        let currentPeriodoRequest = null; // para peticiones por periodo
+
+                        // Para restaurar foco después de cerrar modales
+                        let lastFocusedTrigger = null;
+
+                        // Variables para el control de fechas (calendario)
+                        let currentDate = new Date(); // iniciar con la fecha actual
+                        let currentPeriod = 'day';
+                        let calendarDate = new Date(currentDate);
+
+                        // Mapeo frontend -> backend de periodos
+                        const PERIOD_MAP = { day: 'dia', week: 'semana', month: 'mes', year: 'año' };
+
+                        // =============================================
+                        // SECCIÓN 3: FUNCIONES DE UTILIDAD Y FORMATEO
+                        // =============================================
+
+                        // Formateador de moneda
+                        const fmt = (v) => {
+                            try {
+                                return new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(Number(v || 0));
+                            }
+                            catch (e) {
+                                return 'S/ ' + (Number(v || 0)).toFixed(2);
+                            }
+                        };
+
+                        // Generador de paleta de colores para gráficos
+                        const palette = (n) => {
+                            const base = ['#4dc9f6','#f67019','#f53794','#537bc4','#acc236','#166a8f','#00a950','#58595b','#8549ba','#b91d47'];
+                            const out = [];
+                            for (let i=0;i<n;i++) out.push(base[i % base.length]);
+                            return out;
+                        };
+
+                        // Funciones para determinar tipo de movimiento
+                        const isGasto = (t) => (t || '').toString().toUpperCase().startsWith('G');
+                        const isIngreso = (t) => (t || '').toString().toUpperCase().startsWith('I');
+
+                        // Normalizador de colores hexadecimales
+                        const normalizeHex = (c) => {
+                            if (!c) return null;
+                            c = c.toString().trim();
+                            if (!c) return null;
+                            if (c.startsWith('#')) {
+                                if (/^#([0-9A-Fa-f]{3}){1,2}$/.test(c)) return c;
+                                return null;
+                            }
+                            if (/^[0-9A-Fa-f]{6}$/.test(c)) return '#'+c;
+                            if (/^[0-9A-Fa-f]{3}$/.test(c)) return '#'+c;
+                            return null;
+                        };
+
+                        // Validador de clases de iconos
+                        const isValidIconClass = (cls) => {
+                            if (!cls) return false;
+                            return /^([a-z0-9\-\s]+)$/i.test(cls);
+                        };
+
+                        // Calculador de color de texto según fondo (para contraste)
+                        const textColorForBg = (hex) => {
+                            try {
+                                const c = (hex || '#000').replace('#','');
+                                const r = parseInt(c.substr(0,2),16),
+                                      g = parseInt(c.substr(2,2),16),
+                                      b = parseInt(c.substr(4,2),16);
+                                const lum = 0.2126*r + 0.7152*g + 0.0722*b;
+                                return lum > 180 ? '#000' : '#fff';
+                            } catch(e) { return '#fff'; }
+                        };
+
+                        // Normalizador de tipo de categoría
+                        const normalizeTipo = (t) => {
+                            if (t === null || t === undefined) return null;
+                            const s = String(t).trim().toUpperCase();
+                            if (!s) return null;
+                            if (s.startsWith('I')) return 'I';
+                            if (s.startsWith('G')) return 'G';
+                            return null;
+                        };
+
+                        // Formatea a ISO yyyy-MM-dd
+                        const formatDateISO = (d) => {
+                            if (!(d instanceof Date)) d = new Date(d);
+                            const yyyy = d.getFullYear();
+                            const mm = String(d.getMonth() + 1).padStart(2, '0');
+                            const dd = String(d.getDate()).padStart(2, '0');
+                            return `${yyyy}-${mm}-${dd}`;
+                        };
+
+                        // Debounce helper
+                        const debounce = (fn, wait = 180) => {
+                            let t;
+                            return (...args) => {
+                                clearTimeout(t);
+                                t = setTimeout(()=> fn(...args), wait);
+                            };
+                        };
+
+                        // =============================================
+                        // SECCIÓN 4: FUNCIONES DE CATEGORÍAS
+                        // =============================================
+
+                        // Llena el selector de categorías según tipo (I=Ingreso, G=Gasto)
+                        const populateCategoriaSelect = (tipo) => {
+                            const $sel = $('#selCategoria').empty();
+                            const entries = Object.entries(categoriasMap || {});
+                            const filtered = entries.filter(([id, info]) => {
+                                if (!tipo) return true;
+                                const t = normalizeTipo(info.tipo || info.Tipo);
+                                return t === tipo;
+                            });
+
+                            if (!filtered.length) {
+                                $sel.append($('<option>').attr('value', 0).text('No hay categorías disponibles'));
+                                $sel.prop('disabled', true);
+                                $('#btnGuardarModal').prop('disabled', true);
+
+                                // Mensaje para crear categoría si no hay disponibles
+                                if (!$('#noCatMensaje').length) {
+                                    const $msg = $('<div id="noCatMensaje" class="mt-2 text-warning small">No hay categorías para este tipo. <a href="#" id="crearCategoriaDesdeMov">Crear categoría</a></div>');
+                                    $('#formMovimiento .modal-body').append($msg);
+                                    $('#crearCategoriaDesdeMov').on('click', function(e){
+                                        e.preventDefault();
+                                        // Abre modal de categorías o navega a página de categorías
+                                        if ($('#modalEdicion').length) {
+                                            $('#modalEdicion').modal('show');
+                                        } else {
+                                            window.open('/Categoria', '_blank');
+                                        }
+                                    });
+                                }
+                                return;
+                            }
+
+                            // Ordenar categorías por nombre
+                            filtered.sort((a,b) => (a[1].nombre || '').localeCompare(b[1].nombre || ''));
+
+                            // Añadir opciones al selector
+                            filtered.forEach(([id, info]) => {
+                                $sel.append($('<option>').attr('value', id).text(info.nombre));
+                            });
+
+                            $sel.prop('disabled', false);
+                            $('#btnGuardarModal').prop('disabled', false);
+                            $('#noCatMensaje').remove();
+                        };
+
+                        // Carga las categorías desde el servidor
+                        const cargarCategorias = async () => {
+                            try {
+                                const res = await $.get('/Categoria/Lista');
+                                categoriasMap = {};
+                                categoriasByName = {};
+
+                                // Procesar respuesta y poblar los mapas
+                                (res || []).forEach(c => {
+                                    const id = Number(c.categoriaId);
+                                    const nombre = (c.nombre || '').toString();
+                                    const item = {
+                                        nombre: nombre,
+                                        icono: c.icono || '',
+                                        color: c.color || '',
+                                        tipo: (c.tipo ?? c.Tipo ?? '').toString()
+                                    };
+                                    categoriasMap[id] = item;
+                                    if (nombre) categoriasByName[nombre.trim().toLowerCase()] = item;
+                                });
+                            } catch (err) {
+                                $('#selCategoria').empty().append($('<option>').attr('value', 0).text('Sin categorías'));
+                                categoriasMap = {};
+                                categoriasByName = {};
+                                toastr.warning('No se pudieron cargar las categorías');
+                            }
+                        };
+
+                        // =============================================
+                        // SECCIÓN 5: FUNCIONES DE GRÁFICOS Y ESTADÍSTICAS
+                        // =============================================
+
+                        // Procesa datos de respuesta para gráficos
+                        const splitDataFromResponse = (res) => {
+                            if (!res) return { gastos: {}, ingresos: {} };
+
+                            // Diferentes formatos de respuesta posibles
+                            if (Array.isArray(res.totalesPorCategoria) && res.totalesPorCategoria.length) {
+                                const g = {}, i = {};
+                                res.totalesPorCategoria.forEach(x => {
+                                    const tipo = (x.tipo || '').toString();
+                                    const nombre = x.categoriaNombre ?? x.nombre ?? 'Sin categoría';
+                                    const total = Number(x.total || 0);
+                                    if (isGasto(tipo)) g[nombre] = (g[nombre] || 0) + total;
+                                    else if (isIngreso(tipo)) i[nombre] = (i[nombre] || 0) + total;
+                                });
+                                if (Object.keys(g).length || Object.keys(i).length) return { gastos: g, ingresos: i };
+                            }
+
+                            // Formato alternativo de respuesta
+                            if (Array.isArray(res.totalesPorCategoriaGasto) || Array.isArray(res.totalesPorCategoriaIngreso)) {
+                                const g = {}, i = {};
+                                (res.totalesPorCategoriaGasto || []).forEach(x => g[x.categoriaNombre ?? x.nombre ?? 'Sin categoría'] = Number(x.total || 0));
+                                (res.totalesPorCategoriaIngreso || []).forEach(x => i[x.categoriaNombre ?? x.nombre ?? 'Sin categoría'] = Number(x.total || 0));
+                                return { gastos: g, ingresos: i };
+                            }
+
+                            // Fallback: procesar desde movimientos recientes
+                            const gastos = {}, ingresos = {};
+                            (res.recientes || []).forEach(r => {
+                                const nombre = r.categoriaNombre ?? r.categoria ?? 'Sin categoría';
+                                const total = Number(r.monto || 0);
+                                const tipo = r.tipo ?? '';
+                                if (isGasto(tipo)) gastos[nombre] = (gastos[nombre] || 0) + total;
+                                else if (isIngreso(tipo)) ingresos[nombre] = (ingresos[nombre] || 0) + total;
+                                else gastos[nombre] = (gastos[nombre] || 0) + total;
+                            });
+                            return { gastos, ingresos };
+                        };
+
+                        // Prepara datos para gráficos
+                        const buildDataset = (obj) => {
+                            const labels = Object.keys(obj);
+                            const data = labels.map(l => Number(obj[l] || 0));
+                            return { labels, data };
+                        };
+
+                        // Destruye gráficos existentes
+                        const destruirCharts = () => {
+                            if (chartGastos) {
+                                try { chartGastos.destroy(); } catch(e){}
+                                chartGastos = null;
+                            }
+                            if (chartIngresos) {
+                                try { chartIngresos.destroy(); } catch(e){}
+                                chartIngresos = null;
+                            }
+                        };
+
+                        // Crea elemento de lista para movimientos recientes (usada en listas de gasto/ingreso)
+                        const crearItemLista = (r) => {
+                            const fecha = r.fechaOperacion || r.fecha || '';
+                            const nombre = r.categoriaNombre ?? r.categoria ?? (categoriasMap[Number(r.categoriaId)]?.nombre ?? '');
+                            const montoFmt = fmt(Number(r.monto || 0));
+                            const tipo = r.tipo ?? '';
+
+                            // Obtener información de categoría
+                            const catFromId = categoriasMap[Number(r.categoriaId)];
+                            const catFromName = categoriasByName[(r.categoriaNombre ?? r.categoria ?? '').toString().trim().toLowerCase()];
+                            const catInfo = catFromId || catFromName || {};
+
+                            const icono = r.categoriaIcono ?? r.icono ?? catInfo.icono ?? '';
+                            const color  = r.categoriaColor ?? r.color ?? catInfo.color ?? '#6c757d';
+
+                            // Crear elemento de lista
+                            const $li = $('<li>').addClass('list-group-item d-flex justify-content-between align-items-center py-2');
+                            const $left = $('<div>').addClass('small cat-cell');
+                            const $badge = $('<div>').addClass('cat-icon-badge').css('background-color', normalizeHex(color) || '#6c757d')
+                                            .css('color', textColorForBg(normalizeHex(color) || '#6c757d'));
+
+                            // Añadir icono o inicial
+                            if (isValidIconClass(icono)) {
+                                $badge.append($('<i>').addClass(icono));
+                            } else {
+                                $badge.text((nombre || '').substring(0,1).toUpperCase());
+                            }
+
+                            $left.append($badge);
+                            const $meta = $('<div>');
+                            $meta.append($('<div>').addClass('fw-semibold').text(nombre));
+                            $meta.append($('<div>').addClass('text-muted small').text(fecha));
+                            $left.append($meta);
+
+                            const $right = $('<div>').addClass('text-end');
+                            $right.append($('<div>').addClass('fw-bold').text(montoFmt));
+                            $right.append($('<div>').addClass('small text-muted').text(tipo));
+
+                            // Botón para eliminar movimiento
+                            const $btnWrap = $('<div>').addClass('mt-1');
+                            const $btn = $('<button>').addClass('btn btn-sm btn-danger btn-eliminar').attr('type', 'button').attr('title','Eliminar').attr('data-id', r.movimientoId).text('⨯');
+                            $btnWrap.append($btn);
+                            $right.append($btnWrap);
+
+                            $li.append($left).append($right);
+                            return $li;
+                        };
+
+                        // =============================================
+                        // SECCIÓN 6: FUNCIONALIDAD DE CALENDARIO
+                        // =============================================
+
+                        // Formatea la fecha según el período seleccionado
+                        const formatearPeriodo = (fecha, periodo) => {
+                            const opcionesMes = { month: 'long' };
+                            const opcionesDia = { day: 'numeric' };
+                            const opcionesAnio = { year: 'numeric' };
+
+                            switch(periodo) {
+                                case 'day':
+                                    // Formatear fecha en español
+                                    const hoy = new Date();
+                                    const esHoy = fecha.getDate() === hoy.getDate() &&
+                                                 fecha.getMonth() === hoy.getMonth() &&
+                                                 fecha.getFullYear() === hoy.getFullYear();
+
+                                    if (esHoy) {
+                                        return `Hoy, ${fecha.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}`;
+                                    } else {
+                                        return fecha.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+                                    }
+                                case 'week':
+                                    const inicioSemana = new Date(fecha);
+                                    inicioSemana.setDate(fecha.getDate() - fecha.getDay() + (fecha.getDay() === 0 ? -6 : 1));
+                                    const finSemana = new Date(inicioSemana);
+                                    finSemana.setDate(inicioSemana.getDate() + 6);
+
+                                    return `${inicioSemana.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })} - ${finSemana.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+                                case 'month':
+                                    return fecha.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+                                case 'year':
+                                    return fecha.toLocaleDateString('es-ES', { year: 'numeric' });
+                                default:
+                                    return fecha.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+                            }
+                        };
+
+                        // Actualiza la visualización de la fecha
+                        const actualizarVisualizacionFecha = () => {
+                            $('#dateDisplay').text(formatearPeriodo(currentDate, currentPeriod));
+                        };
+
+                        // Navegación entre fechas según período
+                        const navegarFecha = (direccion) => {
+                            const paso = direccion === 'next' ? 1 : -1;
+
+                            switch(currentPeriod) {
+                                case 'day':
+                                    currentDate.setDate(currentDate.getDate() + paso);
+                                    break;
+                                case 'week':
+                                    currentDate.setDate(currentDate.getDate() + (paso * 7));
+                                    break;
+                                case 'month':
+                                    currentDate.setMonth(currentDate.getMonth() + paso);
+                                    break;
+                                case 'year':
+                                    currentDate.setFullYear(currentDate.getFullYear() + paso);
+                                    break;
+                            }
+
+                            actualizarVisualizacionFecha();
+                            // Solicitar nuevos datos para el periodo/fecha actual (debounced)
+                            fetchPorPeriodoDebounced(currentPeriod, currentDate);
+                        };
+
+                        // Genera el calendario para un mes específico
+                        const generarCalendario = (fecha) => {
+                            const year = fecha.getFullYear();
+                            const month = fecha.getMonth();
+
+                            // Actualizar encabezado del calendario
+                            $('#calendarMonthYear').text(fecha.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }));
+
+                            // Obtener información del mes
+                            const firstDay = new Date(year, month, 1);
+                            const lastDay = new Date(year, month + 1, 0);
+                            const prevLastDay = new Date(year, month, 0).getDate();
+
+                            // Calcular días de la semana
+                            const firstDayIndex = firstDay.getDay();
+                            const adjustedFirstDayIndex = firstDayIndex === 0 ? 6 : firstDayIndex - 1;
+
+                            const lastDayIndex = lastDay.getDay();
+                            const adjustedLastDayIndex = lastDayIndex === 0 ? 6 : lastDayIndex - 1;
+
+                            // Generar HTML para los días del calendario
+                            let calendarDays = '';
+
+                            // Días del mes anterior
+                            for (let i = adjustedFirstDayIndex; i > 0; i--) {
+                                calendarDays += `<div class="calendar-day other-month">${prevLastDay - i + 1}</div>`;
+                            }
+
+                            // Días del mes actual
+                            for (let i = 1; i <= lastDay.getDate(); i++) {
+                                const isToday = i === currentDate.getDate() && month === currentDate.getMonth() && year === currentDate.getFullYear();
+                                calendarDays += `<div class="calendar-day ${isToday ? 'selected' : ''}" data-day="${i}">${i}</div>`;
+                            }
+
+                            // Días del próximo mes
+                            const daysNextMonth = 7 - adjustedLastDayIndex - 1;
+                            for (let i = 1; i <= daysNextMonth; i++) {
+                                calendarDays += `<div class="calendar-day other-month">${i}</div>`;
+                            }
+
+                            $('#calendarDays').html(calendarDays);
+
+                            // Eventos para seleccionar día (delegación limpia)
+                            $('.calendar-day:not(.other-month)').off('click.selectDay').on('click.selectDay', function() {
+                                const day = $(this).data('day');
+                                currentDate = new Date(year, month, day);
+                                calendarDate = new Date(currentDate);
+                                actualizarVisualizacionFecha();
+                                $('#calendarPopup').removeClass('show');
+                                // Solicitar datos del periodo para la fecha seleccionada
+                                fetchPorPeriodoDebounced(currentPeriod, currentDate);
+                            });
+                        };
+
+                        // =============================================
+                        // SECCIÓN 7: FUNCIONALIDAD DE INTERFAZ (MODALES)
+                        // =============================================
+
+                        // Renderiza la cuadrícula de categorías en el modal
+                        const renderCategoriaGrid = (tipo) => {
+                            const $grid = $('#gridCategorias').empty();
+                            const entries = Object.entries(categoriasMap || {});
+                            const filtered = entries.filter(([id, info]) => {
+                                if (!tipo) return true;
+                                const t = normalizeTipo(info.tipo || info.Tipo);
+                                return t === tipo;
+                            });
+
+                            if (!filtered.length) {
+                                $grid.append($('<div>').addClass('col-12 text-center text-muted small').text('No hay categorías para mostrar'));
+                                return;
+                            }
+
+                            // Ordenar y mostrar categorías
+                            filtered.sort((a,b) => (a[1].nombre || '').localeCompare(b[1].nombre || ''));
+                            filtered.forEach(([id, info]) => {
+                                const color = normalizeHex(info.color) || '#6c757d';
+                                const $col = $('<div>').addClass('col');
+                                const $card = $('<div>').addClass('categoria-card').attr('tabindex', 0).attr('role','button').attr('aria-pressed','false')
+                                    .css('background', '#fff')
+                                    .on('click keypress', function(e){
+                                        if (e.type === 'click' || (e.type === 'keypress' && (e.key === 'Enter' || e.key === ' '))) {
+                                            selectCategoria(Number(id));
+                                        }
+                                    });
+
+                                const $badge = $('<div>').addClass('cat-icon-badge').css('margin','0 auto').css('background-color', color).css('color', textColorForBg(color));
+                                if (isValidIconClass(info.icono)) $badge.append($('<i>').addClass(info.icono));
+                                else $badge.text((info.nombre||'').substring(0,1).toUpperCase());
+
+                                $card.append($badge);
+                                $card.append($('<div>').addClass('categoria-label').text(info.nombre));
+                                $col.append($card);
+                                $grid.append($col);
+                            });
+                        };
+
+                        // Selecciona una categoría desde el modal
+                        const selectCategoria = (id) => {
+                            const item = categoriasMap[id];
+                            if (!item) return;
+                            $('#selCategoria').val(id);
+
+                            const color = normalizeHex(item.color) || '#6c757d';
+                            const $badge = $('#btnCategoriaBadge');
+                            const $label = $('#btnCategoriaLabel');
+
+                            // Actualizar badge visual
+                            $badge.css('background-color', color);
+                            $badge.css('color', textColorForBg(color));
+                            $badge.empty();
+                            if (isValidIconClass(item.icono)) {
+                                $badge.append($('<i>').addClass(item.icono));
+                            } else {
+                                $badge.text((item.nombre||'').substring(0,1).toUpperCase());
+                            }
+
+                            $label.text(item.nombre);
+
+                            // Cerrar modal
+                            const modalEl = document.getElementById('modalCategorias');
+                            const bs = bootstrap.Modal.getInstance(modalEl);
+                            if (bs) bs.hide();
+                        };
+
+                        // =============================================
+                        // SECCIÓN 8: CARGA DE ESTADÍSTICAS Y DATOS
+                        // =============================================
+
+                        // Carga estadísticas desde el servidor
+                        const cargarEstadisticas = async () => {
+                            // Abortar petición anterior si existe
+                            try {
+                                if (currentEstRequest && typeof currentEstRequest.abort === 'function') currentEstRequest.abort();
+                            } catch(e) { /* ignore */ }
+
+                            let res = null;
+                            try {
+                                currentEstRequest = $.ajax({ url: '/Movimiento/Estadisticas', method: 'GET', dataType: 'json' });
+                                res = await currentEstRequest;
+                            } catch (err) {
+                                // Mostrar valores por defecto en caso de error
+                                $('#cardIngresos').text(fmt(0));
+                                $('#cardGastos').text(fmt(0));
+                                $('#cardSaldo').text(fmt(0));
+                                $('#listaGastosChart').empty().append($('<li>').addClass('list-group-item text-muted small').text('No hay datos'));
+                                $('#listaIngresosChart').empty().append($('<li>').addClass('list-group-item text-muted small').text('No hay datos'));
+                                destruirCharts();
+                                toastr.error('No se pudieron cargar las estadísticas');
+                                return;
+                            } finally {
+                                currentEstRequest = null;
+                            }
+
+                            // Actualizar tarjetas de resumen (NO modificar en fetchPorPeriodo)
+                            $('#cardIngresos').text(fmt(res.totalIngresos ?? res.TotalIngresos ?? 0));
+                            $('#cardGastos').text(fmt(res.totalGastos ?? res.TotalGastos ?? 0));
+                            $('#cardSaldo').text(fmt(res.saldo ?? res.Saldo ?? ((res.totalIngresos ?? res.TotalIngresos ?? 0) - (res.totalGastos ?? res.TotalGastos ?? 0))));
+
+                            // Procesar datos para gráficos (estadísticas generales)
+                            const split = splitDataFromResponse(res);
+                            const dsGastos = buildDataset(split.gastos || {});
+                            const dsIngresos = buildDataset(split.ingresos || {});
+
+                            // Actualizar totales en cabeceras de pestañas
+                            $('#totalGastosLabel').text(fmt(Object.values(split.gastos || {}).reduce((a,b)=>a+b,0)));
+                            $('#totalIngresosLabel').text(fmt(Object.values(split.ingresos || {}).reduce((a,b)=>a+b,0)));
+
+                            // Mostrar/ocultar mensajes de "sin datos"
+                            $('#noDataGastos').toggle(!dsGastos.data.length);
+                            $('#noDataIngresos').toggle(!dsIngresos.data.length);
+
+                            destruirCharts();
+
+                            // Opciones comunes para gráficos
+                            const chartOpts = {
+                                animation: false,
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: { position: 'bottom' },
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function(ctx){
+                                                return `${ctx.label}: ${fmt(ctx.raw || 0)}`;
+                                            }
+                                        }
+                                    }
+                                }
+                            };
+
+                            // Crear gráfico de gastos (general)
+                            if (dsGastos.data.length) {
+                                const ctxG = document.getElementById('chartGastos').getContext('2d');
+                                const paletteG = palette(dsGastos.data.length);
+                                const bgColorsG = dsGastos.labels.map((lab,idx) => {
+                                    const c = getColorForLabel(lab, idx, paletteG);
+                                    return normalizeHex(c) || paletteG[idx % paletteG.length];
+                                });
+                                chartGastos = new Chart(ctxG, {
+                                    type: 'doughnut',
+                                    data: {
+                                        labels: dsGastos.labels,
+                                        datasets: [{
+                                            data: dsGastos.data,
+                                            backgroundColor: bgColorsG,
+                                            borderColor: '#ffffff',
+                                            borderWidth: 1
+                                        }]
+                                    },
+                                    options: chartOpts
+                                });
+                            } else {
+                                const ctxG = document.getElementById('chartGastos').getContext('2d');
+                                ctxG.clearRect(0,0,ctxG.canvas.width, ctxG.canvas.height);
+                            }
+
+                            // Crear gráfico de ingresos (general)
+                            if (dsIngresos.data.length) {
+                                const ctxI = document.getElementById('chartIngresos').getContext('2d');
+                                const paletteI = palette(dsIngresos.data.length);
+                                const bgColorsI = dsIngresos.labels.map((lab,idx) => {
+                                    const c = getColorForLabel(lab, idx, paletteI);
+                                    return normalizeHex(c) || paletteI[idx % paletteI.length];
+                                });
+                                chartIngresos = new Chart(ctxI, {
+                                    type: 'doughnut',
+                                    data: {
+                                        labels: dsIngresos.labels,
+                                        datasets: [{
+                                            data: dsIngresos.data,
+                                            backgroundColor: bgColorsI,
+                                            borderColor: '#ffffff',
+                                            borderWidth: 1
+                                        }]
+                                    },
+                                    options: chartOpts
+                                });
+                            } else {
+                                const ctxI = document.getElementById('chartIngresos').getContext('2d');
+                                ctxI.clearRect(0,0,ctxI.canvas.width, ctxI.canvas.height);
+                            }
+
+                            // Poblar listas de movimientos recientes (general) para los paneles de gastos/ingresos
+                            const gastosChartList = $('#listaGastosChart').empty();
+                            const ingresosChartList = $('#listaIngresosChart').empty();
+
+                            const gastosRecientes = (res.recientes || []).filter(r => isGasto(r.tipo)).slice(0,6);
+                            const ingresosRecientes = (res.recientes || []).filter(r => isIngreso(r.tipo)).slice(0,6);
+
+                            if (!gastosRecientes.length) {
+                                gastosChartList.append($('<li>').addClass('list-group-item text-muted small').text('No hay movimientos recientes de gasto'));
+                            } else {
+                                gastosRecientes.forEach(r => gastosChartList.append(crearItemLista(r)));
+                            }
+
+                            if (!ingresosRecientes.length) {
+                                ingresosChartList.append($('<li>').addClass('list-group-item text-muted small').text('No hay movimientos recientes de ingreso'));
+                            } else {
+                                ingresosRecientes.forEach(r => ingresosChartList.append(crearItemLista(r)));
+                            }
+
+                            // Forzar actualización de gráficos
+                            setTimeout(()=> {
+                                try {
+                                    if (chartGastos) {
+                                        chartGastos.resize();
+                                        chartGastos.update();
+                                    }
+                                } catch(e){}
+                                try {
+                                    if (chartIngresos) {
+                                        chartIngresos.resize();
+                                        chartIngresos.update();
+                                    }
+                                } catch(e){}
+                            }, 50);
+                        };
+
+                        // =============================================
+                        // NUEVA SECCIÓN: FUNCIONES PARA FILTRADO POR PERIODO
+                        // =============================================
+
+                        // Obtiene color para etiqueta de gráfico
+                        const getColorForLabel = (label, index, fallbackPalette) => {
+                            const key = (label || '').toString().trim().toLowerCase();
+                            let info = categoriasByName[key];
+                            if (!info) {
+                                for (const id in categoriasMap) {
+                                    const n = (categoriasMap[id].nombre || '').toString().trim().toLowerCase();
+                                    if (n === key) { info = categoriasMap[id]; break; }
+                                }
+                            }
+                            let color = info?.color || info?.categoriaColor || null;
+                            color = normalizeHex(color);
+                            if (!color) color = fallbackPalette[index % fallbackPalette.length];
+                            return color;
+                        };
+
+                        // Función que obtiene movimientos del backend para el periodo y actualiza gráficos/lists/table
+                        const fetchPorPeriodo = async (periodoFrontend = currentPeriod, fechaRef = currentDate) => {
+                            const periodoBackend = PERIOD_MAP[periodoFrontend] || periodoFrontend;
+                            // Usar la fecha en formato ISO sin ajustes de timezone
+                            const fecha = formatDateISO(fechaRef || new Date());
+
+                            // abort previo
+                            try { if (currentPeriodoRequest && typeof currentPeriodoRequest.abort === 'function') currentPeriodoRequest.abort(); } catch(e){}
+
+                            const url = `/Movimiento/ObtenerPorPeriodo?periodo=${encodeURIComponent(periodoBackend)}&fecha=${encodeURIComponent(fecha)}`;
+
+                            let res = null;
+                            try {
+                                currentPeriodoRequest = $.ajax({ url, method: 'GET', dataType: 'json' });
+                                res = await currentPeriodoRequest;
+                            } catch (err) {
+                                toastr.error('No se pudieron cargar los datos del período');
+                                // limpiar vistas dependientes
+                                $('#listaGastosChart').empty().append($('<li>').addClass('list-group-item text-muted small').text('No hay datos'));
+                                $('#listaIngresosChart').empty().append($('<li>').addClass('list-group-item text-muted small').text('No hay datos'));
+                                destruirCharts();
+                                return;
+                            } finally {
+                                currentPeriodoRequest = null;
+                            }
+
+                            // Obtener movimientos (esperamos que endpoint devuelva res.movimientos)
+                            const movimientos = (res && res.movimientos) ? res.movimientos : [];
+
+                            // Agrupar por categoría para gastos/ingresos
+                            const gastosByCat = {};
+                            const ingresosByCat = {};
+
+                            movimientos.forEach(m => {
+                                const cat = m.CategoriaNombre ?? m.categoriaNombre ?? (categoriasMap[Number(m.CategoriaId || m.categoriaId)]?.nombre) ?? 'Sin categoría';
+                                const monto = Number(m.Monto ?? m.monto ?? 0);
+                                const tipo = (m.Tipo ?? m.tipo ?? '').toString().toUpperCase();
+
+                                if (tipo.startsWith('G')) gastosByCat[cat] = (gastosByCat[cat] || 0) + monto;
+                                else ingresosByCat[cat] = (ingresosByCat[cat] || 0) + monto;
+                            });
+
+                            const dsGastos = buildDataset(gastosByCat);
+                            const dsIngresos = buildDataset(ingresosByCat);
+
+                            // Mostrar/ocultar mensajes de "sin datos"
+                            $('#noDataGastos').toggle(!dsGastos.data.length);
+                            $('#noDataIngresos').toggle(!dsIngresos.data.length);
+
+                            // Reconstruir charts (NO tocar tarjetas de totales)
+                            destruirCharts();
+
+                            const commonChartOpts = {
+                                animation: false, responsive: true, maintainAspectRatio: false,
+                                plugins: {
+                                    legend: { position: 'bottom' },
+                                    tooltip: { callbacks: { label: function(ctx){ return `${ctx.label}: ${fmt(ctx.raw || 0)}`; } } }
+                                }
+                            };
+
+                            // Gastos por periodo
+                            if (dsGastos.data.length) {
+                                const ctxG = document.getElementById('chartGastos').getContext('2d');
+                                const palG = palette(dsGastos.data.length);
+                                const bgG = dsGastos.labels.map((lab, idx) => normalizeHex(getColorForLabel(lab, idx, palG)) || palG[idx % palG.length]);
+                                chartGastos = new Chart(ctxG, {
+                                    type: 'doughnut',
+                                    data: { labels: dsGastos.labels, datasets: [{ data: dsGastos.data, backgroundColor: bgG, borderColor: '#fff', borderWidth: 1 }] },
+                                    options: commonChartOpts
+                                });
+                            } else {
+                                const ctxG = document.getElementById('chartGastos').getContext('2d');
+                                ctxG.clearRect(0,0,ctxG.canvas.width, ctxG.canvas.height);
+                            }
+
+                            // Ingresos por periodo
+                            if (dsIngresos.data.length) {
+                                const ctxI = document.getElementById('chartIngresos').getContext('2d');
+                                const palI = palette(dsIngresos.data.length);
+                                const bgI = dsIngresos.labels.map((lab, idx) => normalizeHex(getColorForLabel(lab, idx, palI)) || palI[idx % palI.length]);
+                                chartIngresos = new Chart(ctxI, {
+                                    type: 'doughnut',
+                                    data: { labels: dsIngresos.labels, datasets: [{ data: dsIngresos.data, backgroundColor: bgI, borderColor: '#fff', borderWidth: 1 }] },
+                                    options: commonChartOpts
+                                });
+                            } else {
+                                const ctxI = document.getElementById('chartIngresos').getContext('2d');
+                                ctxI.clearRect(0,0,ctxI.canvas.width, ctxI.canvas.height);
+                            }
+
+                            // Poblar listas recientes del periodo (listas de gastos/ingresos en los paneles)
+                            $('#listaGastosChart').empty();
+                            $('#listaIngresosChart').empty();
+                            const gastosRec = movimientos.filter(x => isGasto(x.Tipo ?? x.tipo)).slice(0,8);
+                            const ingresosRec = movimientos.filter(x => isIngreso(x.Tipo ?? x.tipo)).slice(0,8);
+                            if (!gastosRec.length) $('#listaGastosChart').append($('<li>').addClass('list-group-item text-muted small').text('No hay movimientos recientes de gasto'));
+                            else gastosRec.forEach(r => $('#listaGastosChart').append(crearItemLista(r)));
+                            if (!ingresosRec.length) $('#listaIngresosChart').append($('<li>').addClass('list-group-item text-muted small').text('No hay movimientos recientes de ingreso'));
+                            else ingresosRec.forEach(r => $('#listaIngresosChart').append(crearItemLista(r)));
+
+                            // Forzar actualización de gráficos
+                            setTimeout(()=> {
+                                try { if (chartGastos) { chartGastos.resize(); chartGastos.update(); } } catch(e){}
+                                try { if (chartIngresos) { chartIngresos.resize(); chartIngresos.update(); } } catch(e){}
+                            }, 60);
+                        };
+
+                        const fetchPorPeriodoDebounced = debounce(fetchPorPeriodo, 160);
+
+                        // =============================================
+                        // SECCIÓN 9: MANEJO DE EVENTOS
+                        // =============================================
+
+                        // Evento para cambiar entre pestañas (actualiza gráficos)
+                        $('#movimientosTabs').on('shown.bs.tab', function (e) {
+                            const targetId = e.target?.id || '';
+                            if (targetId === 'gastos-tab' && chartGastos) {
+                                try {
+                                    chartGastos.resize();
+                                    chartGastos.update();
+                                } catch (err) {}
+                            }
+                            if (targetId === 'ingresos-tab' && chartIngresos) {
+                                try {
+                                    chartIngresos.resize();
+                                    chartIngresos.update();
+                                } catch (err) {}
+                            }
+                        });
+
+                        // Inicializar modal de movimientos
+                        const modalEl = document.getElementById('movModal');
+                        const bsModal = new bootstrap.Modal(modalEl, { keyboard: true });
+
+                        // Evento para botones de tipo de movimiento (Gasto/Ingreso)
+                        $('.btn-mov-type').on('click', function(){
+                            lastFocusedTrigger = this;
+                            const tipo = $(this).data('type');
+                            const isI = (tipo === 'I');
+
+                            // Reiniciar formulario
+                            $('#txtMovimientoId').val(0);
+                            $('#formMovimiento')[0].reset();
+                            // Establecer fecha actual en el campo de fecha
+                            $('#txtFechaOperacion').val(new Date().toISOString().split('T')[0]);
+
+                            // Configurar tipo y categorías
+                            $('#selTipo').val(tipo);
+                            populateCategoriaSelect(tipo);
+
+                            // Actualizar badge visual
+                            const $badge = $('<span>').addClass('mov-type-badge ' + (isI ? 'income' : 'expense')).text(isI ? 'Ingreso' : 'Gasto');
+                            $('#movModalTypeBadge').empty().append($badge);
+
+                            // Actualizar título del modal
+                            $('#movModalLabel').contents().filter(function(){
+                                return this.nodeType === 3;
+                            }).first().replaceWith(isI ? 'Agregar ingreso ' : 'Agregar gasto ');
+
+                            // Mostrar advertencia si no hay categorías
+                            if ($('#selCategoria').prop('disabled')) {
+                                toastr.warning('No hay categorías disponibles para este tipo. Crea una categoría primero.');
+                            }
+
+                            bsModal.show();
+
+                            // Enfocar campo de monto
+                            setTimeout(()=> $('#txtMonto').focus(), 250);
+                        });
+
+                        // Restaurar foco al cerrar modal
+                        modalEl.addEventListener('hidden.bs.modal', function(){
+                            $('#selTipo').val('G');
+                            $('#movModalTypeBadge').empty();
+                            if (lastFocusedTrigger) try { lastFocusedTrigger.focus(); } catch(e){}
+                        });
+
+                        // Evento para enviar formulario de movimiento
+                        $('#formMovimiento').submit(async function(e){
+                            e.preventDefault();
+                            const $btn = $(this).find('button[type="submit"]');
+                            if (!$btn.data('original-html')) $btn.data('original-html', $btn.html());
+                            $btn.prop('disabled', true);
+                            $btn.html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Guardando...');
+
+                            // Preparar datos del formulario
+                            const modelo = {
+                                MovimientoId: Number($('#txtMovimientoId').val() || 0),
+                                CategoriaId: Number($('#selCategoria').val() || 0),
+                                Tipo: $('#selTipo').val(),
+                                FechaOperacion: $('#txtFechaOperacion').val(),
+                                Monto: Number($('#txtMonto').val() || 0),
+                                Comentario: $('#txtComentario').val()
+                            };
+
+                            // Validaciones
+                            if (!modelo.CategoriaId || modelo.CategoriaId === 0) {
+                                toastr.warning('Seleccione una categoría');
+                                $btn.prop('disabled', false).html($btn.data('original-html'));
+                                return;
+                            }
+                            if (!(modelo.Monto > 0)) {
+                                toastr.warning('Ingrese un monto válido mayor a 0');
+                                $btn.prop('disabled', false).html($btn.data('original-html'));
+                                return;
+                            }
+                            const catInfo = categoriasMap[modelo.CategoriaId];
+                            if (!catInfo) {
+                                toastr.warning('Categoría inválida');
+                                $btn.prop('disabled', false).html($btn.data('original-html'));
+                                return;
+                            }
+                            if (normalizeTipo(catInfo.tipo) !== normalizeTipo(modelo.Tipo)) {
+                                toastr.warning('La categoría seleccionada no corresponde al tipo de movimiento.');
+                                $btn.prop('disabled', false).html($btn.data('original-html'));
+                                return;
+                            }
+
+                            try {
+                                // Enviar datos al servidor
+                                const res = await $.ajax({
+                                    url: '/Movimiento/Insertar',
+                                    type: 'POST',
+                                    contentType: 'application/json',
+                                    data: JSON.stringify(modelo)
+                                });
+
+                                if (res && res.valor) {
+                                    toastr.success('Movimiento guardado');
+                                    $('#formMovimiento')[0].reset();
+                                    $('#txtFechaOperacion').val(new Date().toISOString().split('T')[0]);
+                                    bsModal.hide();
+
+                                    // Actualizar estadísticas y vista del período actual
+                                    await cargarEstadisticas();
+
+                                    // Forzar la actualización inmediata del período actual
+                                    try {
+                                        await fetchPorPeriodo(currentPeriod, currentDate);
+                                    } catch (error) {
+                                        console.error("Error al actualizar la vista del período:", error);
+                                        toastr.error('Error al actualizar la vista del período');
+                                    }
+                                } else {
+                                    const msg = (res && (res.mensaje || res.message)) || 'No se pudo guardar';
+                                    toastr.error(msg);
+                                }
+                            } catch (err) {
+                                toastr.error('Error al guardar');
+                            } finally {
+                                $btn.prop('disabled', false);
+                                $btn.html($btn.data('original-html'));
+                            }
+                        });
+
+                        // Evento para eliminar movimientos (listas de gastos/ingresos)
+                        $('#listaGastosChart, #listaIngresosChart').on('click', '.btn-eliminar', async function(){
+                            if (!confirm('¿Eliminar movimiento?')) return;
+                            const $thisBtn = $(this);
+                            const id = $thisBtn.data('id');
+                            $thisBtn.prop('disabled', true);
+                            try {
+                                const res = await $.ajax({ url: `/Movimiento/Eliminar?id=${id}`, type: 'DELETE' });
+                                if (res && res.valor) {
+                                    toastr.success('Eliminado');
+                                    await cargarEstadisticas();
+                                    // actualizar vista por periodo en caso corresponda
+                                    fetchPorPeriodoDebounced(currentPeriod, currentDate);
+                                }
+                                else {
+                                    const msg = (res && (res.mensaje || res.message)) || 'No se pudo eliminar';
+                                    toastr.error(msg);
+                                }
+                            } catch (err) {
+                                toastr.error('Error al eliminar');
+                            }
+                            finally {
+                                $thisBtn.prop('disabled', false);
+                            }
+                        });
+
+                        // Evento para abrir modal de selección de categorías
+                        $('#btnCategoriaSelected').on('click', function(e){
+                            e.preventDefault();
+                            const modalEl2 = document.getElementById('modalCategorias');
+                            const bs2 = new bootstrap.Modal(modalEl2, { keyboard: true });
+                            const tipo = $('#selTipo').val() || 'G';
+                            renderCategoriaGrid(tipo);
+                            lastFocusedTrigger = this;
+                            bs2.show();
+                        });
+
+                        // =============================================
+                        // SECCIÓN 10: INICIALIZACIÓN Y EVENTOS DE CALENDARIO
+                        // =============================================
+
+                        // Inicializar campo de fecha
+                        $('#txtFechaOperacion').val(new Date().toISOString().split('T')[0]);
+
+                        // Inicializar visualización de fecha y calendario
+                        actualizarVisualizacionFecha();
+                        generarCalendario(calendarDate);
+
+                        // Eventos para cambiar período (día, semana, mes, año)
+                        $('.filter-btn-group .btn').on('click', function() {
+                            // Remover clase active de todos los botones
+                            $('.filter-btn-group .btn').removeClass('active').addClass('btn-outline-primary');
+                            $('.filter-btn-group .btn').removeClass('btn-primary');
+
+                            // Agregar clase active al botón clickeado
+                            $(this).addClass('active').addClass('btn-primary').removeClass('btn-outline-primary');
+
+                            // Obtener período seleccionado
+                            currentPeriod = $(this).data('period');
+
+                            // Actualizar visualización
+                            actualizarVisualizacionFecha();
+
+                            // solicitar datos por periodo (debounced)
+                            fetchPorPeriodoDebounced(currentPeriod, currentDate);
+
+                            console.log('Período seleccionado:', currentPeriod);
+                        });
+
+                        // Eventos para navegación de fechas
+                        $('#prevDate').on('click', () => navegarFecha('prev'));
+                        $('#nextDate').on('click', () => navegarFecha('next'));
+
+                        // Evento para mostrar/ocultar calendario
+                        $('#dateDisplay').on('click', function(e) {
+                            $('#calendarPopup').toggleClass('show');
+                            e.stopPropagation();
+                        });
+
+                        // Cerrar calendario al hacer clic fuera
+                        $(document).on('click', function(e) {
+                            if (!$(e.target).closest('.calendar-container').length) {
+                                $('#calendarPopup').removeClass('show');
+                            }
+                        });
+
+                        // Navegación entre meses en el calendario
+                        $('#prevMonth').on('click', function(e) {
+                            e.stopPropagation();
+                            calendarDate.setMonth(calendarDate.getMonth() - 1);
+                            generarCalendario(calendarDate);
+                        });
+
+                        $('#nextMonth').on('click', function(e) {
+                            e.stopPropagation();
+                            calendarDate.setMonth(calendarDate.getMonth() + 1);
+                            generarCalendario(calendarDate);
+                        });
+
+                        // =============================================
+                        // SECCIÓN 11: INICIALIZACIÓN PRINCIPAL
+                        // =============================================
+
+                        // Función de inicialización
+                        const init = async () => {
+                            await cargarCategorias();
+                            await cargarEstadisticas();
+                            // Cargar datos para el periodo inicial (por defecto 'day' y fecha actual)
+                            await fetchPorPeriodo(currentPeriod, currentDate);
+                        };
+
+                        // Iniciar la aplicación
+                        init();
+                    });
+                })(jQuery);
+            </script>
+
+
+</body>
+</html>
