@@ -3,8 +3,44 @@
   "WorkspaceRootPath": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|c:\\users\\krieg.desktop-6u3iqmj\\onedrive\\im\u00E1genes\\escritorio\\dev\\_dev_web\\edubanck\\edubank_ssr_net\\edubank.appweb\\views\\movimiento\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|solutionrelative:edubank.appweb\\views\\movimiento\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|c:\\users\\krieg.desktop-6u3iqmj\\onedrive\\im\u00E1genes\\escritorio\\dev\\_dev_web\\edubanck\\edubank_ssr_net\\edubank.appweb\\views\\categoria\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|solutionrelative:edubank.appweb\\views\\categoria\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|c:\\users\\krieg.desktop-6u3iqmj\\onedrive\\im\u00E1genes\\escritorio\\dev\\_dev_web\\edubanck\\edubank_ssr_net\\edubank.appweb\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|solutionrelative:edubank.appweb\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|c:\\users\\krieg.desktop-6u3iqmj\\onedrive\\im\u00E1genes\\escritorio\\dev\\_dev_web\\edubanck\\edubank_ssr_net\\edubank.appweb\\wwwroot\\js\\categorias\\categorias.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|solutionrelative:edubank.appweb\\wwwroot\\js\\categorias\\categorias.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|c:\\users\\krieg.desktop-6u3iqmj\\onedrive\\im\u00E1genes\\escritorio\\dev\\_dev_web\\edubanck\\edubank_ssr_net\\edubank.appweb\\wwwroot\\js\\categorias\\index.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|solutionrelative:edubank.appweb\\wwwroot\\js\\categorias\\index.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|c:\\users\\krieg.desktop-6u3iqmj\\onedrive\\im\u00E1genes\\escritorio\\dev\\_dev_web\\edubanck\\edubank_ssr_net\\edubank.appweb\\wwwroot\\js\\categorias\\modales.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|solutionrelative:edubank.appweb\\wwwroot\\js\\categorias\\modales.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|c:\\users\\krieg.desktop-6u3iqmj\\onedrive\\im\u00E1genes\\escritorio\\dev\\_dev_web\\edubanck\\edubank_ssr_net\\edubank.appweb\\wwwroot\\js\\categorias\\eliminar.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|solutionrelative:edubank.appweb\\wwwroot\\js\\categorias\\eliminar.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|c:\\users\\krieg.desktop-6u3iqmj\\onedrive\\im\u00E1genes\\escritorio\\dev\\_dev_web\\edubanck\\edubank_ssr_net\\edubank.appweb\\wwwroot\\js\\categorias\\editar.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|solutionrelative:edubank.appweb\\wwwroot\\js\\categorias\\editar.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|c:\\users\\krieg.desktop-6u3iqmj\\onedrive\\im\u00E1genes\\escritorio\\dev\\_dev_web\\edubanck\\edubank_ssr_net\\edubank.appweb\\wwwroot\\js\\categorias\\agregar.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|solutionrelative:edubank.appweb\\wwwroot\\js\\categorias\\agregar.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|c:\\users\\krieg.desktop-6u3iqmj\\onedrive\\im\u00E1genes\\escritorio\\dev\\_dev_web\\edubanck\\edubank_ssr_net\\edubank.appweb\\wwwroot\\js\\categorias\\listar.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|solutionrelative:edubank.appweb\\wwwroot\\js\\categorias\\listar.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|c:\\users\\krieg.desktop-6u3iqmj\\onedrive\\im\u00E1genes\\escritorio\\dev\\_dev_web\\edubanck\\edubank_ssr_net\\edubank.appweb\\wwwroot\\js\\categorias\\utils.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|solutionrelative:edubank.appweb\\wwwroot\\js\\categorias\\utils.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
     }
   ],
   "DocumentGroupContainers": [
@@ -14,19 +50,136 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 8,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "modales.js",
+              "DocumentMoniker": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\wwwroot\\js\\categorias\\modales.js",
+              "RelativeDocumentMoniker": "EduBank.AppWeb\\wwwroot\\js\\categorias\\modales.js",
+              "ToolTip": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\wwwroot\\js\\categorias\\modales.js",
+              "RelativeToolTip": "EduBank.AppWeb\\wwwroot\\js\\categorias\\modales.js",
+              "ViewState": "AgIAACsAAAAAAAAAAAAmwEgAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-09-22T22:46:11.544Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "eliminar.js",
+              "DocumentMoniker": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\wwwroot\\js\\categorias\\eliminar.js",
+              "RelativeDocumentMoniker": "EduBank.AppWeb\\wwwroot\\js\\categorias\\eliminar.js",
+              "ToolTip": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\wwwroot\\js\\categorias\\eliminar.js",
+              "RelativeToolTip": "EduBank.AppWeb\\wwwroot\\js\\categorias\\eliminar.js",
+              "ViewState": "AgIAABMAAAAAAAAAAAAgwDAAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-09-22T22:45:55.551Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "editar.js",
+              "DocumentMoniker": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\wwwroot\\js\\categorias\\editar.js",
+              "RelativeDocumentMoniker": "EduBank.AppWeb\\wwwroot\\js\\categorias\\editar.js",
+              "ToolTip": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\wwwroot\\js\\categorias\\editar.js",
+              "RelativeToolTip": "EduBank.AppWeb\\wwwroot\\js\\categorias\\editar.js",
+              "ViewState": "AgIAACgAAAAAAAAAAAAgwEUAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-09-22T22:45:01.852Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "agregar.js",
+              "DocumentMoniker": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\wwwroot\\js\\categorias\\agregar.js",
+              "RelativeDocumentMoniker": "EduBank.AppWeb\\wwwroot\\js\\categorias\\agregar.js",
+              "ToolTip": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\wwwroot\\js\\categorias\\agregar.js",
+              "RelativeToolTip": "EduBank.AppWeb\\wwwroot\\js\\categorias\\agregar.js",
+              "ViewState": "AgIAAAEAAAAAAAAAAAA1wB4AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-09-22T22:44:54.259Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "listar.js",
+              "DocumentMoniker": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\wwwroot\\js\\categorias\\listar.js",
+              "RelativeDocumentMoniker": "EduBank.AppWeb\\wwwroot\\js\\categorias\\listar.js",
+              "ToolTip": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\wwwroot\\js\\categorias\\listar.js",
+              "RelativeToolTip": "EduBank.AppWeb\\wwwroot\\js\\categorias\\listar.js",
+              "ViewState": "AgIAACoAAAAAAAAAAAAmwEcAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-09-22T22:44:31.183Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "index.js",
+              "DocumentMoniker": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\wwwroot\\js\\categorias\\index.js",
+              "RelativeDocumentMoniker": "EduBank.AppWeb\\wwwroot\\js\\categorias\\index.js",
+              "ToolTip": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\wwwroot\\js\\categorias\\index.js",
+              "RelativeToolTip": "EduBank.AppWeb\\wwwroot\\js\\categorias\\index.js",
+              "ViewState": "AgIAAB8AAAAAAAAAAAAmwCsAAAA6AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-09-22T22:44:22.295Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "categorias.js",
+              "DocumentMoniker": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\wwwroot\\js\\categorias\\categorias.js",
+              "RelativeDocumentMoniker": "EduBank.AppWeb\\wwwroot\\js\\categorias\\categorias.js",
+              "ToolTip": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\wwwroot\\js\\categorias\\categorias.js",
+              "RelativeToolTip": "EduBank.AppWeb\\wwwroot\\js\\categorias\\categorias.js",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-09-22T18:43:28.015Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "_Layout.cshtml",
+              "DocumentMoniker": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\Views\\Shared\\_Layout.cshtml",
+              "RelativeDocumentMoniker": "EduBank.AppWeb\\Views\\Shared\\_Layout.cshtml",
+              "ToolTip": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\Views\\Shared\\_Layout.cshtml",
+              "RelativeToolTip": "EduBank.AppWeb\\Views\\Shared\\_Layout.cshtml",
+              "ViewState": "AgIAAIMBAAAAAAAAAAAWwJ0BAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-09-22T17:57:20.85Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "Index.cshtml",
-              "DocumentMoniker": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\Views\\Movimiento\\Index.cshtml",
-              "RelativeDocumentMoniker": "EduBank.AppWeb\\Views\\Movimiento\\Index.cshtml",
-              "ToolTip": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\Views\\Movimiento\\Index.cshtml",
-              "RelativeToolTip": "EduBank.AppWeb\\Views\\Movimiento\\Index.cshtml",
-              "ViewState": "AgIAAEkBAAAAAAAAAAAswEYBAABCAAAAAAAAAA==",
+              "DocumentMoniker": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\Views\\Categoria\\Index.cshtml",
+              "RelativeDocumentMoniker": "EduBank.AppWeb\\Views\\Categoria\\Index.cshtml",
+              "ToolTip": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\Views\\Categoria\\Index.cshtml",
+              "RelativeToolTip": "EduBank.AppWeb\\Views\\Categoria\\Index.cshtml",
+              "ViewState": "AgIAAKkAAAAAAAAAAAApwL0AAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-09-09T03:30:57.492Z",
+              "WhenOpened": "2025-09-22T17:49:41.184Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "utils.js",
+              "DocumentMoniker": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\wwwroot\\js\\categorias\\utils.js",
+              "RelativeDocumentMoniker": "EduBank.AppWeb\\wwwroot\\js\\categorias\\utils.js",
+              "ToolTip": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\wwwroot\\js\\categorias\\utils.js",
+              "RelativeToolTip": "EduBank.AppWeb\\wwwroot\\js\\categorias\\utils.js",
+              "ViewState": "AgIAACIBAAAAAAAAAAAgwDMBAAAuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-09-22T22:43:17.652Z",
               "EditorCaption": ""
             }
           ]

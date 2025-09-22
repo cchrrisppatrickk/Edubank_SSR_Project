@@ -175,3 +175,4 @@ C:\Users\krieg.DESKTOP-6U3IQMJ\OneDrive\Imágenes\Escritorio\Dev\_Dev_Web\EduBan
 C:\Users\krieg.DESKTOP-6U3IQMJ\OneDrive\Imágenes\Escritorio\Dev\_Dev_Web\EduBanck\EduBank_SSR_NET\EduBank.AppWeb\bin\Debug\net8.0\EduBank.BLL.pdb
 C:\Users\krieg.DESKTOP-6U3IQMJ\OneDrive\Imágenes\Escritorio\Dev\_Dev_Web\EduBanck\EduBank_SSR_NET\EduBank.AppWeb\bin\Debug\net8.0\EduBank.DAL.pdb
 C:\Users\krieg.DESKTOP-6U3IQMJ\OneDrive\Imágenes\Escritorio\Dev\_Dev_Web\EduBanck\EduBank_SSR_NET\EduBank.AppWeb\bin\Debug\net8.0\EduBank.Models.pdb
+C:\Users\krieg.DESKTOP-6U3IQMJ\OneDrive\Imágenes\Escritorio\Dev\_Dev_Web\EduBanck\EduBank_SSR_NET\EduBank.AppWeb\obj\Debug\net8.0\EduBank.AppWeb.sourcelink.json

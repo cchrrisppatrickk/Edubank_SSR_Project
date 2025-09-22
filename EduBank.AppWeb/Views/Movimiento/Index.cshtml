@@ -370,6 +370,83 @@
                         const PERIOD_MAP = { day: 'dia', week: 'semana', month: 'mes', year: 'año' };
 
                         // =============================================
+                        // SECCIÓN 3: EDITAR
+                        // =============================================
+
+                                        // Función para cargar datos de un movimiento para editar
+                                        // Función para cargar datos de un movimiento para editar (mejorada)
+                        const cargarMovimientoParaEditar = async (movimientoId) => {
+                            try {
+                                const res = await $.get(`/Movimiento/ObtenerJson?id=${movimientoId}`);
+                                if (res && res.movimientoId) {
+                                    // Llenar el formulario con los datos del movimiento
+                                    $('#txtMovimientoId').val(res.movimientoId);
+                                    $('#selTipo').val(res.tipo || 'G');
+                                    $('#selCategoria').val(res.categoriaId || 0);
+                                    $('#txtFechaOperacion').val(formatDateISO(new Date(res.fechaOperacion)));
+                                    $('#txtMonto').val(Number(res.monto || 0).toFixed(2));
+                                    $('#txtComentario').val(res.comentario || '');
+
+                                    // Actualizar la visualización de la categoría seleccionada
+                                    const catInfo = categoriasMap[Number(res.categoriaId)];
+                                    if (catInfo) {
+                                        const color = normalizeHex(catInfo.color) || '#6c757d';
+                                        const $badge = $('#btnCategoriaBadge');
+                                        const $label = $('#btnCategoriaLabel');
+
+                                        $badge.css('background-color', color);
+                                        $badge.css('color', textColorForBg(color));
+                                        $badge.empty();
+                                        if (isValidIconClass(catInfo.icono)) {
+                                            $badge.append($('<i>').addClass(catInfo.icono));
+                                        } else {
+                                            $badge.text((catInfo.nombre || '').substring(0, 1).toUpperCase());
+                                        }
+                                        $label.text(catInfo.nombre);
+                                    } else {
+                                        // Si no se encuentra la categoría, mostrar un mensaje
+                                        $('#btnCategoriaLabel').text('Categoría no encontrada');
+                                        $('#btnCategoriaBadge').css('background-color', '#dc3545').css('color', 'white')
+                                            .empty().append($('<i>').addClass('bi bi-exclamation-triangle'));
+                                    }
+
+                                    // Actualizar badge visual del tipo
+                                    const isI = (res.tipo === 'I');
+                                    const $badgeType = $('<span>').addClass('mov-type-badge ' + (isI ? 'income' : 'expense')).text(isI ? 'Ingreso' : 'Gasto');
+                                    $('#movModalTypeBadge').empty().append($badgeType);
+
+                                    // Actualizar título del modal y mensaje informativo
+                                    $('#movModalLabel').contents().filter(function() {
+                                        return this.nodeType === 3;
+                                    }).first().replaceWith(isI ? 'Editar ingreso ' : 'Editar gasto ');
+
+                                    // Mostrar mensaje informativo para edición
+                                    if (!$('#edicionInfo').length) {
+                                        const $info = $('<div id="edicionInfo" class="alert alert-info alert-dismissible fade show small mt-2 mb-0"></div>');
+                                        $info.html('<i class="bi bi-info-circle me-1"></i>La categoría actual se mantendrá si no selecciona una nueva. <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>');
+                                        $('#formMovimiento .modal-body').prepend($info);
+                                    } else {
+                                        $('#edicionInfo').show();
+                                    }
+
+                                    // Mostrar el modal
+                                    const modalEl = document.getElementById('movModal');
+                                    const bsModal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+                                    bsModal.show();
+
+                                    // Enfocar campo de monto
+                                    setTimeout(() => $('#txtMonto').focus(), 250);
+                                } else {
+                                    toastr.error('No se pudieron cargar los datos del movimiento');
+                                }
+                            } catch (err) {
+                                toastr.error('Error al cargar el movimiento para editar');
+                                console.error('Error al cargar movimiento:', err);
+                            }
+                        };
+
+
+                        // =============================================
                         // SECCIÓN 3: FUNCIONES DE UTILIDAD Y FORMATEO
                         // =============================================
 
@@ -594,6 +671,7 @@
                         };
 
                         // Crea elemento de lista para movimientos recientes (usada en listas de gasto/ingreso)
+                                       // Crea elemento de lista para movimientos recientes (usada en listas de gasto/ingreso)
                         const crearItemLista = (r) => {
                             const fecha = r.fechaOperacion || r.fecha || '';
                             const nombre = r.categoriaNombre ?? r.categoria ?? (categoriasMap[Number(r.categoriaId)]?.nombre ?? '');
@@ -631,10 +709,26 @@
                             $right.append($('<div>').addClass('fw-bold').text(montoFmt));
                             $right.append($('<div>').addClass('small text-muted').text(tipo));
 
+                            // Contenedor para botones de acciones
+                            const $btnWrap = $('<div>').addClass('mt-1 d-flex gap-1');
+
+                            // Botón para editar movimiento
+                            const $btnEditar = $('<button>')
+                                .addClass('btn btn-sm btn-outline-primary btn-editar')
+                                .attr('type', 'button')
+                                .attr('title', 'Editar')
+                                .attr('data-id', r.movimientoId)
+                                .html('<i class="bi bi-pencil"></i>');
+
                             // Botón para eliminar movimiento
-                            const $btnWrap = $('<div>').addClass('mt-1');
-                            const $btn = $('<button>').addClass('btn btn-sm btn-danger btn-eliminar').attr('type', 'button').attr('title','Eliminar').attr('data-id', r.movimientoId).text('⨯');
-                            $btnWrap.append($btn);
+                            const $btnEliminar = $('<button>')
+                                .addClass('btn btn-sm btn-danger btn-eliminar')
+                                .attr('type', 'button')
+                                .attr('title', 'Eliminar')
+                                .attr('data-id', r.movimientoId)
+                                .html('<i class="bi bi-trash"></i>');
+
+                            $btnWrap.append($btnEditar, $btnEliminar);
                             $right.append($btnWrap);
 
                             $li.append($left).append($right);
@@ -1143,15 +1237,27 @@
                         const bsModal = new bootstrap.Modal(modalEl, { keyboard: true });
 
                         // Evento para botones de tipo de movimiento (Gasto/Ingreso)
+                                       // Evento para botones de tipo de movimiento (modificar el existente)
+                                        // Evento para botones de tipo de movimiento (solo creación)
                         $('.btn-mov-type').on('click', function(){
                             lastFocusedTrigger = this;
                             const tipo = $(this).data('type');
                             const isI = (tipo === 'I');
 
-                            // Reiniciar formulario
+                            // Reiniciar formulario completamente para creación
                             $('#txtMovimientoId').val(0);
                             $('#formMovimiento')[0].reset();
-                            // Establecer fecha actual en el campo de fecha
+                            $('#selCategoria').val(0);
+
+                            // Ocultar mensaje informativo de edición
+                            $('#edicionInfo').hide();
+
+                            // Restablecer visualización de categoría
+                            $('#btnCategoriaBadge').css('background-color', '#e9ecef').css('color', '#6c757d').empty()
+                                .append($('<i>').addClass('bi bi-palette'));
+                            $('#btnCategoriaLabel').text('Categoría');
+
+                            // Establecer fecha actual
                             $('#txtFechaOperacion').val(new Date().toISOString().split('T')[0]);
 
                             // Configurar tipo y categorías
@@ -1167,15 +1273,17 @@
                                 return this.nodeType === 3;
                             }).first().replaceWith(isI ? 'Agregar ingreso ' : 'Agregar gasto ');
 
-                            // Mostrar advertencia si no hay categorías
+                            // Mostrar advertencia si no hay categorías (solo para creación)
                             if ($('#selCategoria').prop('disabled')) {
                                 toastr.warning('No hay categorías disponibles para este tipo. Crea una categoría primero.');
                             }
 
+                            const modalEl = document.getElementById('movModal');
+                            const bsModal = new bootstrap.Modal(modalEl, { keyboard: true });
                             bsModal.show();
 
                             // Enfocar campo de monto
-                            setTimeout(()=> $('#txtMonto').focus(), 250);
+                            setTimeout(() => $('#txtMonto').focus(), 250);
                         });
 
                         // Restaurar foco al cerrar modal
@@ -1186,6 +1294,9 @@
                         });
 
                         // Evento para enviar formulario de movimiento
+                        // Evento para enviar formulario de movimiento (modificar el existente)
+                        // Evento para enviar formulario de movimiento (modificar validación)
+                                        // Evento para enviar formulario de movimiento (VERSIÓN CORREGIDA)
                         $('#formMovimiento').submit(async function(e){
                             e.preventDefault();
                             const $btn = $(this).find('button[type="submit"]');
@@ -1194,74 +1305,126 @@
                             $btn.html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Guardando...');
 
                             // Preparar datos del formulario
+                            const movimientoId = Number($('#txtMovimientoId').val() || 0);
+                            const categoriaSeleccionada = Number($('#selCategoria').val() || 0);
+
                             const modelo = {
-                                MovimientoId: Number($('#txtMovimientoId').val() || 0),
-                                CategoriaId: Number($('#selCategoria').val() || 0),
+                                MovimientoId: movimientoId,
+                                CategoriaId: categoriaSeleccionada,
                                 Tipo: $('#selTipo').val(),
                                 FechaOperacion: $('#txtFechaOperacion').val(),
                                 Monto: Number($('#txtMonto').val() || 0),
                                 Comentario: $('#txtComentario').val()
                             };
 
-                            // Validaciones
-                            if (!modelo.CategoriaId || modelo.CategoriaId === 0) {
-                                toastr.warning('Seleccione una categoría');
-                                $btn.prop('disabled', false).html($btn.data('original-html'));
-                                return;
-                            }
+                            // Validaciones básicas
                             if (!(modelo.Monto > 0)) {
                                 toastr.warning('Ingrese un monto válido mayor a 0');
                                 $btn.prop('disabled', false).html($btn.data('original-html'));
                                 return;
                             }
-                            const catInfo = categoriasMap[modelo.CategoriaId];
-                            if (!catInfo) {
-                                toastr.warning('Categoría inválida');
-                                $btn.prop('disabled', false).html($btn.data('original-html'));
-                                return;
-                            }
-                            if (normalizeTipo(catInfo.tipo) !== normalizeTipo(modelo.Tipo)) {
-                                toastr.warning('La categoría seleccionada no corresponde al tipo de movimiento.');
+
+                            // MANEJO ESPECIAL PARA EDICIÓN: Si es edición y no se seleccionó categoría, mantener la original
+                            const esEdicion = movimientoId > 0;
+
+                            if (esEdicion && (!categoriaSeleccionada || categoriaSeleccionada === 0)) {
+                                // En edición, si no se cambió la categoría, usar la original del movimiento
+                                try {
+                                    const movimientoOriginal = await $.get(`/Movimiento/ObtenerJson?id=${movimientoId}`);
+                                    if (movimientoOriginal && movimientoOriginal.categoriaId) {
+                                        modelo.CategoriaId = movimientoOriginal.categoriaId;
+                                        console.log('Manteniendo categoría original:', modelo.CategoriaId);
+                                    } else {
+                                        toastr.warning('No se pudo obtener la categoría original del movimiento');
+                                        $btn.prop('disabled', false).html($btn.data('original-html'));
+                                        return;
+                                    }
+                                } catch (err) {
+                                    console.error('Error al obtener movimiento original:', err);
+                                    toastr.warning('Error al obtener la categoría original');
+                                    $btn.prop('disabled', false).html($btn.data('original-html'));
+                                    return;
+                                }
+                            } else if (!esEdicion && (!categoriaSeleccionada || categoriaSeleccionada === 0)) {
+                                // Para creación: categoría es obligatoria
+                                toastr.warning('Seleccione una categoría');
                                 $btn.prop('disabled', false).html($btn.data('original-html'));
                                 return;
                             }
 
+                            // Validación de tipo de categoría (solo si se seleccionó una nueva categoría)
+                            if (categoriaSeleccionada && categoriaSeleccionada !== 0) {
+                                const catInfo = categoriasMap[categoriaSeleccionada];
+                                if (!catInfo) {
+                                    toastr.warning('Categoría inválida');
+                                    $btn.prop('disabled', false).html($btn.data('original-html'));
+                                    return;
+                                }
+
+                                // Verificar que el tipo de categoría coincida con el tipo de movimiento
+                                const tipoCategoria = normalizeTipo(catInfo.tipo);
+                                const tipoMovimiento = normalizeTipo(modelo.Tipo);
+
+                                if (tipoCategoria !== tipoMovimiento) {
+                                    toastr.warning('La categoría seleccionada no corresponde al tipo de movimiento.');
+                                    $btn.prop('disabled', false).html($btn.data('original-html'));
+                                    return;
+                                }
+                            }
+
                             try {
-                                // Enviar datos al servidor
+                                // Determinar si es creación o actualización
+                                const url = esEdicion ? '/Movimiento/Actualizar' : '/Movimiento/Insertar';
+                                const method = esEdicion ? 'PUT' : 'POST';
+
+                                console.log('Enviando datos:', modelo); // Para debugging
+
                                 const res = await $.ajax({
-                                    url: '/Movimiento/Insertar',
-                                    type: 'POST',
+                                    url: url,
+                                    type: method,
                                     contentType: 'application/json',
                                     data: JSON.stringify(modelo)
                                 });
 
                                 if (res && res.valor) {
-                                    toastr.success('Movimiento guardado');
-                                    $('#formMovimiento')[0].reset();
-                                    $('#txtFechaOperacion').val(new Date().toISOString().split('T')[0]);
-                                    bsModal.hide();
+                                    toastr.success(esEdicion ? 'Movimiento actualizado' : 'Movimiento guardado');
+
+                                    // Resetear formulario solo si no es edición
+                                    if (!esEdicion) {
+                                        $('#formMovimiento')[0].reset();
+                                        $('#txtMovimientoId').val(0);
+                                        $('#txtFechaOperacion').val(new Date().toISOString().split('T')[0]);
+
+                                        // Resetear visualización de categoría
+                                        $('#btnCategoriaBadge').css('background-color', '#e9ecef')
+                                            .css('color', '#6c757d')
+                                            .empty()
+                                            .append($('<i>').addClass('bi bi-palette'));
+                                        $('#btnCategoriaLabel').text('Categoría');
+                                    }
+
+                                    const modalEl = document.getElementById('movModal');
+                                    const bsModal = bootstrap.Modal.getInstance(modalEl);
+                                    if (bsModal) bsModal.hide();
 
                                     // Actualizar estadísticas y vista del período actual
                                     await cargarEstadisticas();
+                                    await fetchPorPeriodo(currentPeriod, currentDate);
 
-                                    // Forzar la actualización inmediata del período actual
-                                    try {
-                                        await fetchPorPeriodo(currentPeriod, currentDate);
-                                    } catch (error) {
-                                        console.error("Error al actualizar la vista del período:", error);
-                                        toastr.error('Error al actualizar la vista del período');
-                                    }
                                 } else {
                                     const msg = (res && (res.mensaje || res.message)) || 'No se pudo guardar';
                                     toastr.error(msg);
                                 }
                             } catch (err) {
-                                toastr.error('Error al guardar');
+                                console.error('Error en guardado:', err);
+                                toastr.error('Error al guardar: ' + (err.responseText || 'Error desconocido'));
                             } finally {
                                 $btn.prop('disabled', false);
                                 $btn.html($btn.data('original-html'));
                             }
                         });
+
+                        
 
                         // Evento para eliminar movimientos (listas de gastos/ingresos)
                         $('#listaGastosChart, #listaIngresosChart').on('click', '.btn-eliminar', async function(){
@@ -1288,6 +1451,13 @@
                                 $thisBtn.prop('disabled', false);
                             }
                         });
+
+                        // Evento para editar movimientos (agregar después del evento de eliminar)
+                        $('#listaGastosChart, #listaIngresosChart').on('click', '.btn-editar', async function(){
+                            const movimientoId = $(this).data('id');
+                            await cargarMovimientoParaEditar(movimientoId);
+                        });
+
 
                         // Evento para abrir modal de selección de categorías
                         $('#btnCategoriaSelected').on('click', function(e){

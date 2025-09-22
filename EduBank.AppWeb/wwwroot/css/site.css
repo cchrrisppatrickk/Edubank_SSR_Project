@@ -11,6 +11,18 @@ html {
     }
 }
 
+
+/* Agregar estos estilos si es necesario */
+.btn-editar, .btn-eliminar {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.cat-cell {
+    flex: 1;
+}
+
+
 body {
     margin-bottom: 0; /* Cambiado de 60px a 0 porque ahora tenemos un footer fijo */
     background: #f8fafc;
