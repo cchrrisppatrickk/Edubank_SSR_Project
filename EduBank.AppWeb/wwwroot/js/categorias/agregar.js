@@ -1,4 +1,4 @@
-﻿// wwwroot/js/categorias/agregar.js
+﻿    // wwwroot/js/categorias/agregar.js
 class AgregarCategorias {
     constructor(manager) {
         this.manager = manager;

@@ -1,12 +1,105 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|c:\\users\\krieg.desktop-6u3iqmj\\onedrive\\im\u00E1genes\\escritorio\\dev\\_dev_web\\edubanck\\edubank_ssr_net\\edubank.appweb\\wwwroot\\js\\movimientos\\crud.funciones.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|solutionrelative:edubank.appweb\\wwwroot\\js\\movimientos\\crud.funciones.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|c:\\users\\krieg.desktop-6u3iqmj\\onedrive\\im\u00E1genes\\escritorio\\dev\\_dev_web\\edubanck\\edubank_ssr_net\\edubank.appweb\\wwwroot\\js\\movimientos\\graficos.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|solutionrelative:edubank.appweb\\wwwroot\\js\\movimientos\\graficos.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|c:\\users\\krieg.desktop-6u3iqmj\\onedrive\\im\u00E1genes\\escritorio\\dev\\_dev_web\\edubanck\\edubank_ssr_net\\edubank.appweb\\wwwroot\\js\\movimientos\\utils.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|solutionrelative:edubank.appweb\\wwwroot\\js\\movimientos\\utils.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|c:\\users\\krieg.desktop-6u3iqmj\\onedrive\\im\u00E1genes\\escritorio\\dev\\_dev_web\\edubanck\\edubank_ssr_net\\edubank.appweb\\views\\movimiento\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|solutionrelative:edubank.appweb\\views\\movimiento\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|c:\\users\\krieg.desktop-6u3iqmj\\onedrive\\im\u00E1genes\\escritorio\\dev\\_dev_web\\edubanck\\edubank_ssr_net\\edubank.appweb\\wwwroot\\js\\movimientos\\index.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|solutionrelative:edubank.appweb\\wwwroot\\js\\movimientos\\index.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": []
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 3,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\Views\\Movimiento\\Index.cshtml",
+              "RelativeDocumentMoniker": "EduBank.AppWeb\\Views\\Movimiento\\Index.cshtml",
+              "ToolTip": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\Views\\Movimiento\\Index.cshtml",
+              "RelativeToolTip": "EduBank.AppWeb\\Views\\Movimiento\\Index.cshtml",
+              "ViewState": "AgIAAC8BAAAAAAAAAAAAADsBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-09-22T23:44:48.865Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "utils.js",
+              "DocumentMoniker": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\wwwroot\\js\\movimientos\\utils.js",
+              "RelativeDocumentMoniker": "EduBank.AppWeb\\wwwroot\\js\\movimientos\\utils.js",
+              "ToolTip": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\wwwroot\\js\\movimientos\\utils.js",
+              "RelativeToolTip": "EduBank.AppWeb\\wwwroot\\js\\movimientos\\utils.js",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAIAAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-09-22T23:41:45.492Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "graficos.js",
+              "DocumentMoniker": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\wwwroot\\js\\movimientos\\graficos.js",
+              "RelativeDocumentMoniker": "EduBank.AppWeb\\wwwroot\\js\\movimientos\\graficos.js",
+              "ToolTip": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\wwwroot\\js\\movimientos\\graficos.js",
+              "RelativeToolTip": "EduBank.AppWeb\\wwwroot\\js\\movimientos\\graficos.js",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwBAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-09-22T23:41:38.399Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "crud.funciones.js",
+              "DocumentMoniker": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\wwwroot\\js\\movimientos\\crud.funciones.js",
+              "RelativeDocumentMoniker": "EduBank.AppWeb\\wwwroot\\js\\movimientos\\crud.funciones.js",
+              "ToolTip": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\wwwroot\\js\\movimientos\\crud.funciones.js",
+              "RelativeToolTip": "EduBank.AppWeb\\wwwroot\\js\\movimientos\\crud.funciones.js",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAvAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-09-22T23:40:43.095Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "index.js",
+              "DocumentMoniker": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\wwwroot\\js\\movimientos\\index.js",
+              "RelativeDocumentMoniker": "EduBank.AppWeb\\wwwroot\\js\\movimientos\\index.js",
+              "ToolTip": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\wwwroot\\js\\movimientos\\index.js",
+              "RelativeToolTip": "EduBank.AppWeb\\wwwroot\\js\\movimientos\\index.js",
+              "ViewState": "AgIAABcAAAAAAAAAAAAmwDQAAAADAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-09-22T23:40:28.388Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
     }
   ]
 }
