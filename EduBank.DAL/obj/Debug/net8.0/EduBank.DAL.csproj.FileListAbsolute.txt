@@ -15,3 +15,4 @@ C:\Users\krieg.DESKTOP-6U3IQMJ\OneDrive\Imágenes\Escritorio\Dev\_Dev_Web\EduBan
 C:\Users\krieg.DESKTOP-6U3IQMJ\OneDrive\Imágenes\Escritorio\Dev\_Dev_Web\EduBanck\EduBank_SSR_NET\EduBank.DAL\bin\Debug\net8.0\EduBank.Models.dll
 C:\Users\krieg.DESKTOP-6U3IQMJ\OneDrive\Imágenes\Escritorio\Dev\_Dev_Web\EduBanck\EduBank_SSR_NET\EduBank.DAL\bin\Debug\net8.0\EduBank.Models.pdb
 C:\Users\krieg.DESKTOP-6U3IQMJ\OneDrive\Imágenes\Escritorio\Dev\_Dev_Web\EduBanck\EduBank_SSR_NET\EduBank.DAL\obj\Debug\net8.0\EduBank..2B0B359A.Up2Date
+C:\Users\krieg.DESKTOP-6U3IQMJ\OneDrive\Imágenes\Escritorio\Dev\_Dev_Web\EduBanck\EduBank_SSR_NET\EduBank.DAL\obj\Debug\net8.0\EduBank.DAL.sourcelink.json

@@ -12,3 +12,4 @@ C:\Users\krieg.DESKTOP-6U3IQMJ\OneDrive\Imágenes\Escritorio\Dev\_Dev_Web\EduBan
 C:\Users\krieg.DESKTOP-6U3IQMJ\OneDrive\Imágenes\Escritorio\Dev\_Dev_Web\EduBanck\EduBank_SSR_NET\EduBank.Models\obj\Debug\net8.0\EduBank.Models.pdb
 C:\Users\krieg.DESKTOP-6U3IQMJ\OneDrive\Imágenes\Escritorio\Dev\_Dev_Web\EduBanck\EduBank_SSR_NET\EduBank.Models\obj\Debug\net8.0\EduBank.Models.genruntimeconfig.cache
 C:\Users\krieg.DESKTOP-6U3IQMJ\OneDrive\Imágenes\Escritorio\Dev\_Dev_Web\EduBanck\EduBank_SSR_NET\EduBank.Models\obj\Debug\net8.0\ref\EduBank.Models.dll
+C:\Users\krieg.DESKTOP-6U3IQMJ\OneDrive\Imágenes\Escritorio\Dev\_Dev_Web\EduBanck\EduBank_SSR_NET\EduBank.Models\obj\Debug\net8.0\EduBank.Models.sourcelink.json

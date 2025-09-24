@@ -1,39 +1,32 @@
 ﻿// wwwroot/js/movimientos/utils.js
 class MovimientosUtils {
-    // Configuración de toastr
-    static toastrConfig = {
-        "closeButton": true,
-        "debug": false,
-        "newestOnTop": true,
-        "progressBar": true,
-        "positionClass": "toast-top-right",
-        "preventDuplicates": true,
-        "timeOut": "3500",
-        "extendedTimeOut": "1000",
-        "showEasing": "swing",
-        "hideEasing": "linear",
-        "showMethod": "fadeIn",
-        "hideMethod": "fadeOut"
-    };
+    static token = $('input[name="__RequestVerificationToken"]').val();
 
-    // Mapeo de periodos frontend -> backend
-    static PERIOD_MAP = { day: 'dia', week: 'semana', month: 'mes', year: 'año' };
+    static ajaxOptions(opts) {
+        if (this.token) {
+            opts.headers = opts.headers || {};
+            opts.headers["RequestVerificationToken"] = this.token;
+        }
+        return opts;
+    }
 
-    // Función de seguridad para escapar HTML
-    static escapeHtml(unsafe) {
-        if (unsafe === null || unsafe === undefined) return '';
-        return String(unsafe)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
+    static mostrarError(xhr) {
+        try {
+            const json = xhr.responseJSON || JSON.parse(xhr.responseText);
+            const msg = json?.mensaje || json?.message || "Error en la solicitud";
+            toastr.error(msg);
+        } catch (e) {
+            toastr.error('Error en la solicitud');
+        }
     }
 
     // Formateador de moneda
     static fmt(v) {
         try {
-            return new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(Number(v || 0));
+            return new Intl.NumberFormat('es-PE', {
+                style: 'currency',
+                currency: 'PEN'
+            }).format(Number(v || 0));
         } catch (e) {
             return 'S/ ' + (Number(v || 0)).toFixed(2);
         }
@@ -41,15 +34,20 @@ class MovimientosUtils {
 
     // Generador de paleta de colores para gráficos
     static palette(n) {
-        const base = ['#4dc9f6','#f67019','#f53794','#537bc4','#acc236','#166a8f','#00a950','#58595b','#8549ba','#b91d47'];
+        const base = ['#4dc9f6', '#f67019', '#f53794', '#537bc4', '#acc236', '#166a8f', '#00a950', '#58595b', '#8549ba', '#b91d47'];
         const out = [];
         for (let i = 0; i < n; i++) out.push(base[i % base.length]);
         return out;
     }
 
     // Funciones para determinar tipo de movimiento
-    static isGasto(t) { return (t || '').toString().toUpperCase().startsWith('G'); }
-    static isIngreso(t) { return (t || '').toString().toUpperCase().startsWith('I'); }
+    static isGasto(t) {
+        return (t || '').toString().toUpperCase().startsWith('G');
+    }
+
+    static isIngreso(t) {
+        return (t || '').toString().toUpperCase().startsWith('I');
+    }
 
     // Normalizador de colores hexadecimales
     static normalizeHex(c) {
@@ -71,16 +69,18 @@ class MovimientosUtils {
         return /^([a-z0-9\-\s]+)$/i.test(cls);
     }
 
-    // Calculador de color de texto según fondo (para contraste)
+    // Calculador de color de texto según fondo
     static textColorForBg(hex) {
         try {
             const c = (hex || '#000').replace('#', '');
-            const r = parseInt(c.substr(0, 2), 16),
-                  g = parseInt(c.substr(2, 2), 16),
-                  b = parseInt(c.substr(4, 2), 16);
+            const r = parseInt(c.substr(0, 2), 16);
+            const g = parseInt(c.substr(2, 2), 16);
+            const b = parseInt(c.substr(4, 2), 16);
             const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
             return lum > 180 ? '#000' : '#fff';
-        } catch (e) { return '#fff'; }
+        } catch (e) {
+            return '#fff';
+        }
     }
 
     // Normalizador de tipo de categoría
@@ -111,19 +111,14 @@ class MovimientosUtils {
         };
     }
 
-    // Obtiene color para etiqueta de gráfico
-    static getColorForLabel(label, index, fallbackPalette, categoriasByName, categoriasMap) {
-        const key = (label || '').toString().trim().toLowerCase();
-        let info = categoriasByName[key];
-        if (!info) {
-            for (const id in categoriasMap) {
-                const n = (categoriasMap[id].nombre || '').toString().trim().toLowerCase();
-                if (n === key) { info = categoriasMap[id]; break; }
-            }
-        }
-        let color = info?.color || info?.categoriaColor || null;
-        color = this.normalizeHex(color);
-        if (!color) color = fallbackPalette[index % fallbackPalette.length];
-        return color;
+    // Escape HTML para prevenir XSS
+    static escapeHtml(unsafe) {
+        if (unsafe === null || unsafe === undefined) return '';
+        return String(unsafe)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
     }
 }

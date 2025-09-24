@@ -94,24 +94,38 @@ namespace EduBank.AppWeb.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CambiarEstado([FromBody] dynamic model)
+        public async Task<IActionResult> CambiarEstado([FromBody] CambiarEstadoRequest model)
         {
-            // Model expected: { CategoriaId: int, Activo: bool }
+            if (model == null)
+                return BadRequest(new { valor = false, mensaje = "Datos inválidos" });
+
+            if (model.CategoriaId <= 0)
+                return BadRequest(new { valor = false, mensaje = "ID de categoría inválido" });
+
             try
             {
-                int id = (int)model.CategoriaId;
-                bool activo = (bool)model.Activo;
-                var c = await _categoriaService.Obtener(id);
-                if (c == null) return NotFound(new { valor = false, mensaje = "No encontrada" });
+                var categoria = await _categoriaService.Obtener(model.CategoriaId);
+                if (categoria == null)
+                    return NotFound(new { valor = false, mensaje = "Categoría no encontrada" });
 
-                c.Activo = activo;
-                var ok = await _categoriaService.Actualizar(c);
-                return Ok(new { valor = ok });
+                categoria.Activo = model.Activo;
+                var resultado = await _categoriaService.Actualizar(categoria);
+
+                return Ok(new { valor = resultado });
             }
-            catch
+            catch (Exception ex)
             {
-                return BadRequest(new { valor = false, mensaje = "Datos inválidos" });
+                // Log the exception
+                return StatusCode(500, new { valor = false, mensaje = "Error interno del servidor" });
             }
         }
+
+        // Agregar esta clase en el mismo archivo del Controller
+        public class CambiarEstadoRequest
+        {
+            public int CategoriaId { get; set; }
+            public bool Activo { get; set; }
+        }
+
     }
 }
