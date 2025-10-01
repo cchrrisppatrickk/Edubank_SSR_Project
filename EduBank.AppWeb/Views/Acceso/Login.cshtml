@@ -1,0 +1,61 @@
+﻿@model EduBank.Models.ViewModel.LoginViewModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - EduBank</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+</head>
+<body>
+    <div class="container">
+        <div class="row mt-5 justify-content-center">
+            <div class="col-sm-4">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white text-center">
+                        <h4>Iniciar Sesión</h4>
+                    </div>
+                    <div class="card-body">
+                        <form asp-controller="Acceso" asp-action="Login" method="post">
+                            <div class="mb-3">
+                                <label for="CorreoElectronico" class="form-label">Correo Electrónico</label>
+                                <input class="form-control" type="email" placeholder="Correo Electrónico" asp-for="CorreoElectronico" required />
+                                <span asp-validation-for="CorreoElectronico" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="Contrasena" class="form-label">Contraseña</label>
+                                <input class="form-control" type="password" placeholder="Contraseña" asp-for="Contrasena" required />
+                                <span asp-validation-for="Contrasena" class="text-danger"></span>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+                            </div>
+
+                            @if (ViewData["Mensaje"] != null)
+                            {
+                                <div class="alert alert-danger mt-3" role="alert">
+                                    @ViewData["Mensaje"]
+                                </div>
+                            }
+
+                            <div class="text-center mt-3">
+                                ¿NO TIENES UNA CUENTA?
+                                <a asp-controller="Acceso" asp-action="Registrarse">Regístrate aquí</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

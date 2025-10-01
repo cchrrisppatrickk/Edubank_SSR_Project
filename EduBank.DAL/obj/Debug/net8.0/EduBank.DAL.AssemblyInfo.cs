@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("EduBank.DAL")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+eb5fbba9f68ba0c0f524179e9d6762d825370394")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8c11526b96b13dd6579a0c005c895001366122bd")]
 [assembly: System.Reflection.AssemblyProductAttribute("EduBank.DAL")]
 [assembly: System.Reflection.AssemblyTitleAttribute("EduBank.DAL")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

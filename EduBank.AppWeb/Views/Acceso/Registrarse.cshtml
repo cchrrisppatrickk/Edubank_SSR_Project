@@ -1,0 +1,57 @@
+﻿@model EduBank.Models.ViewModel.RegistroViewModel
+@{
+    Layout = null;
+}
+<head>
+    <title>Registrarse</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+</head>
+
+<div class="row mt-5 justify-content-center">
+    <div class="col-sm-4">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white text-center">
+                <h4>Regístrate</h4>
+            </div>
+            <div class="card-body">
+                <form asp-controller="Acceso" asp-action="Registrarse" method="post">
+
+                    <input class="form-control mb-3" type="text" placeholder="Nombre" asp-for="Nombre" required />
+                    <span asp-validation-for="Nombre" class="text-danger"></span>
+
+                    <input class="form-control mb-3" type="text" placeholder="Apellidos" asp-for="Apellidos" required />
+                    <span asp-validation-for="Apellidos" class="text-danger"></span>
+
+                    <input class="form-control mb-3" type="email" placeholder="Correo" asp-for="CorreoElectronico" required />
+                    <span asp-validation-for="CorreoElectronico" class="text-danger"></span>
+
+                    <input class="form-control mb-3" type="password" placeholder="Contraseña" asp-for="Contrasena" required />
+                    <span asp-validation-for="Contrasena" class="text-danger"></span>
+
+                    <input class="form-control mb-3" type="password" placeholder="Confirmar contraseña" asp-for="ConfirmarContrasena" required />
+                    <span asp-validation-for="ConfirmarContrasena" class="text-danger"></span>
+                    <div class="d-grid gap-2 mb-3">
+                        <button class="btn btn-primary" type="submit">Registrarse</button>
+                    </div>
+
+
+                    @if (ViewData["Mensaje"] != null)
+                    {
+                        <div class="alert alert-danger " role="alert">
+                            @ViewData["Mensaje"]
+                        </div>
+
+                    }
+                    ¿YA TIENES CUENTA? <a asp-controller="Acceso" asp-action="Login">Iniciar sesión</a>
+
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+}
