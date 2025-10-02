@@ -28,7 +28,6 @@ namespace EduBank.DAL.Repository
             }
             catch (Exception)
             {
-                // logear excepción aquí con ILogger
                 throw;
             }
         }
@@ -44,7 +43,9 @@ namespace EduBank.DAL.Repository
         {
             var entidad = await _db.Categorias.FindAsync(id);
             if (entidad == null) return false;
-            _db.Categorias.Remove(entidad);
+
+            // Soft delete en lugar de eliminar físicamente
+            entidad.Activo = false;
             var affected = await _db.SaveChangesAsync();
             return affected > 0;
         }
@@ -52,12 +53,38 @@ namespace EduBank.DAL.Repository
         public async Task<Categoria?> Obtener(int id)
         {
             return await _db.Categorias
-                .FirstOrDefaultAsync(c => c.CategoriaId == id);
+                .FirstOrDefaultAsync(c => c.CategoriaId == id && c.Activo);
+        }
+
+        // NUEVO: Obtener categoría por ID y Usuario
+        public async Task<Categoria?> ObtenerPorIdYUsuario(int id, int usuarioId)
+        {
+            return await _db.Categorias
+                .FirstOrDefaultAsync(c => c.CategoriaId == id && c.UsuarioId == usuarioId && c.Activo);
         }
 
         public async Task<List<Categoria>> ObtenerTodos()
         {
             return await _db.Categorias
+                .Where(c => c.Activo)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        // NUEVO: Obtener categorías por usuario específico
+        public async Task<List<Categoria>> ObtenerPorUsuario(int usuarioId)
+        {
+            return await _db.Categorias
+                .Where(c => c.UsuarioId == usuarioId && c.Activo)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        // NUEVO: Obtener categorías por usuario y tipo
+        public async Task<List<Categoria>> ObtenerPorUsuarioYTipo(int usuarioId, string tipo)
+        {
+            return await _db.Categorias
+                .Where(c => c.UsuarioId == usuarioId && c.Tipo == tipo && c.Activo)
                 .AsNoTracking()
                 .ToListAsync();
         }

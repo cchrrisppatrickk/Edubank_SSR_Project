@@ -8,10 +8,24 @@ namespace EduBank.AppWeb.Controllers
     public class CategoriaController : Controller
     {
         private readonly ICategoriaService _categoriaService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public CategoriaController(ICategoriaService categoriaService)
+        public CategoriaController(ICategoriaService categoriaService, IHttpContextAccessor httpContextAccessor)
         {
             _categoriaService = categoriaService;
+            _httpContextAccessor = httpContextAccessor;
+        }
+
+        // MÉTODO PARA OBTENER EL USUARIO AUTENTICADO (TEMPORAL - AJUSTAR SEGÚN TU AUTH)
+        private int ObtenerUsuarioId()
+        {
+            // Esto es temporal - debes implementar según tu sistema de autenticación
+            // Por ahora retorna 1 como ejemplo
+            return 1;
+
+            // Cuando tengas autenticación, sería algo como:
+            // var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            // return int.Parse(userId ?? "0");
         }
 
         public IActionResult Index()
@@ -26,6 +40,8 @@ namespace EduBank.AppWeb.Controllers
             if (string.IsNullOrWhiteSpace(modelo.Nombre))
                 return BadRequest(new { valor = false, mensaje = "Nombre requerido" });
 
+            var usuarioId = ObtenerUsuarioId();
+
             var entidad = new Categoria
             {
                 Nombre = modelo.Nombre.Trim(),
@@ -33,7 +49,8 @@ namespace EduBank.AppWeb.Controllers
                 Tipo = modelo.Tipo,
                 Icono = modelo.Icono,
                 Color = modelo.Color,
-                Activo = modelo.Activo
+                Activo = modelo.Activo,
+                UsuarioId = usuarioId // ASIGNAR USUARIO ID
             };
 
             bool resultado;
@@ -43,6 +60,11 @@ namespace EduBank.AppWeb.Controllers
             }
             else
             {
+                // Verificar que la categoría pertenezca al usuario
+                var categoriaExistente = await _categoriaService.ObtenerPorIdYUsuario(modelo.CategoriaId, usuarioId);
+                if (categoriaExistente == null)
+                    return BadRequest(new { valor = false, mensaje = "Categoría no encontrada o no autorizada" });
+
                 entidad.CategoriaId = modelo.CategoriaId;
                 resultado = await _categoriaService.Actualizar(entidad);
             }
@@ -53,7 +75,9 @@ namespace EduBank.AppWeb.Controllers
         [HttpGet]
         public async Task<IActionResult> Lista()
         {
-            var lista = await _categoriaService.ObtenerTodos();
+            var usuarioId = ObtenerUsuarioId();
+            var lista = await _categoriaService.ObtenerPorUsuario(usuarioId); // FILTRAR POR USUARIO
+
             var vm = lista.Select(c => new VMCategoria
             {
                 CategoriaId = c.CategoriaId,
@@ -62,7 +86,8 @@ namespace EduBank.AppWeb.Controllers
                 Tipo = c.Tipo,
                 Icono = c.Icono,
                 Color = c.Color,
-                Activo = c.Activo
+                Activo = c.Activo,
+                UsuarioId = c.UsuarioId
             }).ToList();
 
             return Ok(vm);
@@ -71,8 +96,10 @@ namespace EduBank.AppWeb.Controllers
         [HttpGet]
         public async Task<IActionResult> ObtenerJson(int id)
         {
-            var c = await _categoriaService.Obtener(id);
+            var usuarioId = ObtenerUsuarioId();
+            var c = await _categoriaService.ObtenerPorIdYUsuario(id, usuarioId); // FILTRAR POR USUARIO
             if (c == null) return NotFound();
+
             var vm = new VMCategoria
             {
                 CategoriaId = c.CategoriaId,
@@ -81,7 +108,8 @@ namespace EduBank.AppWeb.Controllers
                 Tipo = c.Tipo,
                 Icono = c.Icono,
                 Color = c.Color,
-                Activo = c.Activo
+                Activo = c.Activo,
+                UsuarioId = c.UsuarioId
             };
             return Ok(vm);
         }
@@ -89,6 +117,11 @@ namespace EduBank.AppWeb.Controllers
         [HttpDelete]
         public async Task<IActionResult> Eliminar(int id)
         {
+            var usuarioId = ObtenerUsuarioId();
+            var categoria = await _categoriaService.ObtenerPorIdYUsuario(id, usuarioId);
+            if (categoria == null)
+                return NotFound(new { valor = false, mensaje = "Categoría no encontrada o no autorizada" });
+
             var ok = await _categoriaService.Eliminar(id);
             return Ok(new { valor = ok });
         }
@@ -104,9 +137,10 @@ namespace EduBank.AppWeb.Controllers
 
             try
             {
-                var categoria = await _categoriaService.Obtener(model.CategoriaId);
+                var usuarioId = ObtenerUsuarioId();
+                var categoria = await _categoriaService.ObtenerPorIdYUsuario(model.CategoriaId, usuarioId);
                 if (categoria == null)
-                    return NotFound(new { valor = false, mensaje = "Categoría no encontrada" });
+                    return NotFound(new { valor = false, mensaje = "Categoría no encontrada o no autorizada" });
 
                 categoria.Activo = model.Activo;
                 var resultado = await _categoriaService.Actualizar(categoria);
@@ -115,17 +149,38 @@ namespace EduBank.AppWeb.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception
                 return StatusCode(500, new { valor = false, mensaje = "Error interno del servidor" });
             }
         }
 
-        // Agregar esta clase en el mismo archivo del Controller
+        // NUEVO: Endpoint para obtener categorías por tipo
+        [HttpGet]
+        public async Task<IActionResult> ObtenerPorTipo(string tipo)
+        {
+            if (string.IsNullOrEmpty(tipo))
+                return BadRequest(new { valor = false, mensaje = "Tipo requerido" });
+
+            var usuarioId = ObtenerUsuarioId();
+            var lista = await _categoriaService.ObtenerPorUsuarioYTipo(usuarioId, tipo);
+
+            var vm = lista.Select(c => new VMCategoria
+            {
+                CategoriaId = c.CategoriaId,
+                Nombre = c.Nombre,
+                Descripcion = c.Descripcion,
+                Tipo = c.Tipo,
+                Icono = c.Icono,
+                Color = c.Color,
+                Activo = c.Activo
+            }).ToList();
+
+            return Ok(vm);
+        }
+
         public class CambiarEstadoRequest
         {
             public int CategoriaId { get; set; }
             public bool Activo { get; set; }
         }
-
     }
 }

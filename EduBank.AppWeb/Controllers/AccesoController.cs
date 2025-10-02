@@ -1,9 +1,13 @@
 ﻿using EduBank.DAL.DataContext;
 using EduBank.Models;
 using EduBank.Models.ViewModel;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Security.Claims;
 
 namespace EduBank.AppWeb.Controllers
 {
@@ -52,8 +56,13 @@ namespace EduBank.AppWeb.Controllers
         [HttpGet]
         public IActionResult Login()
         {
+            if (User.Identity.IsAuthenticated)
+                return RedirectToAction("Index", "Home");
+
             return View();
         }
+
+
 
 
         [HttpPost]
@@ -70,6 +79,26 @@ namespace EduBank.AppWeb.Controllers
                 ViewData["Mensaje"] = "No se encontraron coincidencias";
                 return View();
             }
+
+
+            List<Claim> claims = new List<Claim>()
+            {
+                new Claim(ClaimTypes.Name, usuario_encontrado.Nombre)
+            };
+
+            ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims,CookieAuthenticationDefaults.AuthenticationScheme);
+
+            AuthenticationProperties properties = new AuthenticationProperties()
+            {
+                AllowRefresh = true,
+            };
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity),
+                properties
+            );
+
 
             return RedirectToAction("Index", "Home");
         }

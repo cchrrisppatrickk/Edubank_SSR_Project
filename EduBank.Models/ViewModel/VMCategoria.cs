@@ -9,6 +9,7 @@ namespace EduBank.Models.ViewModel
     public class VMCategoria
     {
         public int CategoriaId { get; set; }
+        public int UsuarioId { get; set; } 
         public string Nombre { get; set; } = string.Empty;
         public string? Descripcion { get; set; }
         public string Tipo { get; set; } = "Gasto"; // "Ingreso" | "Gasto" | "Ambos"

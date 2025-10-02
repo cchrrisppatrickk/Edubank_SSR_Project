@@ -114,6 +114,30 @@
                 transition: margin 0.3s ease;
             }
 
+        .logout-btn {
+            color: rgba(255, 255, 255, 0.8);
+            transition: all 0.2s ease;
+            border-radius: 8px;
+            margin: 6px 12px;
+            padding: 12px 15px !important;
+            white-space: nowrap;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: left;
+        }
+
+            .logout-btn:hover {
+                color: #ffffff;
+                background: rgba(255, 255, 255, 0.15);
+                transform: translateX(5px);
+                text-decoration: none;
+            }
+
         .toggle-btn {
             position: absolute;
             right: -12px;
@@ -167,6 +191,16 @@
         }
 
             .sidebar.collapsed .sidebar-link i {
+                margin: 0 !important;
+            }
+
+        .sidebar.collapsed .logout-btn {
+            justify-content: center;
+            padding: 12px !important;
+            margin: 6px 8px;
+        }
+
+            .sidebar.collapsed .logout-btn i {
                 margin: 0 !important;
             }
 
@@ -239,30 +273,27 @@
         }
 
         @@media (max-width: 768px) {
-            .sidebar
+            .sidebar {
+                transform: translateX(-100%);
+                width: var(--sidebar-width);
+            }
 
-        {
-            transform: translateX(-100%);
-            width: var(--sidebar-width);
-        }
+                .sidebar.mobile-visible {
+                    transform: translateX(0);
+                }
 
-        .sidebar.mobile-visible {
-            transform: translateX(0);
-        }
+            .main-content {
+                margin-left: 0 !important;
+                width: 100%;
+            }
 
-        .main-content {
-            margin-left: 0 !important;
-            width: 100%;
-        }
+            .footer {
+                width: 100% !important;
+            }
 
-        .footer {
-            width: 100% !important;
-        }
-
-        .mobile-toggle {
-            display: block;
-        }
-
+            .mobile-toggle {
+                display: block;
+            }
         }
     </style>
 </head>
@@ -302,13 +333,25 @@
 
             <!-- Sección de perfil -->
             <div class="profile-section">
-                <div class="d-flex align-items-center">
-                    <img src="https://ui-avatars.com/api/?name=Usuario&background=random" class="profile-img" alt="Perfil">
+                <div class="d-flex align-items-center mb-3">
+                    @{
+                        var userName = User.Identity.Name ?? "Usuario";
+                        var avatarUrl = $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(userName)}&background=random";
+                    }
+                    <img src="@avatarUrl" class="profile-img" alt="Perfil">
                     <div class="profile-info hide-on-collapse ms-3">
-                        <p class="mb-0 text-white fw-medium">Usuario</p>
+                        <p class="mb-0 text-white fw-medium">@userName</p>
                         <small class="text-white-50">Administrador</small>
                     </div>
                 </div>
+
+                <!-- Botón de Cerrar Sesión -->
+                <form asp-controller="Home" asp-action="Salir" method="post" class="w-100">
+                    <button type="submit" class="logout-btn" title="Cerrar Sesión">
+                        <i class="fas fa-sign-out-alt me-3"></i>
+                        <span class="hide-on-collapse">Cerrar Sesión</span>
+                    </button>
+                </form>
             </div>
         </nav>
 
@@ -317,7 +360,7 @@
             <div class="content-header">
                 <h2 class="mb-1">@ViewData["Title"]</h2>
                 <nav aria-label="breadcrumb">
-                    
+
                 </nav>
             </div>
 

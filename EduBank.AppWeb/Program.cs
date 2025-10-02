@@ -2,7 +2,11 @@ using EduBank.BLL.Services;
 using EduBank.DAL.DataContext;
 using EduBank.DAL.Repository;
 using EduBank.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,12 +18,29 @@ builder.Services.AddDbContext<EdubanckssrContext>(optiones =>
     optiones.UseSqlServer(builder.Configuration.GetConnectionString("cadenaSQL"));
 });
 
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+.AddCookie(Options =>
+ {
+     Options.LoginPath = "/Acceso/Login";
+     Options.ExpireTimeSpan = TimeSpan.FromMinutes(20);
+});
 
 builder.Services.AddScoped<IGenericRepository<Categoria>, CategoriaRepository>();
 builder.Services.AddScoped<ICategoriaService, CategoriaService>();
 
 builder.Services.AddScoped<IMovimientoRepository, MovimientoRepository>();
 builder.Services.AddScoped<IMovimientoService, MovimientoService>();
+
+builder.Services.AddScoped<CategoriaRepository>();
+builder.Services.AddScoped<IGenericRepository<Categoria>, CategoriaRepository>();
+builder.Services.AddScoped<ICategoriaService, CategoriaService>();
+
+
+
+
+
+
+
 
 var app = builder.Build();
 
@@ -35,7 +56,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
