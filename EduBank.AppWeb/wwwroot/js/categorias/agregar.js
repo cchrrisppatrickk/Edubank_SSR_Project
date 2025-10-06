@@ -1,31 +1,62 @@
-﻿    // wwwroot/js/categorias/agregar.js
+﻿// wwwroot/js/categorias/agregar.js
 class AgregarCategorias {
     constructor(manager) {
         this.manager = manager;
     }
 
     mostrarFormNuevo(tipo) {
-        this.manager.categoriaSeleccionadaId = 0;
-        $('.categoria-card').removeClass('border-primary');
+        // Reiniciar formulario
+        $('#formCategoria')[0].reset();
+        $('#txtCategoriaId').val(0);
+        $('#txtTipo').val(tipo);
 
-        $('#modalTitulo').text('Nueva Categoría de ' + tipo);
-        $('#txtCategoriaId').val('0');
-        $('#txtNombre').val('');
-        $('#txtDescripcion').val('');
+        // Cambiar título dinámico
+        const tipoTexto = tipo === 'I' ? 'Ingreso' : 'Gasto';
+        $('#tituloModalCategoria').text(`Nueva Categoría de ${tipoTexto}`);
 
-        if (tipo === 'Gasto') {
-            $('#radTipoGasto').prop('checked', true);
-        } else {
-            $('#radTipoIngreso').prop('checked', true);
+        // Resetear previews
+        $('#iconoPreview').html('<i class="bi bi-plus-circle"></i>');
+        $('#colorPreview').css('background-color', '#6c757d');
+
+        // Mostrar modal
+        $('#modalCategoria').modal('show');
+    }
+
+    async guardarNuevaCategoria() {
+        try {
+            const modelo = {
+                categoriaId: 0,
+                nombre: $('#txtNombre').val().trim(),
+                descripcion: $('#txtDescripcion').val(),
+                tipo: $('#txtTipo').val(),
+                icono: $('#txtIcono').val(),
+                color: $('#txtColor').val(),
+            };
+
+            // Validaciones simples
+            if (!modelo.nombre) {
+                toastr.warning('El nombre es obligatorio');
+                return;
+            }
+
+            const opciones = CategoriasUtils.ajaxOptions({
+                url: '/Categoria/Insertar',
+                type: 'POST',
+                data: JSON.stringify(modelo),
+                contentType: 'application/json',
+            });
+
+            const res = await $.ajax(opciones);
+
+            if (res.valor) {
+                toastr.success('Categoría registrada exitosamente');
+                $('#modalCategoria').modal('hide');
+                this.manager.recargarLista();
+            } else {
+                toastr.error(res.mensaje || 'Error al registrar');
+            }
+        } catch (err) {
+            CategoriasUtils.mostrarError(err);
         }
-
-        $('#txtIcono').val('');
-        $('#iconoPreview').html('<i class="bi bi-emoji-smile"></i>');
-        $('#txtColor').val('#10b981');
-        $('#colorPreview').css('background-color', '#10b981');
-        $('#chkActivo').prop('checked', true);
-
-        $('#btnDesactivar, #btnEliminar').hide();
-        $('#modalEdicion').modal('show');
     }
 }

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Categorías</title>
 
+
 </head>
 <body>
     <!-- ---------- UI: Titulo centrado y en negrita (sin subtítulo) ---------- -->
@@ -65,11 +66,12 @@
     </div>
 
     <!-- Modal para edición de categorías -->
+    <!-- Modal para creación/edición de categorías -->
     <div class="modal fade" id="modalEdicion" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalTitulo">Editar Categoría</h5>
+                    <h5 class="modal-title" id="modalTitulo">Nueva Categoría</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form id="formCategoria" novalidate>
@@ -78,11 +80,14 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="txtNombre" class="form-label required-field">Nombre</label>
-                                <input type="text" id="txtNombre" class="form-control" required />
+                                <input type="text" id="txtNombre" class="form-control" required
+                                       placeholder="Ej: Comida, Transporte, Salario..." />
+                                <div class="invalid-feedback">El nombre es requerido</div>
                             </div>
                             <div class="col-md-6">
                                 <label for="txtDescripcion" class="form-label">Descripción</label>
-                                <input type="text" id="txtDescripcion" class="form-control" />
+                                <input type="text" id="txtDescripcion" class="form-control"
+                                       placeholder="Descripción opcional..." />
                             </div>
                         </div>
 
@@ -91,11 +96,11 @@
                                 <label class="form-label required-field">Tipo</label>
                                 <div class="d-flex gap-3">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="tipoCategoria" id="radTipoGasto" value="Gasto" checked />
+                                        <input class="form-check-input" type="radio" name="tipoCategoria" id="radTipoGasto" value="G" checked />
                                         <label class="form-check-label" for="radTipoGasto">Gasto</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="tipoCategoria" id="radTipoIngreso" value="Ingreso" />
+                                        <input class="form-check-input" type="radio" name="tipoCategoria" id="radTipoIngreso" value="I" />
                                         <label class="form-check-label" for="radTipoIngreso">Ingreso</label>
                                     </div>
                                 </div>
@@ -108,7 +113,7 @@
                                     </div>
                                     <span>Seleccionar icono</span>
                                 </button>
-                                <input type="hidden" id="txtIcono" />
+                                <input type="hidden" id="txtIcono" value="bi bi-emoji-smile" />
                             </div>
                         </div>
 
@@ -130,10 +135,18 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Guardar</button>
-                        <button type="button" id="btnDesactivar" class="btn btn-outline-secondary">Desactivar</button>
-                        <button type="button" id="btnEliminar" class="btn btn-danger">Eliminar</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary" id="btnGuardar">
+                            <i class="bi bi-check-circle me-1"></i> Guardar
+                        </button>
+                        <button type="button" id="btnDesactivar" class="btn btn-outline-warning d-none">
+                            <i class="bi bi-power me-1"></i> Desactivar
+                        </button>
+                        <button type="button" id="btnEliminar" class="btn btn-danger d-none">
+                            <i class="bi bi-trash me-1"></i> Eliminar
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="bi bi-x-circle me-1"></i> Cancelar
+                        </button>
                     </div>
                 </form>
             </div>
@@ -149,8 +162,14 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <input type="text" id="buscarIcono" class="form-control" placeholder="Buscar icono...">
+                        <button class="btn btn-outline-secondary" type="button" id="limpiarBusquedaIcono">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
                     <div class="row row-cols-4 row-cols-sm-5 row-cols-md-6 g-3" id="gridIconos">
-                        <!-- Los iconos se cargarán dinámicamente con JavaScript -->
+                        <!-- Los iconos se cargarán dinámicamente -->
                     </div>
                 </div>
             </div>
@@ -167,7 +186,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="row row-cols-4 row-cols-sm-5 row-cols-md-6 g-3" id="gridColores">
-                        <!-- Los colores se cargarán dinámicamente con JavaScript -->
+                        <!-- Los colores se cargarán dinámicamente -->
                     </div>
                 </div>
             </div>
@@ -178,16 +197,635 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
-    
-    @section Scripts {
-        <script src="~/js/categorias/utils.js"></script>
-        <script src="~/js/categorias/modales.js"></script>
-        <script src="~/js/categorias/listar.js"></script>
-        <script src="~/js/categorias/agregar.js"></script>
-        <script src="~/js/categorias/editar.js"></script>
-        <script src="~/js/categorias/eliminar.js"></script>
-        <script src="~/js/categorias/index.js"></script>
+    <script>
+                // Variables globales
+        let iconosDisponibles = [];
+        let modalEdicion = null;
+
+        // Función para mostrar el formulario de nueva categoría
+        function mostrarFormNuevo(tipo) {
+            console.log('➕ Mostrando formulario para:', tipo);
+
+            // Resetear el formulario
+            $('#txtCategoriaId').val(0);
+            $('#txtNombre').val('');
+            $('#txtDescripcion').val('');
+            $('#txtIcono').val('bi bi-emoji-smile');
+            $('#txtColor').val('#10b981');
+            $('#chkActivo').prop('checked', true);
+
+            // Establecer el tipo
+            if (tipo === 'Gasto' || tipo === 'G') {
+                $('#radTipoGasto').prop('checked', true);
+            } else {
+                $('#radTipoIngreso').prop('checked', true);
+            }
+
+            // Actualizar previews
+            actualizarPreviewIcono();
+            actualizarPreviewColor();
+
+            // Configurar modal para creación
+            $('#modalTitulo').text('Nueva Categoría');
+            $('#btnDesactivar').addClass('d-none');
+            $('#btnEliminar').addClass('d-none');
+            $('#btnGuardar').html('<i class="bi bi-check-circle me-1"></i> Crear Categoría');
+
+            // Remover clases de validación
+            $('#formCategoria').removeClass('was-validated');
+
+            // Mostrar modal
+            if (!modalEdicion) {
+                modalEdicion = new bootstrap.Modal('#modalEdicion');
+            }
+            modalEdicion.show();
+        }
+
+               function guardarCategoria() {
+            console.log('💾 Iniciando guardado de categoría...');
+
+            const form = $('#formCategoria')[0];
+            const categoriaId = parseInt($('#txtCategoriaId').val());
+
+            // Validar formulario
+            if (!form.checkValidity()) {
+                form.classList.add('was-validated');
+                toastr.warning('Por favor completa los campos requeridos');
+                return;
+            }
+
+            // Obtener datos del formulario
+            const categoriaData = {
+                CategoriaId: categoriaId,
+                Nombre: $('#txtNombre').val().trim(),
+                Descripcion: $('#txtDescripcion').val().trim(),
+                Tipo: $('input[name="tipoCategoria"]:checked').val(),
+                Icono: $('#txtIcono').val(),
+                Color: $('#txtColor').val(),
+                Activo: $('#chkActivo').is(':checked')
+            };
+
+            console.log('📦 Datos a enviar:', categoriaData);
+
+            // Determinar el endpoint según si es creación o edición
+            const url = categoriaId === 0 ? '/Categoria/Insertar' : '/Categoria/Actualizar';
+            const method = categoriaId === 0 ? 'POST' : 'PUT';
+
+            console.log(`🌐 Enviando a: ${url} con método: ${method}`);
+
+            // Mostrar loading en el botón
+            const btnGuardar = $('#btnGuardar');
+            const originalText = btnGuardar.html();
+            btnGuardar.prop('disabled', true).html('<i class="bi bi-hourglass-split me-1"></i> Guardando...');
+
+            // Enviar datos al servidor
+            $.ajax({
+                url: url,
+                type: method, // ✅ Usar PUT para actualizar
+                contentType: 'application/json',
+                data: JSON.stringify(categoriaData),
+                success: function(response) {
+                    console.log('✅ Respuesta del servidor:', response);
+
+                    if (response.valor) {
+                        toastr.success(response.mensaje || 'Operación realizada correctamente');
+                        modalEdicion.hide();
+                        cargarCategorias(); // Recargar la lista
+                    } else {
+                        toastr.error(response.mensaje || 'Error al realizar la operación');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('❌ Error al guardar:', error);
+                    let mensajeError = 'Error al realizar la operación';
+
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        mensajeError = response.mensaje || mensajeError;
+                    } catch (e) {
+                        // Si no se puede parsear la respuesta, usar el mensaje por defecto
+                    }
+
+                    toastr.error(mensajeError);
+                },
+                complete: function() {
+                    // Restaurar botón
+                    btnGuardar.prop('disabled', false).html(originalText);
+                }
+            });
+        }
+
+        // Función para actualizar preview del icono
+        function actualizarPreviewIcono() {
+            const icono = $('#txtIcono').val();
+            $('#iconoPreview').html(`<i class="${icono}"></i>`);
+            $('#btnSeleccionarIcono .icono-seleccionado-preview').html(`<i class="${icono}"></i>`);
+        }
+
+        // Función para actualizar preview del color
+        function actualizarPreviewColor() {
+            const color = $('#txtColor').val();
+            $('#colorPreview').css('background-color', color);
+            $('#btnSeleccionarColor .color-seleccionado-preview').css('background-color', color);
+        }
+
+        // Función para cargar iconos disponibles
+        function cargarIconos() {
+            // Lista de iconos de Bootstrap Icons comúnmente usados
+            iconosDisponibles = [
+                'bi bi-house', 'bi bi-cart', 'bi bi-car', 'bi bi-heart-pulse', 'bi bi-phone',
+                'bi bi-laptop', 'bi bi-tv', 'bi bi-cup-straw', 'bi bi-utensils', 'bi bi-bag',
+                'bi bi-gift', 'bi bi-airplane', 'bi bi-fuel-pump', 'bi bi-wifi', 'bi bi-droplet',
+                'bi bi-lightning', 'bi bi-house-door', 'bi bi-building', 'bi bi-bank', 'bi bi-cash-coin',
+                'bi bi-credit-card', 'bi bi-wallet', 'bi bi-graph-up', 'bi bi-piggy-bank', 'bi bi-safe',
+                'bi bi-briefcase', 'bi bi-cash-stack', 'bi bi-coin', 'bi bi-currency-dollar', 'bi bi-currency-euro',
+                'bi bi-award', 'bi bi-gem', 'bi bi-trophy', 'bi bi-star', 'bi bi-heart',
+                'bi bi-basket', 'bi bi-tag', 'bi bi-receipt', 'bi bi-file-text', 'bi bi-calendar',
+                'bi bi-clock', 'bi bi-gear', 'bi bi-tools', 'bi bi-shield-check', 'bi bi-key',
+                'bi bi-lock', 'bi bi-unlock', 'bi bi-bell', 'bi bi-megaphone', 'bi bi-chat',
+                'bi bi-envelope', 'bi bi-telephone', 'bi bi-camera', 'bi bi-music-note', 'bi bi-book',
+                'bi bi-pencil', 'bi bi-eraser', 'bi bi-scissors', 'bi bi-brush', 'bi bi-palette'
+            ];
+
+            renderizarIconos(iconosDisponibles);
+        }
+
+        // Función para renderizar iconos en el modal
+        function renderizarIconos(iconos) {
+            const grid = $('#gridIconos');
+            grid.empty();
+
+            iconos.forEach(icono => {
+                grid.append(`
+                    <div class="col">
+                        <div class="card icono-card text-center p-3" onclick="seleccionarIcono('${icono}')" style="cursor: pointer;">
+                            <i class="${icono} fs-4"></i>
+                            <small class="d-block mt-1 text-muted" style="font-size: 0.7rem;">${icono.replace('bi bi-', '')}</small>
+                        </div>
+                    </div>
+                `);
+            });
+        }
+
+        // Función para eliminar categoría
+async function eliminarCategoria(categoriaId) {
+    if (!confirm('¿Estás seguro de que quieres eliminar esta categoría?\n\nEsta acción no se puede deshacer.')) {
+        return;
     }
+
+    try {
+        // Mostrar loading
+        const btnEliminar = $('#btnEliminar');
+        const originalText = btnEliminar.html();
+        btnEliminar.prop('disabled', true).html('<i class="bi bi-hourglass-split me-1"></i> Eliminando...');
+
+        const response = await $.ajax({
+            url: `/Categoria/Eliminar?id=${categoriaId}`,
+            type: 'DELETE'
+        });
+
+        console.log('✅ Respuesta de eliminación:', response);
+
+        if (response.valor) {
+            toastr.success(response.mensaje || 'Categoría eliminada correctamente');
+            if (modalEdicion) {
+                modalEdicion.hide();
+            }
+            cargarCategorias(); // Recargar lista
+        } else {
+            toastr.error(response.mensaje || 'Error al eliminar la categoría');
+        }
+    } catch (error) {
+        console.error('❌ Error al eliminar:', error);
+        let mensajeError = 'Error al eliminar la categoría';
+        
+        try {
+            const response = JSON.parse(error.responseText);
+            mensajeError = response.mensaje || mensajeError;
+        } catch (e) {
+            // Si no se puede parsear la respuesta
+        }
+        
+        toastr.error(mensajeError);
+    } finally {
+        // Restaurar botón
+        $('#btnEliminar').prop('disabled', false).html('<i class="bi bi-trash me-1"></i> Eliminar');
+    }
+}
+
+// Función para cambiar estado (activar/desactivar)
+    async function cambiarEstadoCategoria(categoriaId, nuevoEstado) {
+        try {
+            // Mostrar loading
+            const btnDesactivar = $('#btnDesactivar');
+            const originalText = btnDesactivar.html();
+            btnDesactivar.prop('disabled', true).html('<i class="bi bi-hourglass-split me-1"></i> Procesando...');
+
+            const response = await $.ajax({
+                url: '/Categoria/CambiarEstado',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    CategoriaId: categoriaId,
+                    Activo: nuevoEstado
+                })
+            });
+
+            console.log('✅ Respuesta de cambio de estado:', response);
+
+            if (response.valor) {
+                toastr.success(response.mensaje || 'Estado actualizado correctamente');
+                if (modalEdicion) {
+                    modalEdicion.hide();
+                }
+                cargarCategorias(); // Recargar lista
+            } else {
+                toastr.error(response.mensaje || 'Error al cambiar el estado');
+            }
+        } catch (error) {
+            console.error('❌ Error al cambiar estado:', error);
+            let mensajeError = 'Error al cambiar el estado de la categoría';
+        
+            try {
+                const response = JSON.parse(error.responseText);
+                mensajeError = response.mensaje || mensajeError;
+            } catch (e) {
+                // Si no se puede parsear la respuesta
+            }
+        
+            toastr.error(mensajeError);
+        } finally {
+            // Restaurar botón
+            $('#btnDesactivar').prop('disabled', false).html(
+                nuevoEstado ? 
+                '<i class="bi bi-power me-1"></i> Desactivar' : 
+                '<i class="bi bi-power me-1"></i> Activar'
+            );
+        }
+    }
+
+        // Función para seleccionar icono
+        function seleccionarIcono(icono) {
+            $('#txtIcono').val(icono);
+            actualizarPreviewIcono();
+            bootstrap.Modal.getInstance('#modalIconos').hide();
+        }
+
+        // Función para cargar colores predefinidos
+        function cargarColores() {
+            const colores = [
+                '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16',
+                '#22c55e', '#10b981', '#14b8a6', '#06b6d4', '#0ea5e9',
+                '#3b82f6', '#6366f1', '#8b5cf6', '#a855f7', '#d946ef',
+                '#ec4899', '#f43f5e', '#6b7280', '#374151', '#000000'
+            ];
+
+            const grid = $('#gridColores');
+            grid.empty();
+
+            colores.forEach(color => {
+                grid.append(`
+                    <div class="col">
+                        <div class="card color-card text-center p-3" onclick="seleccionarColor('${color}')" style="cursor: pointer;">
+                            <div class="color-preview mx-auto" style="width: 40px; height: 40px; background-color: ${color}; border-radius: 4px;"></div>
+                            <small class="d-block mt-1 text-muted" style="font-size: 0.7rem;">${color}</small>
+                        </div>
+                    </div>
+                `);
+            });
+        }
+
+        // Función para seleccionar color
+        function seleccionarColor(color) {
+            $('#txtColor').val(color);
+            actualizarPreviewColor();
+            bootstrap.Modal.getInstance('#modalColores').hide();
+        }
+
+        // Event Listeners
+        $(document).ready(function() {
+            console.log('🚀 Inicializando funcionalidades de categorías...');
+
+            // Cargar datos iniciales
+            cargarIconos();
+            cargarColores();
+
+            // Submit del formulario
+            $('#formCategoria').on('submit', function(e) {
+                e.preventDefault();
+                guardarCategoria();
+            });
+
+            // Botón seleccionar icono
+            $('#btnSeleccionarIcono').on('click', function() {
+                new bootstrap.Modal('#modalIconos').show();
+            });
+
+            // Botón seleccionar color
+            $('#btnSeleccionarColor').on('click', function() {
+                new bootstrap.Modal('#modalColores').show();
+            });
+
+            // Búsqueda de iconos
+            $('#buscarIcono').on('input', function() {
+                const termino = $(this).val().toLowerCase();
+                if (termino) {
+                    const iconosFiltrados = iconosDisponibles.filter(icono =>
+                        icono.toLowerCase().includes(termino)
+                    );
+                    renderizarIconos(iconosFiltrados);
+                } else {
+                    renderizarIconos(iconosDisponibles);
+                }
+            });
+
+            // Limpiar búsqueda
+            $('#limpiarBusquedaIcono').on('click', function() {
+                $('#buscarIcono').val('');
+                renderizarIconos(iconosDisponibles);
+            });
+
+            // Validación en tiempo real
+            $('#txtNombre').on('input', function() {
+                if ($(this).val().trim()) {
+                    $(this).removeClass('is-invalid').addClass('is-valid');
+                } else {
+                    $(this).removeClass('is-valid').addClass('is-invalid');
+                }
+            });
+
+            console.log('✅ Funcionalidades de categorías inicializadas');
+        });
+
+
+        // Función principal para cargar todas las categorías
+        function cargarCategorias() {
+            console.log('🔍 Iniciando carga de categorías...');
+
+            $.ajax({
+                url: '/Categoria/Lista',
+                type: 'GET',
+                success: function (response) {
+                    console.log('✅ Respuesta recibida:', response);
+
+                    if (Array.isArray(response)) {
+                        console.log(`📊 Se encontraron ${response.length} categorías`);
+                        renderizarCategorias(response);
+                    } else {
+                        console.error('❌ La respuesta no es un array:', response);
+                        toastr.error('Formato de respuesta inválido');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('❌ Error en la petición:', {
+                        status: xhr.status,
+                        statusText: xhr.statusText,
+                        error: error,
+                        responseText: xhr.responseText
+                    });
+
+                    if (xhr.status === 401) {
+                        toastr.error('No estás autenticado. Por favor inicia sesión.');
+                    } else if (xhr.status === 500) {
+                        toastr.error('Error del servidor al cargar categorías');
+                    } else {
+                        toastr.error('Error al cargar las categorías: ' + error);
+                    }
+                },
+                complete: function() {
+                    console.log('🏁 Petición completada');
+                }
+            });
+        }
+
+        // Función para renderizar las categorías
+        function renderizarCategorias(categorias) {
+            console.log('🎨 Renderizando categorías:', categorias);
+
+            // Limpiar las grids
+            $('#gastos-grid').empty();
+            $('#ingresos-grid').empty();
+
+            if (!categorias || categorias.length === 0) {
+                console.log('📭 No hay categorías para mostrar');
+                mostrarMensajeSinDatos();
+                return;
+            }
+
+            // Separar categorías por tipo - IMPORTANTE: verifica si usa 'Tipo' o 'tipo'
+            const gastos = categorias.filter(c => c.tipo === 'G' || c.Tipo === 'G');
+            const ingresos = categorias.filter(c => c.tipo === 'I' || c.Tipo === 'I');
+
+            console.log('💰 Gastos:', gastos);
+            console.log('💵 Ingresos:', ingresos);
+
+            // Renderizar gastos
+            if (gastos.length > 0) {
+                gastos.forEach(categoria => {
+                    $('#gastos-grid').append(crearCardCategoria(categoria));
+                });
+                console.log('✅ Gastos renderizados correctamente');
+            } else {
+                $('#gastos-grid').html(crearMensajeVacio('gastos'));
+                console.log('📭 No hay categorías de gastos');
+            }
+
+            // Renderizar ingresos
+            if (ingresos.length > 0) {
+                ingresos.forEach(categoria => {
+                    $('#ingresos-grid').append(crearCardCategoria(categoria));
+                });
+                console.log('✅ Ingresos renderizados correctamente');
+            } else {
+                $('#ingresos-grid').html(crearMensajeVacio('ingresos'));
+                console.log('📭 No hay categorías de ingresos');
+            }
+        }
+
+        // Función para crear el HTML de cada card de categoría
+        function crearCardCategoria(categoria) {
+            console.log('🖼️ Creando card para:', categoria);
+
+            // Depuración: ver todas las propiedades del objeto
+            console.log('🔍 Propiedades de la categoría:', Object.keys(categoria));
+
+            // Usar propiedades con fallback (pueden venir en diferente casing)
+            const esActivo = categoria.activo !== undefined ? categoria.activo :
+                            categoria.Activo !== undefined ? categoria.Activo : true;
+
+            const color = categoria.color || categoria.Color || '#6c757d';
+            const icono = categoria.icono || categoria.Icono || 'bi bi-tag';
+            const nombre = categoria.nombre || categoria.Nombre || 'Sin nombre';
+            const descripcion = categoria.descripcion || categoria.Descripcion || '';
+            const tipo = categoria.tipo || categoria.Tipo || 'G';
+            const categoriaId = categoria.categoriaId || categoria.CategoriaId || 0;
+
+            console.log(`📋 Datos procesados: ${nombre}, Tipo: ${tipo}, Activo: ${esActivo}`);
+
+            return `
+                <div class="col">
+                    <div class="card categoria-card ${!esActivo ? 'opacity-50' : ''}"
+                         onclick="editarCategoria(${categoriaId})"
+                         style="cursor: pointer; border-left: 4px solid ${color}; height: 140px;">
+                        <div class="card-body text-center p-2">
+                            <div class="categoria-icono mb-2" style="color: ${color}; font-size: 1.5rem;">
+                                <i class="${icono}"></i>
+                            </div>
+                            <h6 class="card-title mb-1" style="font-size: 0.85rem; min-height: 20px;">${nombre}</h6>
+                            ${descripcion ? `
+                                <p class="card-text text-muted small mb-2" style="font-size: 0.7rem; min-height: 30px; overflow: hidden;">
+                                    ${descripcion}
+                                </p>
+                            ` : '<div style="min-height: 30px;"></div>'}
+                            <div class="d-flex justify-content-center align-items-center">
+                                <span class="badge ${tipo === 'G' ? 'bg-danger' : 'bg-success'} me-1" style="font-size: 0.65rem;">
+                                    ${tipo === 'G' ? 'Gasto' : 'Ingreso'}
+                                </span>
+                                <span class="badge ${esActivo ? 'bg-success' : 'bg-secondary'}" style="font-size: 0.65rem;">
+                                    ${esActivo ? 'Activo' : 'Inactivo'}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function crearMensajeVacio(tipo) {
+            return `
+                <div class="col-12 text-center py-5">
+                    <div class="text-muted mb-3">
+                        <i class="bi bi-inbox display-6"></i>
+                        <p class="mt-2">No hay categorías de ${tipo} registradas</p>
+                    </div>
+                    <button class="btn btn-success btn-sm" onclick="mostrarFormNuevo('${tipo}')">
+                        <i class="bi bi-plus-circle me-1"></i> Agregar primera categoría
+                    </button>
+                </div>
+            `;
+        }
+
+        function mostrarMensajeSinDatos() {
+            const html = `
+                <div class="col-12 text-center py-5">
+                    <div class="text-muted">
+                        <i class="bi bi-database-exclamation display-6"></i>
+                        <p class="mt-2">No tienes categorías creadas</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="mostrarFormNuevo('Gasto')">
+                        <i class="bi bi-plus-circle me-1"></i> Crear primera categoría
+                    </button>
+                </div>
+            `;
+            $('#gastos-grid').html(html);
+            $('#ingresos-grid').html(html);
+        }
+
+                      // Función para editar una categoría existente - VERSIÓN CORREGIDA
+        async function editarCategoria(categoriaId) {
+            console.log('✏️ Editando categoría ID:', categoriaId);
+
+            try {
+                // Mostrar loading
+                toastr.info('Cargando categoría...');
+
+                // Obtener los datos de la categoría
+                const response = await $.ajax({
+                    url: `/Categoria/ObtenerJson/${categoriaId}`,
+                    type: 'GET'
+                });
+
+                console.log('📦 Datos de la categoría:', response);
+
+                // Llenar el formulario con los datos
+                $('#txtCategoriaId').val(response.categoriaId || response.CategoriaId);
+                $('#txtNombre').val(response.nombre || response.Nombre);
+                $('#txtDescripcion').val(response.descripcion || response.Descripcion);
+                $('#txtIcono').val(response.icono || response.Icono || 'bi bi-emoji-smile');
+                $('#txtColor').val(response.color || response.Color || '#10b981');
+                $('#chkActivo').prop('checked', response.activo !== undefined ? response.activo : response.Activo);
+
+                // Establecer el tipo
+                const tipo = response.tipo || response.Tipo;
+                if (tipo === 'G') {
+                    $('#radTipoGasto').prop('checked', true);
+                } else {
+                    $('#radTipoIngreso').prop('checked', true);
+                }
+
+                // Actualizar previews
+                actualizarPreviewIcono();
+                actualizarPreviewColor();
+
+                // Configurar modal para edición
+                $('#modalTitulo').text('Editar Categoría');
+                $('#btnGuardar').html('<i class="bi bi-check-circle me-1"></i> Actualizar');
+
+                // Mostrar botones de desactivar y eliminar
+                $('#btnDesactivar').removeClass('d-none');
+                $('#btnEliminar').removeClass('d-none');
+
+                // ✅ CORRECCIÓN: Configurar los botones con los datos de la categoría
+                configurarBotonesEdicion(response);
+
+                // Remover clases de validación
+                $('#formCategoria').removeClass('was-validated');
+
+                // Mostrar modal
+                if (!modalEdicion) {
+                    modalEdicion = new bootstrap.Modal('#modalEdicion');
+                }
+                modalEdicion.show();
+
+            } catch (error) {
+                console.error('❌ Error al cargar categoría:', error);
+                toastr.error('Error al cargar la categoría para editar');
+            }
+        }
+
+        // Función para configurar los botones de edición - MANTENER ESTA FUNCIÓN
+        function configurarBotonesEdicion(categoria) {
+            const categoriaId = categoria.categoriaId || categoria.CategoriaId;
+            const estaActivo = categoria.activo !== undefined ? categoria.activo : categoria.Activo;
+
+            // Configurar botón desactivar/activar
+            $('#btnDesactivar').off('click').on('click', function() {
+                cambiarEstadoCategoria(categoriaId, !estaActivo);
+            });
+
+            // Actualizar texto del botón desactivar
+            $('#btnDesactivar').html(
+                estaActivo ?
+                '<i class="bi bi-power me-1"></i> Desactivar' :
+                '<i class="bi bi-power me-1"></i> Activar'
+            );
+
+            // Configurar botón eliminar
+            $('#btnEliminar').off('click').on('click', function() {
+                eliminarCategoria(categoriaId);
+            });
+        }
+
+        // Cargar categorías cuando el documento esté listo
+        $(document).ready(function () {
+            console.log('🚀 Documento listo, iniciando aplicación...');
+            console.log('📍 URL de la API: /Categoria/Lista');
+
+            // Verificar que los contenedores existan
+            if ($('#gastos-grid').length && $('#ingresos-grid').length) {
+                console.log('✅ Contenedores encontrados');
+                cargarCategorias();
+            } else {
+                console.error('❌ No se encontraron los contenedores de grids');
+            }
+
+            // Forzar recarga para pruebas
+            setTimeout(() => {
+                console.log('🕒 Recarga automática después de 2 segundos...');
+                // cargarCategorias();
+            }, 2000);
+        });
+    </script>
 
 </body>
 </html>

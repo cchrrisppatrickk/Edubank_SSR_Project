@@ -63,8 +63,6 @@ namespace EduBank.AppWeb.Controllers
         }
 
 
-
-
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel modelo)
         {
@@ -80,13 +78,14 @@ namespace EduBank.AppWeb.Controllers
                 return View();
             }
 
-
             List<Claim> claims = new List<Claim>()
             {
-                new Claim(ClaimTypes.Name, usuario_encontrado.Nombre)
+                new Claim(ClaimTypes.Name, usuario_encontrado.Nombre),
+                new Claim("UsuarioId", usuario_encontrado.UsuarioId.ToString()), // AGREGAR ESTO
+                new Claim(ClaimTypes.Email, usuario_encontrado.CorreoElectronico)
             };
 
-            ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims,CookieAuthenticationDefaults.AuthenticationScheme);
+            ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
             AuthenticationProperties properties = new AuthenticationProperties()
             {
@@ -98,7 +97,6 @@ namespace EduBank.AppWeb.Controllers
                 new ClaimsPrincipal(claimsIdentity),
                 properties
             );
-
 
             return RedirectToAction("Index", "Home");
         }

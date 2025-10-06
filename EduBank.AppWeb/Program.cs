@@ -31,9 +31,12 @@ builder.Services.AddScoped<ICategoriaService, CategoriaService>();
 builder.Services.AddScoped<IMovimientoRepository, MovimientoRepository>();
 builder.Services.AddScoped<IMovimientoService, MovimientoService>();
 
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<CategoriaRepository>();
 builder.Services.AddScoped<IGenericRepository<Categoria>, CategoriaRepository>();
 builder.Services.AddScoped<ICategoriaService, CategoriaService>();
+
+
 
 
 

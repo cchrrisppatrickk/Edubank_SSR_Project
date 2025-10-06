@@ -34,9 +34,28 @@ namespace EduBank.DAL.Repository
 
         public async Task<bool> Actualizar(Categoria modelo)
         {
-            _db.Categorias.Update(modelo);
-            var affected = await _db.SaveChangesAsync();
-            return affected > 0;
+            try
+            {
+                // Buscar la entidad sin rastreo para evitar conflictos
+                var entidadExistente = await _db.Categorias
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(c => c.CategoriaId == modelo.CategoriaId);
+
+                if (entidadExistente == null)
+                    return false;
+
+                // Adjuntar y marcar como modificado
+                _db.Categorias.Attach(modelo);
+                _db.Entry(modelo).State = EntityState.Modified;
+
+                var affected = await _db.SaveChangesAsync();
+                return affected > 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al actualizar categoría: {ex.Message}");
+                throw;
+            }
         }
 
         public async Task<bool> Eliminar(int id)
@@ -80,13 +99,6 @@ namespace EduBank.DAL.Repository
                 .ToListAsync();
         }
 
-        // NUEVO: Obtener categorías por usuario y tipo
-        public async Task<List<Categoria>> ObtenerPorUsuarioYTipo(int usuarioId, string tipo)
-        {
-            return await _db.Categorias
-                .Where(c => c.UsuarioId == usuarioId && c.Tipo == tipo && c.Activo)
-                .AsNoTracking()
-                .ToListAsync();
-        }
+  
     }
 }

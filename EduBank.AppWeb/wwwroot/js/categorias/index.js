@@ -53,6 +53,21 @@ class CategoriasManager {
             dlg.css('will-change', 'auto');
         });
     }
+    bindEvents() {
+        // Formulario principal (editar existente)
+        $('#formCategoria').submit((e) => this.editar.guardarCategoria(e));
+
+        // Botones de acción
+        $('#btnEliminar').click(() => this.eliminar.eliminarCategoria());
+        $('#btnDesactivar').click(() => this.eliminar.cambiarEstado());
+
+        // Botón para guardar nueva categoría
+        $('#btnGuardarCategoria').click(() => this.agregar.guardarNuevaCategoria());
+
+        // Función global para abrir el modal de nueva categoría
+        window.mostrarFormNuevo = (tipo) => this.agregar.mostrarFormNuevo(tipo);
+    }
+
 }
 
 // Inicialización cuando el DOM esté listo

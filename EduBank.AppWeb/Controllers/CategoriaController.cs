@@ -1,33 +1,22 @@
 ﻿using EduBank.BLL.Services;
 using EduBank.Models;
 using EduBank.Models.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EduBank.AppWeb.Controllers
 {
-    public class CategoriaController : Controller
+    [Authorize]
+    public class CategoriaController : BaseController // HEREDAR DE BASECONTROLLER
     {
         private readonly ICategoriaService _categoriaService;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public CategoriaController(ICategoriaService categoriaService, IHttpContextAccessor httpContextAccessor)
+        public CategoriaController(ICategoriaService categoriaService)
         {
             _categoriaService = categoriaService;
-            _httpContextAccessor = httpContextAccessor;
         }
 
-        // MÉTODO PARA OBTENER EL USUARIO AUTENTICADO (TEMPORAL - AJUSTAR SEGÚN TU AUTH)
-        private int ObtenerUsuarioId()
-        {
-            // Esto es temporal - debes implementar según tu sistema de autenticación
-            // Por ahora retorna 1 como ejemplo
-            return 1;
-
-            // Cuando tengas autenticación, sería algo como:
-            // var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            // return int.Parse(userId ?? "0");
-        }
-
+        [HttpGet]
         public IActionResult Index()
         {
             return View();
@@ -36,107 +25,222 @@ namespace EduBank.AppWeb.Controllers
         [HttpPost]
         public async Task<IActionResult> Insertar([FromBody] VMCategoria modelo)
         {
-            if (modelo == null) return BadRequest(new { valor = false, mensaje = "Datos inválidos" });
-            if (string.IsNullOrWhiteSpace(modelo.Nombre))
-                return BadRequest(new { valor = false, mensaje = "Nombre requerido" });
-
-            var usuarioId = ObtenerUsuarioId();
-
-            var entidad = new Categoria
+            try
             {
-                Nombre = modelo.Nombre.Trim(),
-                Descripcion = modelo.Descripcion,
-                Tipo = modelo.Tipo,
-                Icono = modelo.Icono,
-                Color = modelo.Color,
-                Activo = modelo.Activo,
-                UsuarioId = usuarioId // ASIGNAR USUARIO ID
-            };
+                // Validación del modelo recibido
+                if (modelo == null)
+                    return BadRequest(new { valor = false, mensaje = "No se recibieron datos válidos." });
 
-            bool resultado;
-            if (modelo.CategoriaId == 0)
-            {
-                resultado = await _categoriaService.Insertar(entidad);
+                if (string.IsNullOrWhiteSpace(modelo.Nombre))
+                    return BadRequest(new { valor = false, mensaje = "El campo 'Nombre' es obligatorio." });
+
+                if (string.IsNullOrWhiteSpace(modelo.Tipo))
+                    return BadRequest(new { valor = false, mensaje = "El campo 'Tipo' es obligatorio (I o G)." });
+
+                // Obtener usuario autenticado (puede lanzar UnauthorizedAccessException)
+                var usuarioId = ObtenerUsuarioId();
+
+                // Construcción de la entidad
+                var entidad = new Categoria
+                {
+                    Nombre = modelo.Nombre.Trim(),
+                    Descripcion = modelo.Descripcion?.Trim(),
+                    Tipo = modelo.Tipo.Trim(),
+                    Icono = modelo.Icono,
+                    Color = modelo.Color,
+                    Activo = true,
+                    UsuarioId = usuarioId
+                };
+
+                bool resultado;
+
+                // Lógica para insertar o actualizar
+                if (modelo.CategoriaId == 0)
+                {
+                    resultado = await _categoriaService.Insertar(entidad);
+                }
+                else
+                {
+                    var categoriaExistente = await _categoriaService.ObtenerPorIdYUsuario(modelo.CategoriaId, usuarioId);
+                    if (categoriaExistente == null)
+                        return NotFound(new { valor = false, mensaje = "Categoría no encontrada o no pertenece al usuario actual." });
+
+                    entidad.CategoriaId = modelo.CategoriaId;
+                    resultado = await _categoriaService.Actualizar(entidad);
+                }
+
+                return Ok(new
+                {
+                    valor = resultado,
+                    mensaje = resultado ? "Operación realizada correctamente." : "No se pudo completar la operación."
+                });
             }
-            else
+            catch (UnauthorizedAccessException)
             {
-                // Verificar que la categoría pertenezca al usuario
-                var categoriaExistente = await _categoriaService.ObtenerPorIdYUsuario(modelo.CategoriaId, usuarioId);
-                if (categoriaExistente == null)
-                    return BadRequest(new { valor = false, mensaje = "Categoría no encontrada o no autorizada" });
-
-                entidad.CategoriaId = modelo.CategoriaId;
-                resultado = await _categoriaService.Actualizar(entidad);
+                return Unauthorized(new { valor = false, mensaje = "Usuario no autenticado o sesión expirada." });
             }
-
-            return Ok(new { valor = resultado });
+            catch (ArgumentException ex)
+            {
+                // Para errores de parámetros inválidos
+                return BadRequest(new { valor = false, mensaje = $"Error de argumento: {ex.Message}" });
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Por ejemplo, errores de lógica en el servicio
+                return StatusCode(500, new { valor = false, mensaje = $"Error de operación: {ex.Message}" });
+            }
+            catch (Exception ex)
+            {
+                // Error general: útil para depuración
+                return StatusCode(500, new
+                {
+                    valor = false,
+                    mensaje = "Error interno del servidor.",
+                    detalle = ex.Message // ⚠️ puedes quitar 'detalle' en producción
+                });
+            }
         }
 
         [HttpGet]
         public async Task<IActionResult> Lista()
         {
-            var usuarioId = ObtenerUsuarioId();
-            var lista = await _categoriaService.ObtenerPorUsuario(usuarioId); // FILTRAR POR USUARIO
-
-            var vm = lista.Select(c => new VMCategoria
+            try
             {
-                CategoriaId = c.CategoriaId,
-                Nombre = c.Nombre,
-                Descripcion = c.Descripcion,
-                Tipo = c.Tipo,
-                Icono = c.Icono,
-                Color = c.Color,
-                Activo = c.Activo,
-                UsuarioId = c.UsuarioId
-            }).ToList();
+                var usuarioId = ObtenerUsuarioId();
+                var lista = await _categoriaService.ObtenerPorUsuario(usuarioId);
 
-            return Ok(vm);
+                var vm = lista.Select(c => new VMCategoria
+                {
+                    CategoriaId = c.CategoriaId,
+                    Nombre = c.Nombre,
+                    Descripcion = c.Descripcion,
+                    Tipo = c.Tipo,
+                    Icono = c.Icono,
+                    Color = c.Color,
+                    Activo = c.Activo,
+                    UsuarioId = c.UsuarioId
+                }).ToList();
+
+                return Ok(vm);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized(new { valor = false, mensaje = "Usuario no autenticado" });
+            }
         }
 
+        [HttpPut]
+        public async Task<IActionResult> Actualizar([FromBody] VMCategoria modelo)
+        {
+            try
+            {
+                if (modelo == null)
+                    return BadRequest(new { valor = false, mensaje = "No se recibieron datos válidos." });
+
+                // Validaciones básicas
+                if (modelo.CategoriaId == 0)
+                    return BadRequest(new { valor = false, mensaje = "ID de categoría inválido para actualización." });
+
+                if (string.IsNullOrWhiteSpace(modelo.Nombre))
+                    return BadRequest(new { valor = false, mensaje = "El campo 'Nombre' es obligatorio." });
+
+                if (string.IsNullOrWhiteSpace(modelo.Tipo))
+                    return BadRequest(new { valor = false, mensaje = "El campo 'Tipo' es obligatorio (I o G)." });
+
+                // Obtener usuario autenticado
+                var usuarioId = ObtenerUsuarioId();
+
+                // Verificar que la categoría existe y pertenece al usuario
+                var categoriaExistente = await _categoriaService.ObtenerPorIdYUsuario(modelo.CategoriaId, usuarioId);
+                if (categoriaExistente == null)
+                    return NotFound(new { valor = false, mensaje = "Categoría no encontrada o no pertenece al usuario actual." });
+
+                // ✅ CORRECCIÓN: Actualizar la entidad existente en lugar de crear una nueva
+                categoriaExistente.Nombre = modelo.Nombre.Trim();
+                categoriaExistente.Descripcion = modelo.Descripcion?.Trim();
+                categoriaExistente.Tipo = modelo.Tipo.Trim();
+                categoriaExistente.Icono = modelo.Icono;
+                categoriaExistente.Color = modelo.Color;
+                // No actualizamos Activo aquí, usa CambiarEstado para eso
+
+                var resultado = await _categoriaService.Actualizar(categoriaExistente);
+
+                return Ok(new
+                {
+                    valor = resultado,
+                    mensaje = resultado ? "Categoría actualizada correctamente." : "No se pudo actualizar la categoría."
+                });
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized(new { valor = false, mensaje = "Usuario no autenticado o sesión expirada." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    valor = false,
+                    mensaje = "Error interno del servidor al actualizar la categoría.",
+                    detalle = ex.Message // Para debugging
+                });
+            }
+        }
         [HttpGet]
         public async Task<IActionResult> ObtenerJson(int id)
         {
-            var usuarioId = ObtenerUsuarioId();
-            var c = await _categoriaService.ObtenerPorIdYUsuario(id, usuarioId); // FILTRAR POR USUARIO
-            if (c == null) return NotFound();
-
-            var vm = new VMCategoria
+            try
             {
-                CategoriaId = c.CategoriaId,
-                Nombre = c.Nombre,
-                Descripcion = c.Descripcion,
-                Tipo = c.Tipo,
-                Icono = c.Icono,
-                Color = c.Color,
-                Activo = c.Activo,
-                UsuarioId = c.UsuarioId
-            };
-            return Ok(vm);
+                var usuarioId = ObtenerUsuarioId();
+                var c = await _categoriaService.ObtenerPorIdYUsuario(id, usuarioId);
+                if (c == null)
+                    return NotFound(new { valor = false, mensaje = "Categoría no encontrada" });
+
+                var vm = new VMCategoria
+                {
+                    CategoriaId = c.CategoriaId,
+                    Nombre = c.Nombre,
+                    Descripcion = c.Descripcion,
+                    Tipo = c.Tipo,
+                    Icono = c.Icono,
+                    Color = c.Color,
+                    Activo = c.Activo,
+                    UsuarioId = c.UsuarioId
+                };
+                return Ok(vm);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized(new { valor = false, mensaje = "Usuario no autenticado" });
+            }
         }
 
         [HttpDelete]
         public async Task<IActionResult> Eliminar(int id)
         {
-            var usuarioId = ObtenerUsuarioId();
-            var categoria = await _categoriaService.ObtenerPorIdYUsuario(id, usuarioId);
-            if (categoria == null)
-                return NotFound(new { valor = false, mensaje = "Categoría no encontrada o no autorizada" });
+            try
+            {
+                var usuarioId = ObtenerUsuarioId();
+                var categoria = await _categoriaService.ObtenerPorIdYUsuario(id, usuarioId);
+                if (categoria == null)
+                    return NotFound(new { valor = false, mensaje = "Categoría no encontrada o no autorizada" });
 
-            var ok = await _categoriaService.Eliminar(id);
-            return Ok(new { valor = ok });
+                var ok = await _categoriaService.Eliminar(id);
+                return Ok(new { valor = ok, mensaje = ok ? "Categoría eliminada" : "Error al eliminar" });
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized(new { valor = false, mensaje = "Usuario no autenticado" });
+            }
         }
 
         [HttpPost]
         public async Task<IActionResult> CambiarEstado([FromBody] CambiarEstadoRequest model)
         {
-            if (model == null)
-                return BadRequest(new { valor = false, mensaje = "Datos inválidos" });
-
-            if (model.CategoriaId <= 0)
-                return BadRequest(new { valor = false, mensaje = "ID de categoría inválido" });
-
             try
             {
+                if (model == null)
+                    return BadRequest(new { valor = false, mensaje = "Datos inválidos" });
+
                 var usuarioId = ObtenerUsuarioId();
                 var categoria = await _categoriaService.ObtenerPorIdYUsuario(model.CategoriaId, usuarioId);
                 if (categoria == null)
@@ -145,7 +249,17 @@ namespace EduBank.AppWeb.Controllers
                 categoria.Activo = model.Activo;
                 var resultado = await _categoriaService.Actualizar(categoria);
 
-                return Ok(new { valor = resultado });
+                return Ok(new
+                {
+                    valor = resultado,
+                    mensaje = resultado ?
+                        (model.Activo ? "Categoría activada" : "Categoría desactivada") :
+                        "Error al cambiar estado"
+                });
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized(new { valor = false, mensaje = "Usuario no autenticado" });
             }
             catch (Exception ex)
             {
@@ -153,28 +267,33 @@ namespace EduBank.AppWeb.Controllers
             }
         }
 
-        // NUEVO: Endpoint para obtener categorías por tipo
+        // NUEVO: Endpoint para obtener categorías activas
         [HttpGet]
-        public async Task<IActionResult> ObtenerPorTipo(string tipo)
+        public async Task<IActionResult> ObtenerActivas()
         {
-            if (string.IsNullOrEmpty(tipo))
-                return BadRequest(new { valor = false, mensaje = "Tipo requerido" });
-
-            var usuarioId = ObtenerUsuarioId();
-            var lista = await _categoriaService.ObtenerPorUsuarioYTipo(usuarioId, tipo);
-
-            var vm = lista.Select(c => new VMCategoria
+            try
             {
-                CategoriaId = c.CategoriaId,
-                Nombre = c.Nombre,
-                Descripcion = c.Descripcion,
-                Tipo = c.Tipo,
-                Icono = c.Icono,
-                Color = c.Color,
-                Activo = c.Activo
-            }).ToList();
+                var usuarioId = ObtenerUsuarioId();
+                var lista = await _categoriaService.ObtenerPorUsuario(usuarioId);
+                var activas = lista.Where(c => c.Activo).ToList();
 
-            return Ok(vm);
+                var vm = activas.Select(c => new VMCategoria
+                {
+                    CategoriaId = c.CategoriaId,
+                    Nombre = c.Nombre,
+                    Descripcion = c.Descripcion,
+                    Tipo = c.Tipo,
+                    Icono = c.Icono,
+                    Color = c.Color,
+                    Activo = c.Activo
+                }).ToList();
+
+                return Ok(vm);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized(new { valor = false, mensaje = "Usuario no autenticado" });
+            }
         }
 
         public class CambiarEstadoRequest

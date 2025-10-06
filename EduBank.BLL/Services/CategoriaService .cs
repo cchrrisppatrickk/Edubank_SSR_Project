@@ -33,7 +33,6 @@ namespace EduBank.BLL.Services
         public Task<List<Categoria>> ObtenerPorUsuario(int usuarioId)
             => _categoriaRepo.ObtenerPorUsuario(usuarioId);
 
-        public Task<List<Categoria>> ObtenerPorUsuarioYTipo(int usuarioId, string tipo)
-            => _categoriaRepo.ObtenerPorUsuarioYTipo(usuarioId, tipo);
+ 
     }
 }

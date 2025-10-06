@@ -11,13 +11,13 @@ namespace EduBank.BLL.Services
     {
         Task<bool> Insertar(Categoria modelo);
         Task<bool> Actualizar(Categoria modelo);
+
         Task<bool> Eliminar(int id);
         Task<Categoria?> Obtener(int id);
         Task<List<Categoria>> ObtenerTodos();
 
-        // Nuevos métodos
+        // Nuevos métodos - autenticación 
         Task<Categoria?> ObtenerPorIdYUsuario(int id, int usuarioId);
         Task<List<Categoria>> ObtenerPorUsuario(int usuarioId);
-        Task<List<Categoria>> ObtenerPorUsuarioYTipo(int usuarioId, string tipo);
     }
 }
