@@ -11,12 +11,11 @@ namespace EduBank.BLL.Services
     {
         Task<bool> Insertar(Categoria modelo);
         Task<bool> Actualizar(Categoria modelo);
-
-        Task<bool> Eliminar(int id);
+        Task<bool> Eliminar(int id); // Ahora es hard delete
+        Task<bool> CambiarEstado(int id, bool activo); // Nuevo método para soft delete
         Task<Categoria?> Obtener(int id);
         Task<List<Categoria>> ObtenerTodos();
 
-        // Nuevos métodos - autenticación 
         Task<Categoria?> ObtenerPorIdYUsuario(int id, int usuarioId);
         Task<List<Categoria>> ObtenerPorUsuario(int usuarioId);
     }

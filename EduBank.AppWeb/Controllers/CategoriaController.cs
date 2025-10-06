@@ -3,6 +3,7 @@ using EduBank.Models;
 using EduBank.Models.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace EduBank.AppWeb.Controllers
 {
@@ -101,12 +102,13 @@ namespace EduBank.AppWeb.Controllers
             }
         }
 
-        [HttpGet]
+        [HttpGet]   
         public async Task<IActionResult> Lista()
         {
             try
             {
                 var usuarioId = ObtenerUsuarioId();
+                // ✅ Este método ahora devuelve TODAS las categorías (activas e inactivas)
                 var lista = await _categoriaService.ObtenerPorUsuario(usuarioId);
 
                 var vm = lista.Select(c => new VMCategoria
@@ -117,7 +119,7 @@ namespace EduBank.AppWeb.Controllers
                     Tipo = c.Tipo,
                     Icono = c.Icono,
                     Color = c.Color,
-                    Activo = c.Activo,
+                    Activo = c.Activo, // ← Esto ahora mostrará el estado real
                     UsuarioId = c.UsuarioId
                 }).ToList();
 
@@ -215,6 +217,7 @@ namespace EduBank.AppWeb.Controllers
         }
 
         [HttpDelete]
+        [HttpDelete]
         public async Task<IActionResult> Eliminar(int id)
         {
             try
@@ -224,12 +227,26 @@ namespace EduBank.AppWeb.Controllers
                 if (categoria == null)
                     return NotFound(new { valor = false, mensaje = "Categoría no encontrada o no autorizada" });
 
+                // AHORA: Hard Delete (eliminación física)
                 var ok = await _categoriaService.Eliminar(id);
-                return Ok(new { valor = ok, mensaje = ok ? "Categoría eliminada" : "Error al eliminar" });
+                return Ok(new
+                {
+                    valor = ok,
+                    mensaje = ok ? "Categoría eliminada permanentemente" : "Error al eliminar la categoría"
+                });
             }
             catch (UnauthorizedAccessException)
             {
                 return Unauthorized(new { valor = false, mensaje = "Usuario no autenticado" });
+            }
+            catch (DbUpdateException ex)
+            {
+                // Manejar error de integridad referencial (si hay movimientos asociados)
+                return BadRequest(new
+                {
+                    valor = false,
+                    mensaje = "No se puede eliminar la categoría porque tiene movimientos asociados"
+                });
             }
         }
 
@@ -246,15 +263,15 @@ namespace EduBank.AppWeb.Controllers
                 if (categoria == null)
                     return NotFound(new { valor = false, mensaje = "Categoría no encontrada o no autorizada" });
 
-                categoria.Activo = model.Activo;
-                var resultado = await _categoriaService.Actualizar(categoria);
+                // AHORA: Usa el método específico para cambiar estado
+                var resultado = await _categoriaService.CambiarEstado(model.CategoriaId, model.Activo);
 
                 return Ok(new
                 {
                     valor = resultado,
                     mensaje = resultado ?
-                        (model.Activo ? "Categoría activada" : "Categoría desactivada") :
-                        "Error al cambiar estado"
+                        (model.Activo ? "Categoría activada correctamente" : "Categoría desactivada correctamente") :
+                        "Error al cambiar el estado de la categoría"
                 });
             }
             catch (UnauthorizedAccessException)
@@ -265,6 +282,12 @@ namespace EduBank.AppWeb.Controllers
             {
                 return StatusCode(500, new { valor = false, mensaje = "Error interno del servidor" });
             }
+        }
+
+        public class CambiarEstadoRequest
+        {
+            public int CategoriaId { get; set; }
+            public bool Activo { get; set; }
         }
 
         // NUEVO: Endpoint para obtener categorías activas
@@ -296,10 +319,5 @@ namespace EduBank.AppWeb.Controllers
             }
         }
 
-        public class CambiarEstadoRequest
-        {
-            public int CategoriaId { get; set; }
-            public bool Activo { get; set; }
-        }
     }
 }

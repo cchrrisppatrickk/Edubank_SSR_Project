@@ -34,37 +34,30 @@ namespace EduBank.DAL.Repository
 
         public async Task<bool> Actualizar(Categoria modelo)
         {
-            try
-            {
-                // Buscar la entidad sin rastreo para evitar conflictos
-                var entidadExistente = await _db.Categorias
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(c => c.CategoriaId == modelo.CategoriaId);
-
-                if (entidadExistente == null)
-                    return false;
-
-                // Adjuntar y marcar como modificado
-                _db.Categorias.Attach(modelo);
-                _db.Entry(modelo).State = EntityState.Modified;
-
-                var affected = await _db.SaveChangesAsync();
-                return affected > 0;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error al actualizar categoría: {ex.Message}");
-                throw;
-            }
+            _db.Categorias.Update(modelo);
+            var affected = await _db.SaveChangesAsync();
+            return affected > 0;
         }
 
+        // CAMBIO: Hard Delete (eliminación física)
         public async Task<bool> Eliminar(int id)
         {
             var entidad = await _db.Categorias.FindAsync(id);
             if (entidad == null) return false;
 
-            // Soft delete en lugar de eliminar físicamente
-            entidad.Activo = false;
+            // Eliminación física de la base de datos
+            _db.Categorias.Remove(entidad);
+            var affected = await _db.SaveChangesAsync();
+            return affected > 0;
+        }
+
+        // NUEVO: Método específico para cambiar estado (soft delete)
+        public async Task<bool> CambiarEstado(int id, bool activo)
+        {
+            var entidad = await _db.Categorias.FindAsync(id);
+            if (entidad == null) return false;
+
+            entidad.Activo = activo;
             var affected = await _db.SaveChangesAsync();
             return affected > 0;
         }
@@ -72,33 +65,33 @@ namespace EduBank.DAL.Repository
         public async Task<Categoria?> Obtener(int id)
         {
             return await _db.Categorias
-                .FirstOrDefaultAsync(c => c.CategoriaId == id && c.Activo);
+                .FirstOrDefaultAsync(c => c.CategoriaId == id); 
         }
 
-        // NUEVO: Obtener categoría por ID y Usuario
         public async Task<Categoria?> ObtenerPorIdYUsuario(int id, int usuarioId)
         {
             return await _db.Categorias
-                .FirstOrDefaultAsync(c => c.CategoriaId == id && c.UsuarioId == usuarioId && c.Activo);
+                .FirstOrDefaultAsync(c => c.CategoriaId == id && c.UsuarioId == usuarioId); // ← Quitado: && c.Activo
         }
 
         public async Task<List<Categoria>> ObtenerTodos()
         {
             return await _db.Categorias
-                .Where(c => c.Activo)
+                // .Where(c => c.Activo) ← QUITAR ESTE FILTRO
                 .AsNoTracking()
                 .ToListAsync();
         }
 
-        // NUEVO: Obtener categorías por usuario específico
+
         public async Task<List<Categoria>> ObtenerPorUsuario(int usuarioId)
         {
             return await _db.Categorias
-                .Where(c => c.UsuarioId == usuarioId && c.Activo)
+                .Where(c => c.UsuarioId == usuarioId) // ← Quitado: && c.Activo
                 .AsNoTracking()
                 .ToListAsync();
         }
 
-  
+
+
     }
 }

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("EduBank.AppWeb")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9ca28e3e84ff4523a28f1e1adc0094b143367413")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fd774296e6f17c67d722bcb3c66256a40a92c4ad")]
 [assembly: System.Reflection.AssemblyProductAttribute("EduBank.AppWeb")]
 [assembly: System.Reflection.AssemblyTitleAttribute("EduBank.AppWeb")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
