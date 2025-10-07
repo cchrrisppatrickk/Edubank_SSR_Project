@@ -36,8 +36,11 @@ builder.Services.AddScoped<CategoriaRepository>();
 builder.Services.AddScoped<IGenericRepository<Categoria>, CategoriaRepository>();
 builder.Services.AddScoped<ICategoriaService, CategoriaService>();
 
-
-
+// Agregar estas líneas en el registro de servicios
+// En Program.cs agregar:
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped<ICuentaRepository, CuentaRepository>();
+builder.Services.AddScoped<ICuentaService, CuentaService>();
 
 
 

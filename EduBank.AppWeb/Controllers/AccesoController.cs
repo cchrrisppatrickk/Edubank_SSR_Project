@@ -26,15 +26,25 @@ namespace EduBank.AppWeb.Controllers
             return View();
         }
 
+      
         [HttpPost]
         public async Task<IActionResult> Registrarse(RegistroViewModel model)
         {
             if (model.Contrasena != model.ConfirmarContrasena)
             {
                 ViewData["Mensaje"] = "Las contraseñas no coinciden";
-                return View();
+                return View(model);
             }
 
+            // VALIDACIÓN: verificar si el correo ya está registrado
+            bool existe = await _db.Usuarios.AnyAsync(u => u.CorreoElectronico == model.CorreoElectronico);
+            if (existe)
+            {
+                ViewData["Mensaje"] = "El correo electrónico ya está registrado. Intenta con otro.";
+                return View(model);
+            }
+
+            // Si pasa la validación, registrar el usuario normalmente
             Usuario usuario = new Usuario()
             {
                 Nombre = model.Nombre,
@@ -46,11 +56,13 @@ namespace EduBank.AppWeb.Controllers
             await _db.Usuarios.AddAsync(usuario);
             await _db.SaveChangesAsync();
 
-            if (usuario.UsuarioId != 0) return RedirectToAction("Login", "Acceso");
+            if (usuario.UsuarioId != 0)
+                return RedirectToAction("Login", "Acceso");
 
-            ViewData["Mensaje"] = "No se puede crear un nuevo usuario, error fatal";
-            return View();
+            ViewData["Mensaje"] = "No se pudo crear el usuario. Intenta nuevamente.";
+            return View(model);
         }
+
 
 
         [HttpGet]

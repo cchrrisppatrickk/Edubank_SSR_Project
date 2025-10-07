@@ -317,19 +317,31 @@
             </div>
 
             <div class="sidebar-nav">
+                <!-- Inicio -->
                 <a asp-area="" asp-controller="Home" asp-action="Index" class="sidebar-link">
-                    <i class="fas fa-home me-3"></i>
+                    <i class="fas fa-house me-3"></i>
                     <span class="hide-on-collapse">Inicio</span>
                 </a>
+
+                <!-- Movimientos -->
                 <a asp-area="" asp-controller="Movimiento" asp-action="Index" class="sidebar-link">
-                    <i class="fas fa-exchange-alt me-3"></i>
+                    <i class="fas fa-arrow-right-arrow-left me-3"></i>
                     <span class="hide-on-collapse">Movimientos</span>
                 </a>
+
+                <!-- Categorías -->
                 <a asp-area="" asp-controller="Categoria" asp-action="Index" class="sidebar-link">
-                    <i class="fas fa-tags me-3"></i>
+                    <i class="fas fa-layer-group me-3"></i>
                     <span class="hide-on-collapse">Categorías</span>
                 </a>
+
+                <!-- Cuentas -->
+                <a asp-area="" asp-controller="Cuenta" asp-action="Index" class="sidebar-link">
+                    <i class="fas fa-wallet me-3"></i>
+                    <span class="hide-on-collapse">Cuentas</span>
+                </a>
             </div>
+
 
             <!-- Sección de perfil -->
             <div class="profile-section">

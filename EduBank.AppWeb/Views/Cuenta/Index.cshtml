@@ -1,0 +1,745 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mis Cuentas</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+
+    <style>
+        body {
+            background: linear-gradient(180deg, #f0f4ff, #ffffff);
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            min-height: 100vh;
+        }
+
+        .section-title {
+            position: relative;
+            font-weight: 700;
+            color: #1f2937;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+            .section-title::after {
+                content: "";
+                position: absolute;
+                bottom: -6px;
+                left: 0;
+                width: 45%;
+                height: 3px;
+                background: linear-gradient(90deg, #0d6efd, #3b82f6);
+                border-radius: 4px;
+            }
+
+        .card {
+            border: none;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(6px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+            .card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            }
+
+        .saldo-card {
+            background: linear-gradient(145deg, #ffffff, #f3f6fb);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .icon-saldo {
+            background: linear-gradient(135deg, #dbeafe, #eff6ff);
+            border-radius: 16px;
+            padding: 1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 2px 2px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .badge.bg-gradient {
+            background: linear-gradient(90deg, #0d6efd, #3b82f6);
+            box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
+        }
+
+        .cuentas-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .cuenta-card {
+            background: white;
+            border: 1.5px solid #e9ecef;
+            border-radius: 14px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+            .cuenta-card:hover {
+                border-color: #0d6efd;
+                background: #f8fbff;
+                transform: translateY(-2px);
+                box-shadow: 0 6px 16px rgba(13, 110, 253, 0.08);
+            }
+
+        .add-card-minimal {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+            border: 1.5px solid #e9ecef;
+            border-radius: 14px;
+            color: #495057;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 2.5rem 1.5rem;
+            min-height: 180px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+        }
+
+            .add-card-minimal:hover {
+                border-color: #0d6efd;
+                background: #f8fbff;
+                color: #0d6efd;
+                transform: translateY(-2px);
+                box-shadow: 0 6px 16px rgba(13, 110, 253, 0.08);
+            }
+
+        .modal-content {
+            border-radius: 16px;
+            border: none;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .required-field::after {
+            content: " *";
+            color: #dc3545;
+        }
+
+        #sinCuentas {
+            text-align: center;
+            padding: 4rem 0;
+        }
+
+            #sinCuentas i {
+                font-size: 4rem;
+                opacity: 0.6;
+            }
+
+        .cuenta-actions {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .cuenta-card:hover .cuenta-actions {
+            opacity: 1;
+        }
+
+        .tipo-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .icon-efectivo {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            color: white;
+        }
+
+        .icon-bancaria {
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            color: white;
+        }
+
+        .icon-tarjeta {
+            background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+            color: white;
+        }
+
+        .icon-inversion {
+            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+            color: white;
+        }
+
+        .estado-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.75rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container py-4">
+        <!-- ================= CABECERA ================= -->
+        <div class="mb-4">
+            <h2 class="section-title">
+                <i class="bi bi-wallet2 text-primary"></i> Mis Cuentas
+            </h2>
+        </div>
+
+        <!-- ================= SALDO TOTAL ================= -->
+        <div class="card saldo-card mb-5">
+            <div class="card-body py-4 px-3">
+                <div class="row align-items-center">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-saldo me-3">
+                                <i class="bi bi-cash-stack text-primary fs-1"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted fw-semibold text-uppercase">Saldo Total</small>
+                                <h3 class="display-6 fw-bold text-dark mt-1 mb-0" id="saldoTotal">S/ 0.00</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 d-flex justify-content-center justify-content-md-end">
+                        <div class="d-flex gap-3">
+                            <button class="btn btn-outline-primary d-flex align-items-center gap-1" onclick="cargarCuentas()">
+                                <i class="bi bi-arrow-clockwise"></i> Actualizar
+                            </button>
+                            <button class="btn btn-outline-secondary d-flex align-items-center gap-1" onclick="exportarDatos()">
+                                <i class="bi bi-download"></i> Exportar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= FILTROS Y CONTADOR ================= -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline-primary active" onclick="filtrarCuentas('all')">Todas</button>
+                <button class="btn btn-sm btn-outline-success" onclick="filtrarCuentas('active')">Activas</button>
+                <button class="btn btn-sm btn-outline-secondary" onclick="filtrarCuentas('inactive')">Inactivas</button>
+            </div>
+            <span class="badge bg-gradient fs-6 px-3 py-2" id="contadorCuentas">0 cuentas</span>
+        </div>
+
+        <!-- ================= LISTADO DE CUENTAS ================= -->
+        <div class="cuentas-grid">
+            <div>
+                <div id="gridCuentas">
+                    <div id="sinCuentas">
+                        <i class="bi bi-wallet2 text-secondary"></i>
+                        <h5 class="fw-semibold text-muted mt-3">No tienes cuentas registradas</h5>
+                        <p class="text-muted">Agrega tu primera cuenta para comenzar a gestionar tus finanzas.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="add-card-minimal" onclick="abrirModalCrear()">
+                    <div class="btn-add-icon">
+                        <i class="bi bi-plus-lg fs-2"></i>
+                    </div>
+                    <h5>Agregar Cuenta</h5>
+                    <p>Nueva cuenta</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL CREAR/EDITAR ================= -->
+    <div class="modal fade" id="modalCuenta" tabindex="-1" aria-labelledby="modalCuentaLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalCuentaLabel">Nueva Cuenta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formCuenta">
+                        <input type="hidden" id="CuentaId" value="0">
+
+                        <div class="mb-3">
+                            <label for="Nombre" class="form-label required-field">Nombre de la Cuenta</label>
+                            <input type="text" class="form-control" id="Nombre" placeholder="Ej: Cuenta Principal..." required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="Tipo" class="form-label required-field">Tipo de Cuenta</label>
+                            <select class="form-select" id="Tipo" required>
+                                <option value="">Seleccionar tipo...</option>
+                                <option value="Efectivo">Efectivo</option>
+                                <option value="Bancaria">Bancaria</option>
+                                <option value="Tarjeta">Tarjeta</option>
+                                <option value="Inversión">Inversión</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="Moneda" class="form-label required-field">Moneda</label>
+                            <select class="form-select" id="Moneda" required>
+                                <option value="PEN">Soles (PEN)</option>
+                                <option value="USD">Dólares (USD)</option>
+                                <option value="EUR">Euros (EUR)</option>
+                                <option value="MXN">Pesos Mexicanos (MXN)</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="Saldo" class="form-label">Saldo Inicial</label>
+                            <input type="number" class="form-control" id="Saldo" value="0" min="0" step="0.01">
+                        </div>
+
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="Activo" checked>
+                            <label class="form-check-label" for="Activo">Cuenta activa</label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btnGuardarCuenta">
+                        <i class="bi bi-check-lg me-1"></i>Guardar Cuenta
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL CONFIRMACIÓN ================= -->
+    <div class="modal fade" id="modalConfirmacion" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalConfirmacionLabel">Confirmar acción</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modalConfirmacionBody">
+                    <!-- Contenido dinámico -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="btnConfirmarAccion">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+    <!-- JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    <script>
+        // Variables globales
+        let cuentas = [];
+        let filtroActual = 'all';
+
+        $(document).ready(function () {
+            cargarCuentas();
+            cargarSaldoTotal();
+
+            $("#btnGuardarCuenta").click(guardarCuenta);
+
+            $('#modalCuenta').on('hidden.bs.modal', function () {
+                limpiarFormulario();
+            });
+        });
+
+        // Cargar lista de cuentas
+                async function cargarCuentas() {
+            try {
+                mostrarCargando();
+                const response = await fetch('/Cuenta/Lista');
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        toastr.error('Sesión expirada. Por favor, inicie sesión nuevamente.');
+                        return;
+                    }
+                    throw new Error(`Error ${response.status}: ${response.statusText}`);
+                }
+
+                cuentas = await response.json();
+                renderizarCuentas();
+
+            } catch (error) {
+                console.error('Error al cargar cuentas:', error);
+                toastr.error('Error al cargar las cuentas: ' + error.message);
+
+                // Mostrar estado de error en la UI
+                $('#gridCuentas').html(`
+                    <div class="text-center py-4">
+                        <i class="bi bi-exclamation-triangle text-warning fs-1"></i>
+                        <h5 class="mt-2">Error al cargar cuentas</h5>
+                        <p class="text-muted">${error.message}</p>
+                        <button class="btn btn-primary mt-2" onclick="cargarCuentas()">
+                            <i class="bi bi-arrow-clockwise"></i> Reintentar
+                        </button>
+                    </div>
+                `);
+            }
+        }
+
+        function actualizarEstadosBotones() {
+            // Remover active de todos los botones
+            $('.btn-group .btn').removeClass('active');
+
+            // Agregar active al botón correspondiente
+            $(`button[onclick="filtrarCuentas('${filtroActual}')"]`).addClass('active');
+
+            // Actualizar contador con información del filtro
+            const cuentasFiltradas = filtrarCuentasPorEstado();
+            const textoFiltro = getFiltroTexto(filtroActual);
+            $('#contadorCuentas').text(`${cuentasFiltradas.length} ${textoFiltro.toLowerCase()}`);
+        }
+
+        function getFiltroTexto(filtro) {
+            const textos = {
+                'all': 'cuentas',
+                'active': 'cuentas activas',
+                'inactive': 'cuentas inactivas'
+            };
+            return textos[filtro] || 'cuentas';
+        }
+
+        // Cargar saldo total
+        async function cargarSaldoTotal() {
+            try {
+                const response = await fetch('/Cuenta/ObtenerSaldoTotal');
+                if (response.ok) {
+                    const data = await response.json();
+                    $('#saldoTotal').text(formatearMoneda(data.saldoTotal));
+                }
+            } catch (error) {
+                console.error('Error al cargar saldo total:', error);
+            }
+        }
+
+        // Renderizar cuentas en la grid
+        function renderizarCuentas() {
+        const grid = $('#gridCuentas');
+        const sinCuentas = $('#sinCuentas');
+
+            let cuentasFiltradas = filtrarCuentasPorEstado();
+
+            if (cuentasFiltradas.length === 0) {
+                const mensaje = filtroActual === 'all'
+                    ? 'No tienes cuentas registradas'
+                    : `No tienes ${getFiltroTexto(filtroActual)}`;
+
+                grid.html(`
+                    <div id="sinCuentas">
+                        <i class="bi bi-wallet2 text-secondary"></i>
+                        <h5 class="fw-semibold text-muted mt-3">${mensaje}</h5>
+                        <p class="text-muted">${filtroActual !== 'all' ? 'Cambia el filtro para ver más cuentas' : 'Agrega tu primera cuenta para comenzar'}</p>
+                    </div>
+                `);
+                actualizarEstadosBotones();
+                return;
+            }
+
+            sinCuentas.hide();
+
+            const html = cuentasFiltradas.map(cuenta => `
+                <div class="cuenta-card" onclick="editarCuenta(${cuenta.cuentaId})">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <div class="tipo-icon ${obtenerClaseIcono(cuenta.tipo)}">
+                                <i class="bi ${obtenerIconoTipo(cuenta.tipo)}"></i>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1 fw-bold">${cuenta.nombre}</h6>
+                                    <span class="badge bg-light text-dark">${cuenta.tipo}</span>
+                                    <span class="badge bg-light text-dark ms-1">${cuenta.moneda}</span>
+                                </div>
+                                <div class="cuenta-actions">
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-primary" onclick="event.stopPropagation(); editarCuenta(${cuenta.cuentaId})"
+                                                title="Editar cuenta">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn ${cuenta.activo ? 'btn-outline-warning' : 'btn-outline-success'}"
+                                                onclick="event.stopPropagation(); cambiarEstado(${cuenta.cuentaId}, ${!cuenta.activo})"
+                                                title="${cuenta.activo ? 'Desactivar' : 'Activar'} cuenta">
+                                            <i class="bi ${cuenta.activo ? 'bi-pause' : 'bi-play'}"></i>
+                                        </button>
+                                        <button class="btn btn-outline-danger" onclick="event.stopPropagation(); confirmarEliminacion(${cuenta.cuentaId})"
+                                                title="Eliminar cuenta">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <h5 class="mb-0 ${cuenta.saldo >= 0 ? 'text-success' : 'text-danger'}">
+                                    ${formatearMoneda(cuenta.saldo)}
+                                </h5>
+                                <span class="badge ${cuenta.activo ? 'bg-success' : 'bg-secondary'} estado-badge">
+                                    ${cuenta.activo ? 'Activa' : 'Inactiva'}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            grid.html(html);
+            $('#contadorCuentas').text(`${cuentasFiltradas.length} ${cuentasFiltradas.length === 1 ? 'cuenta' : 'cuentas'}`);
+        }
+
+        // Filtrar cuentas por estado (filtrado local - más eficiente)
+        function filtrarCuentasPorEstado() {
+            switch (filtroActual) {
+                case 'active':
+                    return cuentas.filter(c => c.activo);
+                case 'inactive':
+                    return cuentas.filter(c => !c.activo);
+                default:
+                    return cuentas;
+            }
+        }
+
+        // Aplicar filtro (solo cambia el filtro y re-renderiza)
+        function filtrarCuentas(filtro) {
+            // Actualizar estado de botones
+            $('.btn-group .btn').removeClass('active');
+            $(`button[onclick="filtrarCuentas('${filtro}')"]`).addClass('active');
+
+            // Cambiar filtro y renderizar
+            filtroActual = filtro;
+            renderizarCuentas();
+        }
+
+
+        function getFiltroTexto(filtro) {
+            const textos = { 'all': 'Todas', 'active': 'Activas', 'inactive': 'Inactivas' };
+            return textos[filtro];
+        }
+
+        // Guardar cuenta (crear o editar)
+                async function guardarCuenta() {
+            const form = $('#formCuenta')[0];
+            if (!form.checkValidity()) {
+                form.classList.add('was-validated');
+                return;
+            }
+
+            const cuentaId = parseInt($('#CuentaId').val());
+            const esEdicion = cuentaId > 0;
+
+            const cuenta = {
+                CuentaId: cuentaId,
+                Nombre: $('#Nombre').val().trim(),
+                Tipo: $('#Tipo').val(),
+                Moneda: $('#Moneda').val(),
+                Saldo: parseFloat($('#Saldo').val()) || 0,
+                Activo: $('#Activo').is(":checked")
+            };
+
+            if (!cuenta.Tipo) {
+                toastr.warning("Debe seleccionar un tipo de cuenta válido.");
+                return;
+            }
+
+            const btn = $('#btnGuardarCuenta');
+            const originalText = btn.html();
+
+            try {
+                btn.prop('disabled', true).html('<i class="bi bi-hourglass-split me-1"></i>Guardando...');
+
+                const url = esEdicion ? '/Cuenta/Actualizar' : '/Cuenta/Insertar';
+                const metodo = esEdicion ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method: metodo,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(cuenta)
+                });
+
+                const resultado = await response.json();
+
+                if (resultado.valor) {
+                    toastr.success(resultado.mensaje);
+                    $("#modalCuenta").modal('hide');
+                    await cargarCuentas();
+                    await cargarSaldoTotal();
+                } else {
+                    throw new Error(resultado.mensaje);
+                }
+
+            } catch (error) {
+                toastr.error('Error al guardar la cuenta: ' + error.message);
+            } finally {
+                btn.prop('disabled', false).html(originalText);
+            }
+        }
+
+
+        // Editar cuenta
+        async function editarCuenta(cuentaId) {
+            try {
+                const response = await fetch(`/Cuenta/ObtenerJson?id=${cuentaId}`);
+                if (response.ok) {
+                    const cuenta = await response.json();
+
+                    $('#CuentaId').val(cuenta.cuentaId);
+                    $('#Nombre').val(cuenta.nombre);
+                    $('#Tipo').val(cuenta.tipo);
+                    $('#Moneda').val(cuenta.moneda);
+                    $('#Saldo').val(cuenta.saldo);
+                    $('#Activo').prop('checked', cuenta.activo);
+
+                    $('#modalCuentaLabel').text('Editar Cuenta');
+                    $('#modalCuenta').modal('show');
+                }
+            } catch (error) {
+                toastr.error('Error al cargar la cuenta para editar');
+            }
+        }
+
+        // Cambiar estado de cuenta
+        async function cambiarEstado(cuentaId, nuevoEstado) {
+            try {
+                const response = await fetch('/Cuenta/CambiarEstado', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        CuentaId: cuentaId,
+                        Activo: nuevoEstado
+                    })
+                });
+
+                const resultado = await response.json();
+
+                if (resultado.valor) {
+                    toastr.success(resultado.mensaje);
+                    await cargarCuentas();
+                } else {
+                    throw new Error(resultado.mensaje);
+                }
+            } catch (error) {
+                toastr.error('Error al cambiar estado: ' + error.message);
+            }
+        }
+
+        // Confirmar eliminación
+        function confirmarEliminacion(cuentaId) {
+            const cuenta = cuentas.find(c => c.cuentaId === cuentaId);
+            if (!cuenta) return;
+
+            $('#modalConfirmacionLabel').text('Confirmar Eliminación');
+            $('#modalConfirmacionBody').html(`
+                <p>¿Estás seguro de que deseas eliminar permanentemente la cuenta <strong>"${cuenta.nombre}"</strong>?</p>
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>Advertencia:</strong> Esta acción no se puede deshacer.
+                </div>
+            `);
+
+            $('#btnConfirmarAccion').off('click').on('click', () => eliminarCuenta(cuentaId));
+            $('#modalConfirmacion').modal('show');
+        }
+
+        // Eliminar cuenta
+        async function eliminarCuenta(cuentaId) {
+            try {
+                const response = await fetch(`/Cuenta/Eliminar?id=${cuentaId}`, {
+                    method: 'DELETE'
+                });
+
+                const resultado = await response.json();
+
+                if (resultado.valor) {
+                    toastr.success(resultado.mensaje);
+                    $('#modalConfirmacion').modal('hide');
+                    await cargarCuentas();
+                    await cargarSaldoTotal();
+                } else {
+                    throw new Error(resultado.mensaje);
+                }
+            } catch (error) {
+                toastr.error('Error al eliminar la cuenta: ' + error.message);
+            }
+        }
+
+        // Funciones de utilidad
+        function abrirModalCrear() {
+            $('#modalCuentaLabel').text('Nueva Cuenta');
+            $('#modalCuenta').modal('show');
+        }
+
+        function limpiarFormulario() {
+            $('#formCuenta')[0].reset();
+            $('#formCuenta').removeClass('was-validated');
+            $('#CuentaId').val('0');
+            $('#Activo').prop('checked', true);
+        }
+
+        function formatearMoneda(monto) {
+            return new Intl.NumberFormat('es-PE', {
+                style: 'currency',
+                currency: 'PEN'
+            }).format(monto);
+        }
+
+        function obtenerIconoTipo(tipo) {
+            const iconos = {
+                'Efectivo': 'bi-cash-coin',
+                'Bancaria': 'bi-bank',
+                'Tarjeta': 'bi-credit-card',
+                'Inversión': 'bi-graph-up'
+            };
+            return iconos[tipo] || 'bi-wallet2';
+        }
+
+        function obtenerClaseIcono(tipo) {
+            const clases = {
+                'Efectivo': 'icon-efectivo',
+                'Bancaria': 'icon-bancaria',
+                'Tarjeta': 'icon-tarjeta',
+                'Inversión': 'icon-inversion'
+            };
+            return clases[tipo] || 'icon-bancaria';
+        }
+
+        function mostrarCargando() {
+            $('#gridCuentas').html(`
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p class="mt-2 text-muted">Cargando cuentas...</p>
+                </div>
+            `);
+        }
+
+        function exportarDatos() {
+            toastr.info('Función de exportación en desarrollo');
+        }
+    </script>
+</body>
+</html>
