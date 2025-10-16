@@ -180,11 +180,6 @@
             background: linear-gradient(135deg, #f59e0b, #fbbf24);
             color: white;
         }
-
-        .estado-badge {
-            font-size: 0.75rem;
-            padding: 0.25rem 0.75rem;
-        }
     </style>
 </head>
 <body>
@@ -198,10 +193,12 @@
         </div>
 
         <!-- ================= SALDO TOTAL ================= -->
+        <!-- ================= SALDO TOTAL ================= -->
         <div class="card saldo-card mb-5">
             <div class="card-body py-4 px-3">
                 <div class="row align-items-center">
-                    <div class="col-md-6 mb-3 mb-md-0">
+                    <!-- Columna izquierda: saldo total -->
+                    <div class="col-md-6 mb-4 mb-md-0">
                         <div class="d-flex align-items-center">
                             <div class="icon-saldo me-3">
                                 <i class="bi bi-cash-stack text-primary fs-1"></i>
@@ -212,13 +209,18 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 d-flex justify-content-center justify-content-md-end">
-                        <div class="d-flex gap-3">
-                            <button class="btn btn-outline-primary d-flex align-items-center gap-1" onclick="cargarCuentas()">
-                                <i class="bi bi-arrow-clockwise"></i> Actualizar
+
+                    <!-- Columna derecha: botones verticales -->
+                    <div class="col-md-6">
+                        <div class="d-flex flex-column gap-3">
+                            <button class="btn btn-light py-3 shadow-sm border-0 d-flex flex-column align-items-center justify-content-center rounded-4">
+                                <i class="bi bi-clock-history text-primary fs-3 mb-1"></i>
+                                <span class="fw-semibold text-dark">Historial de Transferencias</span>
                             </button>
-                            <button class="btn btn-outline-secondary d-flex align-items-center gap-1" onclick="exportarDatos()">
-                                <i class="bi bi-download"></i> Exportar
+
+                            <button class="btn btn-light py-3 shadow-sm border-0 d-flex flex-column align-items-center justify-content-center rounded-4">
+                                <i class="bi bi-arrow-left-right text-success fs-3 mb-1"></i>
+                                <span class="fw-semibold text-dark">Nueva Transferencia</span>
                             </button>
                         </div>
                     </div>
@@ -226,13 +228,18 @@
             </div>
         </div>
 
-        <!-- ================= FILTROS Y CONTADOR ================= -->
+
+        <!-- ================= CONTADOR ================= -->
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <div class="d-flex gap-2">
-                <button class="btn btn-sm btn-outline-primary active" onclick="filtrarCuentas('all')">Todas</button>
-                <button class="btn btn-sm btn-outline-success" onclick="filtrarCuentas('active')">Activas</button>
-                <button class="btn btn-sm btn-outline-secondary" onclick="filtrarCuentas('inactive')">Inactivas</button>
-            </div>
+            <div></div>
+            <span class="badge bg-gradient fs-6 px-3 py-2" id="contadorCuentas">0 cuentas</span>
+        </div>
+
+        <!-- ================= NUEVO TÍTULO: LISTA DE CUENTAS ================= -->
+        <div class="mb-3 d-flex justify-content-between align-items-center">
+            <h4 class="section-title">
+                <i class="bi bi-list-ul text-primary"></i> Lista de Cuentas
+            </h4>
             <span class="badge bg-gradient fs-6 px-3 py-2" id="contadorCuentas">0 cuentas</span>
         </div>
 
@@ -302,11 +309,6 @@
                             <label for="Saldo" class="form-label">Saldo Inicial</label>
                             <input type="number" class="form-control" id="Saldo" value="0" min="0" step="0.01">
                         </div>
-
-                        <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" id="Activo" checked>
-                            <label class="form-check-label" for="Activo">Cuenta activa</label>
-                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -349,7 +351,6 @@
     <script>
         // Variables globales
         let cuentas = [];
-        let filtroActual = 'all';
 
         $(document).ready(function () {
             cargarCuentas();
@@ -363,7 +364,7 @@
         });
 
         // Cargar lista de cuentas
-                async function cargarCuentas() {
+        async function cargarCuentas() {
             try {
                 mostrarCargando();
                 const response = await fetch('/Cuenta/Lista');
@@ -376,14 +377,23 @@
                     throw new Error(`Error ${response.status}: ${response.statusText}`);
                 }
 
-                cuentas = await response.json();
+                let data = await response.json();
+
+                // MAPEAR propiedades de español a inglés
+                cuentas = data.map(c => ({
+                    cuentaId: c.cuentaId || c.CuentaId,
+                    nombre: c.nombre || c.Nombre,
+                    tipo: c.tipo || c.Tipo,
+                    moneda: c.moneda || c.Moneda,
+                    saldo: c.saldo || c.Saldo
+                }));
+
                 renderizarCuentas();
 
             } catch (error) {
                 console.error('Error al cargar cuentas:', error);
                 toastr.error('Error al cargar las cuentas: ' + error.message);
 
-                // Mostrar estado de error en la UI
                 $('#gridCuentas').html(`
                     <div class="text-center py-4">
                         <i class="bi bi-exclamation-triangle text-warning fs-1"></i>
@@ -395,28 +405,6 @@
                     </div>
                 `);
             }
-        }
-
-        function actualizarEstadosBotones() {
-            // Remover active de todos los botones
-            $('.btn-group .btn').removeClass('active');
-
-            // Agregar active al botón correspondiente
-            $(`button[onclick="filtrarCuentas('${filtroActual}')"]`).addClass('active');
-
-            // Actualizar contador con información del filtro
-            const cuentasFiltradas = filtrarCuentasPorEstado();
-            const textoFiltro = getFiltroTexto(filtroActual);
-            $('#contadorCuentas').text(`${cuentasFiltradas.length} ${textoFiltro.toLowerCase()}`);
-        }
-
-        function getFiltroTexto(filtro) {
-            const textos = {
-                'all': 'cuentas',
-                'active': 'cuentas activas',
-                'inactive': 'cuentas inactivas'
-            };
-            return textos[filtro] || 'cuentas';
         }
 
         // Cargar saldo total
@@ -434,30 +422,24 @@
 
         // Renderizar cuentas en la grid
         function renderizarCuentas() {
-        const grid = $('#gridCuentas');
-        const sinCuentas = $('#sinCuentas');
+            const grid = $('#gridCuentas');
+            const sinCuentas = $('#sinCuentas');
 
-            let cuentasFiltradas = filtrarCuentasPorEstado();
-
-            if (cuentasFiltradas.length === 0) {
-                const mensaje = filtroActual === 'all'
-                    ? 'No tienes cuentas registradas'
-                    : `No tienes ${getFiltroTexto(filtroActual)}`;
-
+            if (cuentas.length === 0) {
                 grid.html(`
                     <div id="sinCuentas">
                         <i class="bi bi-wallet2 text-secondary"></i>
-                        <h5 class="fw-semibold text-muted mt-3">${mensaje}</h5>
-                        <p class="text-muted">${filtroActual !== 'all' ? 'Cambia el filtro para ver más cuentas' : 'Agrega tu primera cuenta para comenzar'}</p>
+                        <h5 class="fw-semibold text-muted mt-3">No tienes cuentas registradas</h5>
+                        <p class="text-muted">Agrega tu primera cuenta para comenzar a gestionar tus finanzas.</p>
                     </div>
                 `);
-                actualizarEstadosBotones();
+                $('#contadorCuentas').text('0 cuentas');
                 return;
             }
 
             sinCuentas.hide();
 
-            const html = cuentasFiltradas.map(cuenta => `
+            const html = cuentas.map(cuenta => `
                 <div class="cuenta-card" onclick="editarCuenta(${cuenta.cuentaId})">
                     <div class="row align-items-center">
                         <div class="col-auto">
@@ -478,11 +460,6 @@
                                                 title="Editar cuenta">
                                             <i class="bi bi-pencil"></i>
                                         </button>
-                                        <button class="btn ${cuenta.activo ? 'btn-outline-warning' : 'btn-outline-success'}"
-                                                onclick="event.stopPropagation(); cambiarEstado(${cuenta.cuentaId}, ${!cuenta.activo})"
-                                                title="${cuenta.activo ? 'Desactivar' : 'Activar'} cuenta">
-                                            <i class="bi ${cuenta.activo ? 'bi-pause' : 'bi-play'}"></i>
-                                        </button>
                                         <button class="btn btn-outline-danger" onclick="event.stopPropagation(); confirmarEliminacion(${cuenta.cuentaId})"
                                                 title="Eliminar cuenta">
                                             <i class="bi bi-trash"></i>
@@ -494,9 +471,6 @@
                                 <h5 class="mb-0 ${cuenta.saldo >= 0 ? 'text-success' : 'text-danger'}">
                                     ${formatearMoneda(cuenta.saldo)}
                                 </h5>
-                                <span class="badge ${cuenta.activo ? 'bg-success' : 'bg-secondary'} estado-badge">
-                                    ${cuenta.activo ? 'Activa' : 'Inactiva'}
-                                </span>
                             </div>
                         </div>
                     </div>
@@ -504,40 +478,11 @@
             `).join('');
 
             grid.html(html);
-            $('#contadorCuentas').text(`${cuentasFiltradas.length} ${cuentasFiltradas.length === 1 ? 'cuenta' : 'cuentas'}`);
-        }
-
-        // Filtrar cuentas por estado (filtrado local - más eficiente)
-        function filtrarCuentasPorEstado() {
-            switch (filtroActual) {
-                case 'active':
-                    return cuentas.filter(c => c.activo);
-                case 'inactive':
-                    return cuentas.filter(c => !c.activo);
-                default:
-                    return cuentas;
-            }
-        }
-
-        // Aplicar filtro (solo cambia el filtro y re-renderiza)
-        function filtrarCuentas(filtro) {
-            // Actualizar estado de botones
-            $('.btn-group .btn').removeClass('active');
-            $(`button[onclick="filtrarCuentas('${filtro}')"]`).addClass('active');
-
-            // Cambiar filtro y renderizar
-            filtroActual = filtro;
-            renderizarCuentas();
-        }
-
-
-        function getFiltroTexto(filtro) {
-            const textos = { 'all': 'Todas', 'active': 'Activas', 'inactive': 'Inactivas' };
-            return textos[filtro];
+            $('#contadorCuentas').text(`${cuentas.length} ${cuentas.length === 1 ? 'cuenta' : 'cuentas'}`);
         }
 
         // Guardar cuenta (crear o editar)
-                async function guardarCuenta() {
+        async function guardarCuenta() {
             const form = $('#formCuenta')[0];
             if (!form.checkValidity()) {
                 form.classList.add('was-validated');
@@ -552,8 +497,7 @@
                 Nombre: $('#Nombre').val().trim(),
                 Tipo: $('#Tipo').val(),
                 Moneda: $('#Moneda').val(),
-                Saldo: parseFloat($('#Saldo').val()) || 0,
-                Activo: $('#Activo').is(":checked")
+                Saldo: parseFloat($('#Saldo').val()) || 0
             };
 
             if (!cuenta.Tipo) {
@@ -596,7 +540,6 @@
             }
         }
 
-
         // Editar cuenta
         async function editarCuenta(cuentaId) {
             try {
@@ -609,40 +552,12 @@
                     $('#Tipo').val(cuenta.tipo);
                     $('#Moneda').val(cuenta.moneda);
                     $('#Saldo').val(cuenta.saldo);
-                    $('#Activo').prop('checked', cuenta.activo);
 
                     $('#modalCuentaLabel').text('Editar Cuenta');
                     $('#modalCuenta').modal('show');
                 }
             } catch (error) {
                 toastr.error('Error al cargar la cuenta para editar');
-            }
-        }
-
-        // Cambiar estado de cuenta
-        async function cambiarEstado(cuentaId, nuevoEstado) {
-            try {
-                const response = await fetch('/Cuenta/CambiarEstado', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        CuentaId: cuentaId,
-                        Activo: nuevoEstado
-                    })
-                });
-
-                const resultado = await response.json();
-
-                if (resultado.valor) {
-                    toastr.success(resultado.mensaje);
-                    await cargarCuentas();
-                } else {
-                    throw new Error(resultado.mensaje);
-                }
-            } catch (error) {
-                toastr.error('Error al cambiar estado: ' + error.message);
             }
         }
 
@@ -696,7 +611,6 @@
             $('#formCuenta')[0].reset();
             $('#formCuenta').removeClass('was-validated');
             $('#CuentaId').val('0');
-            $('#Activo').prop('checked', true);
         }
 
         function formatearMoneda(monto) {

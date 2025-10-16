@@ -1,5 +1,8 @@
 wwwroot\css\site.css
 wwwroot\favicon.ico
+wwwroot\img\3.jpg
+wwwroot\img\card.png
+wwwroot\img\Fondo.jpg
 wwwroot\js\categorias\agregar.js
 wwwroot\js\categorias\editar.js
 wwwroot\js\categorias\eliminar.js

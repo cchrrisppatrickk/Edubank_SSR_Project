@@ -75,14 +75,15 @@ namespace EduBank.AppWeb.Controllers
 
                 var lista = await _cuentaService.ObtenerPorUsuario(usuarioId);
 
-                var vm = lista.Select(c => new VMCuenta
+                // CORREGIR: Usar camelCase para las propiedades
+                var vm = lista.Select(c => new
                 {
-                    CuentaId = c.CuentaId,
-                    Nombre = c.Nombre,
-                    Tipo = c.Tipo,
-                    Moneda = c.Moneda,
-                    Saldo = c.Saldo,
-                    Activo = c.Activo
+                    cuentaId = c.CuentaId,    // camelCase
+                    nombre = c.Nombre,        // camelCase
+                    tipo = c.Tipo,            // camelCase
+                    moneda = c.Moneda,        // camelCase
+                    saldo = c.Saldo,          // camelCase
+                    activo = c.Activo         // camelCase
                 }).ToList();
 
                 _logger.LogInformation("Retornando {Count} cuentas para usuario {UsuarioId}", vm.Count, usuarioId);
@@ -265,14 +266,14 @@ namespace EduBank.AppWeb.Controllers
                 var lista = await _cuentaService.ObtenerPorUsuario(usuarioId);
                 var activas = lista.Where(c => c.Activo).ToList();
 
-                var vm = activas.Select(c => new VMCuenta
+                var vm = activas.Select(c => new
                 {
-                    CuentaId = c.CuentaId,
-                    Nombre = c.Nombre,
-                    Tipo = c.Tipo,
-                    Moneda = c.Moneda,
-                    Saldo = c.Saldo,
-                    Activo = c.Activo
+                    cuentaId = c.CuentaId,
+                    nombre = c.Nombre,
+                    tipo = c.Tipo,
+                    moneda = c.Moneda,
+                    saldo = c.Saldo,
+                    activo = c.Activo
                 }).ToList();
 
                 return Ok(vm);
@@ -286,23 +287,30 @@ namespace EduBank.AppWeb.Controllers
         [HttpGet]
         public async Task<IActionResult> ObtenerInactivas()
         {
-            var usuarioId = ObtenerUsuarioId(); // usa tu método de sesión
-            var lista = await _cuentaService.ObtenerPorUsuario(usuarioId);
+            try
+            {
+                var usuarioId = ObtenerUsuarioId();
+                var lista = await _cuentaService.ObtenerPorUsuario(usuarioId);
 
-            var inactivas = lista
-                .Where(c => !c.Activo)
-                .Select(c => new
-                {
-                    cuentaId = c.CuentaId,
-                    nombre = c.Nombre,
-                    tipo = c.Tipo,
-                    moneda = c.Moneda,
-                    saldo = c.Saldo,
-                    activo = c.Activo
-                })
-                .ToList();
+                var inactivas = lista
+                    .Where(c => !c.Activo)
+                    .Select(c => new
+                    {
+                        cuentaId = c.CuentaId,
+                        nombre = c.Nombre,
+                        tipo = c.Tipo,
+                        moneda = c.Moneda,
+                        saldo = c.Saldo,
+                        activo = c.Activo
+                    })
+                    .ToList();
 
-            return Ok(inactivas);
+                return Ok(inactivas);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized(new { valor = false, mensaje = "Usuario no autenticado" });
+            }
         }
 
         [HttpGet]

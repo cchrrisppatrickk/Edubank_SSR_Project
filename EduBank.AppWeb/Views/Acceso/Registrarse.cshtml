@@ -2,56 +2,99 @@
 @{
     Layout = null;
 }
+<!DOCTYPE html>
+<html lang="es">
 <head>
-    <title>Registrarse</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Registrarse - EduBank</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/Regis.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
 </head>
 
-<div class="row mt-5 justify-content-center">
-    <div class="col-sm-4">
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white text-center">
-                <h4>Regístrate</h4>
-            </div>
-            <div class="card-body">
-                <form asp-controller="Acceso" asp-action="Registrarse" method="post">
+<body>
+    <img src="~/img/Fondo.jpg" alt="Background Image" class="bg-image" />
+    <div class="overlay"></div>
 
-                    <input class="form-control mb-3" type="text" placeholder="Nombre" asp-for="Nombre" required />
-                    <span asp-validation-for="Nombre" class="text-danger"></span>
+    <div class="container d-flex justify-content-center align-items-center min-vh-100" data-aos="zoom-in">
+        <div class="card login-card p-0">
+            <div class="row g-0">
 
-                    <input class="form-control mb-3" type="text" placeholder="Apellidos" asp-for="Apellidos" required />
-                    <span asp-validation-for="Apellidos" class="text-danger"></span>
+                <div class="col-md-6 login-image d-none d-md-flex align-items-center justify-content-center">
+                    <img src="~/img/3.jpg" alt="EduBank Registro" class="img-fluid side-illustration" />
+                </div>
 
-                    <input class="form-control mb-3" type="email" placeholder="Correo" asp-for="CorreoElectronico" required />
-                    <span asp-validation-for="CorreoElectronico" class="text-danger"></span>
 
-                    <input class="form-control mb-3" type="password" placeholder="Contraseña" asp-for="Contrasena" required />
-                    <span asp-validation-for="Contrasena" class="text-danger"></span>
-
-                    <input class="form-control mb-3" type="password" placeholder="Confirmar contraseña" asp-for="ConfirmarContrasena" required />
-                    <span asp-validation-for="ConfirmarContrasena" class="text-danger"></span>
-                    <div class="d-grid gap-2 mb-3">
-                        <button class="btn btn-primary" type="submit">Registrarse</button>
+                <div class="col-md-6 p-4 d-flex flex-column justify-content-center">
+                    <div class="text-center mb-4">
+                        <i class="fa-solid fa-user-plus fa-3x text-primary mb-2"></i>
+                        <h2 class="login-title">Crea tu cuenta</h2>
+                        <p class="login-subtitle">Forma parte de <strong>EduBank</strong> 💰</p>
                     </div>
 
+                    <form asp-controller="Acceso" asp-action="Registrarse" method="post" novalidate>
+                        <div class="input-group mb-3 cartoon-input">
+                            <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                            <input type="text" class="form-control" placeholder="Nombre" asp-for="Nombre" required>
+                        </div>
+                        <span asp-validation-for="Nombre" class="text-danger"></span>
 
-                    @if (ViewData["Mensaje"] != null)
-                    {
-                        <div class="alert alert-danger " role="alert">
-                            @ViewData["Mensaje"]
+                        <div class="input-group mb-3 cartoon-input">
+                            <span class="input-group-text"><i class="fa-solid fa-user-tag"></i></span>
+                            <input type="text" class="form-control" placeholder="Apellidos" asp-for="Apellidos" required>
+                        </div>
+                        <span asp-validation-for="Apellidos" class="text-danger"></span>
+
+                        <div class="input-group mb-3 cartoon-input">
+                            <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
+                            <input type="email" class="form-control" placeholder="Correo electrónico" asp-for="CorreoElectronico" required>
+                        </div>
+                        <span asp-validation-for="CorreoElectronico" class="text-danger"></span>
+
+                        <div class="input-group mb-3 cartoon-input">
+                            <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                            <input type="password" class="form-control" placeholder="Contraseña" asp-for="Contrasena" required>
+                        </div>
+                        <span asp-validation-for="Contrasena" class="text-danger"></span>
+
+                        <div class="input-group mb-3 cartoon-input">
+                            <span class="input-group-text"><i class="fa-solid fa-key"></i></span>
+                            <input type="password" class="form-control" placeholder="Confirmar contraseña" asp-for="ConfirmarContrasena" required>
+                        </div>
+                        <span asp-validation-for="ConfirmarContrasena" class="text-danger"></span>
+
+                        <div class="d-grid mb-3">
+                            <button class="btn btn-primary btn-lg" type="submit">
+                                <i class="fa-solid fa-paper-plane me-2"></i>Registrarse
+                            </button>
                         </div>
 
-                    }
-                    ¿YA TIENES CUENTA? <a asp-controller="Acceso" asp-action="Login">Iniciar sesión</a>
+                        @if (ViewData["Mensaje"] != null)
+                        {
+                            <div class="alert alert-danger text-center" role="alert">
+                                @ViewData["Mensaje"]
+                            </div>
+                        }
 
-
-                </form>
+                        <div class="text-center mt-3">
+                            ¿Ya tienes cuenta? <a asp-controller="Acceso" asp-action="Login">Inicia sesión aquí</a>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-@section Scripts {
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-}
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 1200, once: true });
+    </script>
+</body>
+</html>
