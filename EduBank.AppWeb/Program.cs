@@ -43,7 +43,12 @@ builder.Services.AddScoped<ICuentaRepository, CuentaRepository>();
 builder.Services.AddScoped<ICuentaService, CuentaService>();
 
 
+// Servicios
+builder.Services.AddScoped<ITransferenciaService, TransferenciaService>();
 
+// Repositorios
+builder.Services.AddScoped<ITransferenciaRepository, TransferenciaRepository>();
+builder.Services.AddScoped<IGenericRepository<Transferencia>, GenericRepository<Transferencia>>();
 
 
 
