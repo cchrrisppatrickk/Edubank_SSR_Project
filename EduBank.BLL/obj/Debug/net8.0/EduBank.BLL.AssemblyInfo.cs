@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("EduBank.BLL")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f09c7d4862809da8310b23647d8d7511e32637e3")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+24d23fe702280b8ed85e8158afef9b04135bb031")]
 [assembly: System.Reflection.AssemblyProductAttribute("EduBank.BLL")]
 [assembly: System.Reflection.AssemblyTitleAttribute("EduBank.BLL")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

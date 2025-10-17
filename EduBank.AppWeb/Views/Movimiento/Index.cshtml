@@ -3,10 +3,14 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard de Movimientos - Modal Form (Visual Update)</title>
+    <title>Dashboard de Movimientos - EduBank</title>
 
+    <!-- Estilos -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
-
+    
 </head>
 
 <body>
@@ -15,7 +19,28 @@
             <h2 class="fw-bold">Dashboard de Movimientos</h2>
         </div>
 
-        <!-- Top summary: Ingresos | Saldo (centro) | Gastos -->
+        <!-- Selector de Cuenta -->
+        <div class="account-selector-container">
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    <div class="account-selector-label">
+                        <i class="bi bi-wallet2 me-2"></i>Seleccionar Cuenta
+                    </div>
+                    <select id="selectCuenta" class="form-select account-selector">
+                        <option value="">Cargando cuentas...</option>
+                    </select>
+                </div>
+                <div class="col-md-8">
+                    <div class="account-info" id="accountInfo" style="display: none;">
+                        <div class="account-balance" id="accountBalance">S/ 0.00</div>
+                        <div class="account-name" id="accountName">Nombre de la cuenta</div>
+                        <div class="account-type" id="accountType">Tipo de cuenta</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resumen: Ingresos | Acciones | Gastos -->
         <div class="row g-3 align-items-center mb-4">
             <div class="col-md-3">
                 <div class="card shadow-sm border-0 h-100 summary-card">
@@ -29,28 +54,22 @@
                 </div>
             </div>
 
-            <!-- SALDO CENTRAL -->
+            <!-- Centro con botones de acción -->
             <div class="col-md-6">
-                <div class="card shadow-lg border-0 text-center h-100 saldo-card">
+                <div class="card shadow-lg border-0 text-center h-100">
                     <div class="card-body d-flex flex-column align-items-center justify-content-center">
-                        <div class="icon-saldo mb-2">
-                            <i class="bi bi-cash-stack fs-2"></i>
-                        </div>
-                        <small class="text-muted">Saldo</small>
-                        <h1 class="display-6 fw-bold mb-0" id="cardSaldo">S/ 0.00</h1>
-                        <div class="text-muted small mt-1">Total disponible</div>
+                   
 
-                        <!-- BOTONES NUEVOS: ahora más grandes y con label debajo -->
-                        <div class="action-buttons-saldo d-flex justify-content-center gap-3 mt-3" role="group" aria-label="Agregar movimiento">
+                        <div class="action-buttons-saldo d-flex justify-content-center gap-4 mt-3">
                             <div class="text-center">
-                                <button class="btn btn-inc btn-mov-type" data-type="I" id="btnAgregarIngreso" title="Agregar ingreso" aria-label="Agregar ingreso">
+                                <button class="btn btn-inc btn-mov-type" data-type="I" id="btnAgregarIngreso" title="Agregar ingreso">
                                     <i class="bi bi-plus-lg"></i>
                                 </button>
                                 <span class="btn-mov-label">Ingreso</span>
                             </div>
 
                             <div class="text-center">
-                                <button class="btn btn-dec btn-mov-type" data-type="G" id="btnAgregarGasto" title="Agregar gasto" aria-label="Agregar gasto">
+                                <button class="btn btn-dec btn-mov-type" data-type="G" id="btnAgregarGasto" title="Agregar gasto">
                                     <i class="bi bi-dash-lg"></i>
                                 </button>
                                 <span class="btn-mov-label">Gasto</span>
@@ -73,19 +92,19 @@
             </div>
         </div>
 
-        <!-- Contenido principal: pestañas (Gastos / Ingresos) y gráficos -->
+        <!-- Contenido principal -->
         <div class="row g-4">
             <div class="col-md-12">
                 <div class="card border-0 shadow-sm">
                     <div class="card-header p-0 bg-transparent border-0">
                         <ul class="nav nav-tabs justify-content-center px-3" id="movimientosTabs" role="tablist">
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link active d-flex align-items-center" id="gastos-tab" data-bs-toggle="tab" data-bs-target="#pane-gastos" type="button" role="tab" aria-controls="pane-gastos" aria-selected="true">
+                                <button class="nav-link active d-flex align-items-center" id="gastos-tab" data-bs-toggle="tab" data-bs-target="#pane-gastos" type="button" role="tab">
                                     <i class="bi bi-arrow-down-circle me-2"></i> Gastos
                                 </button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link d-flex align-items-center" id="ingresos-tab" data-bs-toggle="tab" data-bs-target="#pane-ingresos" type="button" role="tab" aria-controls="pane-ingresos" aria-selected="false">
+                                <button class="nav-link d-flex align-items-center" id="ingresos-tab" data-bs-toggle="tab" data-bs-target="#pane-ingresos" type="button" role="tab">
                                     <i class="bi bi-arrow-up-circle me-2"></i> Ingresos
                                 </button>
                             </li>
@@ -94,10 +113,10 @@
 
                     <div class="card-body p-3">
                         <!-- Filtro por período -->
-                        <div class="period-filter">
-                            <div class="filter-container">
-                                <div class="period-title">Filtrar por período</div>
-                                <div class="filter-btn-group d-flex justify-content-center">
+                        <div class="period-filter mb-4">
+                            <div class="filter-container text-center">
+                                <div class="period-title mb-2 fw-bold">Filtrar por período</div>
+                                <div class="filter-btn-group d-flex justify-content-center gap-2 flex-wrap">
                                     <button type="button" class="btn btn-period btn-primary active" data-period="day">
                                         <i class="bi bi-calendar-day me-1"></i> Día
                                     </button>
@@ -112,38 +131,15 @@
                                     </button>
                                 </div>
 
-                                <!-- Selector de fecha con flechas -->
+                                <!-- Selector de fecha -->
                                 <div class="date-selector mt-3">
                                     <button class="date-arrow" id="prevDate">
                                         <i class="bi bi-chevron-left"></i>
                                     </button>
 
-                                    <div class="calendar-container">
+                                    <div class="calendar-container position-relative">
                                         <div class="date-display" id="dateDisplay">
-                                            Hoy, 6 de septiembre de 2025
-                                        </div>
-                                        <div class="calendar-popup" id="calendarPopup">
-                                            <div class="calendar-header">
-                                                <button class="date-arrow" id="prevMonth">
-                                                    <i class="bi bi-chevron-left"></i>
-                                                </button>
-                                                <span id="calendarMonthYear">Septiembre 2025</span>
-                                                <button class="date-arrow" id="nextMonth">
-                                                    <i class="bi bi-chevron-right"></i>
-                                                </button>
-                                            </div>
-                                            <div class="calendar-weekdays">
-                                                <div class="calendar-grid">
-                                                    <div class="calendar-weekday">Lu</div>
-                                                    <div class="calendar-weekday">Ma</div>
-                                                    <div class="calendar-weekday">Mi</div>
-                                                    <div class="calendar-weekday">Ju</div>
-                                                    <div class="calendar-weekday">Vi</div>
-                                                    <div class="calendar-weekday">Sá</div>
-                                                    <div class="calendar-weekday">Do</div>
-                                                    <div id="calendarDays" class="calendar-grid"></div>
-                                                </div>
-                                            </div>
+                                            Cargando fecha...
                                         </div>
                                     </div>
 
@@ -154,166 +150,517 @@
                             </div>
                         </div>
 
+                        <div class="tab-content" id="movimientosTabsContent">
+                            <!-- PANE GASTOS -->
+                            <div class="tab-pane fade show active" id="pane-gastos" role="tabpanel">
+                                <div class="d-flex flex-column align-items-stretch">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <strong class="mb-0">Distribución de Gastos</strong>
+                                        <small class="text-muted" id="totalGastosLabel">S/ 0.00</small>
+                                    </div>
 
-                        <div class="card-body p-3">
-                            <div class="tab-content" id="movimientosTabsContent">
-                                <!-- PANE GASTOS -->
-                                <div class="tab-pane fade show active" id="pane-gastos" role="tabpanel" aria-labelledby="gastos-tab">
-                                    <div class="d-flex flex-column align-items-stretch">
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <strong class="mb-0">Gastos</strong>
-                                            <small class="text-muted" id="totalGastosLabel">S/ 0.00</small>
-                                        </div>
+                                    <div class="chart-area mb-2">
+                                        <canvas id="chartGastos"></canvas>
+                                    </div>
 
-                                        <div class="chart-area mb-2">
-                                            <canvas id="chartGastos"></canvas>
-                                        </div>
+                                    <div class="text-center small text-muted mt-2" id="noDataGastos" style="display:none;">
+                                        No hay datos de gastos para el período seleccionado
+                                    </div>
 
-                                        <div class="text-center small text-muted mt-2" id="noDataGastos" style="display:none;">No hay datos de gastos</div>
-
-                                        <div class="mt-3">
-                                            <strong class="small">Gastos recientes (gráfico)</strong>
-                                            <ul class="list-group list-group-flush mt-2" id="listaGastosChart"></ul>
-                                        </div>
+                                    <div class="mt-3">
+                                        <strong class="small">Gastos Recientes</strong>
+                                        <ul class="list-group list-group-flush mt-2" id="listaGastosChart"></ul>
                                     </div>
                                 </div>
+                            </div>
 
-                                <!-- PANE INGRESOS -->
-                                <div class="tab-pane fade" id="pane-ingresos" role="tabpanel" aria-labelledby="ingresos-tab">
-                                    <div class="d-flex flex-column align-items-stretch">
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <strong class="mb-0">Ingresos</strong>
-                                            <small class="text-muted" id="totalIngresosLabel">S/ 0.00</small>
-                                        </div>
+                            <!-- PANE INGRESOS -->
+                            <div class="tab-pane fade" id="pane-ingresos" role="tabpanel">
+                                <div class="d-flex flex-column align-items-stretch">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <strong class="mb-0">Distribución de Ingresos</strong>
+                                        <small class="text-muted" id="totalIngresosLabel">S/ 0.00</small>
+                                    </div>
 
-                                        <div class="chart-area mb-2">
-                                            <canvas id="chartIngresos"></canvas>
-                                        </div>
+                                    <div class="chart-area mb-2">
+                                        <canvas id="chartIngresos"></canvas>
+                                    </div>
 
-                                        <div class="text-center small text-muted mt-2" id="noDataIngresos" style="display:none;">No hay datos de ingresos</div>
+                                    <div class="text-center small text-muted mt-2" id="noDataIngresos" style="display:none;">
+                                        No hay datos de ingresos para el período seleccionado
+                                    </div>
 
-                                        <div class="mt-3">
-                                            <strong class="small">Ingresos recientes (gráfico)</strong>
-                                            <ul class="list-group list-group-flush mt-2" id="listaIngresosChart"></ul>
-                                        </div>
+                                    <div class="mt-3">
+                                        <strong class="small">Ingresos Recientes</strong>
+                                        <ul class="list-group list-group-flush mt-2" id="listaIngresosChart"></ul>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <!-- /Distribución -->
                 </div>
             </div>
+        </div>
+    </div>
 
-
-
-            <!-- MODAL (formulario) -->
-            <div class="modal fade" id="movModal" tabindex="-1" aria-labelledby="movModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title d-flex align-items-center" id="movModalLabel">Agregar movimiento&nbsp;<span id="movModalTypeBadge"></span></h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                        </div>
-                        <div class="modal-body">
-                            <form id="formMovimiento" class="needs-validation" novalidate>
-                                <input type="hidden" id="txtMovimientoId" value="0" />
-                                <!-- dentro del formMovimiento -->
-                                <input type="hidden" id="selTipo" value="G" />
-
-
-                                <!-- mantenemos un campo oculto para la categoria (compatibilidad con el resto del código) -->
-                                <select id="selCategoria" class="d-none"></select>
-
-
-                                <div class="mb-3">
-                                    <label class="form-label">Categoría</label>
-                                    <div class="d-flex flex-column gap-2">
-                                        <button type="button"
-                                                id="btnCategoriaSelected"
-                                                class="btn btn-outline-secondary p-3 d-flex align-items-center justify-content-between"
-                                                aria-haspopup="dialog"
-                                                aria-controls="modalCategorias"
-                                                aria-label="Seleccionar categoría">
-                                            <span class="d-flex align-items-center">
-                                                <div id="btnCategoriaBadge" class="cat-icon-badge small me-2" style="background:#e9ecef;color:#6c757d;">
-                                                    <i class="bi bi-palette" aria-hidden="true"></i>
-                                                </div>
-                                                <span id="btnCategoriaLabel">Categoría</span>
-                                            </span>
-                                            <i class="bi bi-chevron-right"></i>
-                                        </button>
-                                    </div>
-                                </div>
-
-
-
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Fecha</label>
-                                        <input type="date" id="txtFechaOperacion" class="form-control p-3" required />
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Monto</label>
-                                        <input type="number" step="0.01" id="txtMonto" class="form-control p-3" min="0.01" inputmode="decimal" required />
-                                    </div>
-                                </div>
-
-                                <div class="mb-4">
-                                    <label class="form-label">Comentario</label>
-                                    <textarea id="txtComentario" class="form-control p-3" rows="3" placeholder="Agregar una descripción opcional"></textarea>
-                                </div>
-
-                                <div class="d-grid">
-                                    <button class="btn btn-success p-3 fw-bold" type="submit" id="btnGuardarModal">Guardar movimiento</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+    <!-- MODAL para Movimientos -->
+    <div class="modal fade" id="movModal" tabindex="-1" aria-labelledby="movModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title d-flex align-items-center" id="movModalLabel">
+                        Agregar movimiento
+                        <span id="movModalTypeBadge" class="badge ms-2"></span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
-            </div>
+                <div class="modal-body">
+                    <form id="formMovimiento" class="needs-validation" novalidate>
+                        <input type="hidden" id="txtMovimientoId" value="0" />
+                        <input type="hidden" id="selTipo" value="G" />
+                        <input type="hidden" id="selCategoria" />
 
-            <!-- Modal para selección de Categorias - MÁS GRANDE Y MEJORADO -->
-            <div class="modal fade" id="modalCategorias" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title d-flex align-items-center">
-                                <i class="bi bi-tag me-2"></i>
-                                Seleccionar Categoría
-                            </h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <div class="mb-3">
+                            <label class="form-label">Categoría</label>
+                            <button type="button" id="btnCategoriaSelected"
+                                    class="btn btn-outline-secondary p-3 w-100 d-flex align-items-center justify-content-between">
+                                <span class="d-flex align-items-center">
+                                    <div id="btnCategoriaBadge" class="cat-icon-badge small me-2" style="background:#e9ecef;color:#6c757d;">
+                                        <i class="bi bi-palette"></i>
+                                    </div>
+                                    <span id="btnCategoriaLabel">Seleccionar categoría</span>
+                                </span>
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
                         </div>
-                        <div class="modal-body">
-                            <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-3" id="gridCategorias">
-                                <!-- Las categorias se cargarán dinámicamente con JavaScript -->
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Fecha</label>
+                                <input type="date" id="txtFechaOperacion" class="form-control p-3" required />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Monto</label>
+                                <input type="number" step="0.01" id="txtMonto" class="form-control p-3" min="0.01" required />
                             </div>
                         </div>
-                        <div class="modal-footer justify-content-center border-0 pt-0">
-                            <small class="text-muted">Selecciona una categoría para continuar</small>
+
+                        <div class="mb-4">
+                            <label class="form-label">Comentario (opcional)</label>
+                            <textarea id="txtComentario" class="form-control p-3" rows="3" placeholder="Descripción del movimiento..."></textarea>
                         </div>
-                    </div>
+
+                        <div class="d-grid">
+                            <button class="btn btn-success p-3 fw-bold" type="submit" id="btnGuardarModal">
+                                Guardar movimiento
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
+        </div>
+    </div>
 
+    <!-- MODAL para Categorías -->
+    <div class="modal fade" id="modalCategorias" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title d-flex align-items-center">
+                        <i class="bi bi-tag me-2"></i>
+                        Seleccionar Categoría
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-3" id="gridCategorias">
+                        <!-- Las categorías se cargan dinámicamente -->
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-center border-0 pt-0">
+                    <small class="text-muted">Selecciona una categoría para continuar</small>
+                </div>
+            </div>
+        </div>
+    </div>
 
-            <!-- DEPENDENCIAS JS -->
-            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <!-- DEPENDENCIAS JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
-            @section Scripts {
-                <script src="~/js/movimientos/utils.js"></script>
-                <script src="~/js/movimientos/listar.js"></script>
-                <script src="~/js/movimientos/agregar.js"></script>
-                <script src="~/js/movimientos/editar.js"></script>
-                <script src="~/js/movimientos/eliminar.js"></script>
-                <script src="~/js/movimientos/graficos.js"></script>
-                <script src="~/js/movimientos/modales.js"></script>
-                <script src="~/js/movimientos/index.js"></script>
+    <script>
+        // JavaScript unificado y corregido
+        $(document).ready(function() {
+            'use strict';
+
+            // ==================== VARIABLES GLOBALES ====================
+            let cuentas = [];
+            let cuentaSeleccionada = null;
+            let categorias = [];
+            let categoriaSeleccionada = null;
+            let tipoMovimientoActual = 'G';
+            let chartGastos = null;
+            let chartIngresos = null;
+            let currentDate = new Date();
+            let currentPeriod = 'day';
+
+            // ==================== INICIALIZACIÓN ====================
+            function inicializarAplicacion() {
+                cargarCuentas();
+                cargarCategorias();
+                inicializarEventos();
+                actualizarVisualizacionFecha();
             }
 
+            // ==================== MANEJO DE CUENTAS ====================
+            function cargarCuentas() {
+                $.ajax({
+                    url: '/Cuenta/ObtenerActivas',
+                    type: 'GET',
+                    success: function(response) {
+                        if (Array.isArray(response)) {
+                            cuentas = response;
+                            actualizarSelectorCuentas();
+                            if (cuentas.length > 0) {
+                                $('#selectCuenta').val(cuentas[0].cuentaId);
+                                seleccionarCuenta(cuentas[0].cuentaId);
+                            }
+                        } else {
+                            console.error('Respuesta inesperada:', response);
+                            toastr.error('Error al cargar cuentas');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error al cargar cuentas:', error);
+                        $('#selectCuenta').html('<option value="">Error al cargar cuentas</option>');
+                        toastr.error('Error al cargar las cuentas');
+                    }
+                });
+            }
 
+            function actualizarSelectorCuentas() {
+                const select = $('#selectCuenta');
+                select.empty();
+
+                if (cuentas.length === 0) {
+                    select.append('<option value="">No hay cuentas disponibles</option>');
+                    return;
+                }
+
+                select.append('<option value="">Selecciona una cuenta</option>');
+                cuentas.forEach(cuenta => {
+                    select.append(
+                        $('<option></option>')
+                            .val(cuenta.cuentaId)
+                            .text(`${cuenta.nombre} (${cuenta.tipo}) - S/ ${(cuenta.saldo || 0).toFixed(2)}`)
+                    );
+                });
+            }
+
+            function seleccionarCuenta(cuentaId) {
+                const cuenta = cuentas.find(c => c.cuentaId == cuentaId);
+                if (cuenta) {
+                    cuentaSeleccionada = cuenta;
+                    mostrarInfoCuenta(cuenta);
+                    cargarEstadisticas();
+                }
+            }
+
+            function mostrarInfoCuenta(cuenta) {
+                $('#accountBalance').text(`S/ ${(cuenta.saldo || 0).toFixed(2)}`);
+                $('#accountName').text(cuenta.nombre);
+                $('#accountType').text(`${cuenta.tipo} • ${cuenta.moneda || 'PEN'}`);
+                $('#accountInfo').show();
+            }
+
+            // ==================== MANEJO DE CATEGORÍAS ====================
+            function cargarCategorias() {
+                $.ajax({
+                    url: '/Categoria/ObtenerActivas',
+                    type: 'GET',
+                    success: function(response) {
+                        if (Array.isArray(response)) {
+                            categorias = response;
+                            console.log('Categorías cargadas:', categorias.length);
+                        } else {
+                            console.error('Respuesta inesperada:', response);
+                            toastr.error('Error al cargar categorías');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error al cargar categorías:', error);
+                        toastr.error('Error al cargar categorías');
+                    }
+                });
+            }
+
+            // ==================== GRID DE CATEGORÍAS  ====================
+            function actualizarGridCategorias(categoriasLista) {
+                const grid = $('#gridCategorias');
+                grid.empty();
+
+                if (categoriasLista.length === 0) {
+                    grid.html(`
+                        <div class="col-12 text-center py-4">
+                            <i class="bi bi-inbox fs-1 text-muted"></i>
+                            <p class="text-muted mt-2">No hay categorías disponibles</p>
+                        </div>
+                    `);
+                    return;
+                }
+
+                categoriasLista.forEach(categoria => {
+                    const categoriaHtml = `
+                        <div class="col">
+                            <div class="categoria-item card h-100 border-0 shadow-sm cursor-pointer"
+                                 data-id="${categoria.categoriaId}"
+                                 title="${categoria.nombre}">
+                                <div class="card-body text-center p-3">
+                                    <div class="cat-icon-badge mb-2 mx-auto"
+                                         style="background: ${categoria.color || '#6c757d'}; color: white; width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                                        <i class="bi ${categoria.icono || 'bi-tag'}"></i>
+                                    </div>
+                                    <div class="categoria-name small fw-bold">${categoria.nombre}</div>
+                                    ${categoria.descripcion ? `<div class="categoria-desc ultra-small text-muted mt-1">${categoria.descripcion}</div>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    grid.append(categoriaHtml);
+                });
+            }
+
+            function seleccionarCategoria(categoriaId) {
+                const categoria = categorias.find(cat => cat.categoriaId == categoriaId);
+                if (categoria) {
+                    categoriaSeleccionada = categoria;
+                    $('#btnCategoriaBadge')
+                        .html(`<i class="bi ${categoria.icono || 'bi-tag'}"></i>`)
+                        .css({
+                            'background': categoria.color || '#6c757d',
+                            'color': 'white'
+                        });
+                    $('#btnCategoriaLabel').text(categoria.nombre);
+                    $('#selCategoria').val(categoriaId);
+                    $('#modalCategorias').modal('hide');
+                }
+            }
+
+            // ==================== MANEJO DE MODALES ====================
+            function abrirModalMovimiento(tipo) {
+                tipoMovimientoActual = tipo;
+                const titulo = tipo === 'I' ? 'Agregar Ingreso' : 'Agregar Gasto';
+                const badgeClass = tipo === 'I' ? 'bg-success' : 'bg-danger';
+                const badgeText = tipo === 'I' ? 'INGRESO' : 'GASTO';
+
+                $('#movModalLabel').text(titulo);
+                $('#movModalTypeBadge').html(`<span class="badge ${badgeClass}">${badgeText}</span>`);
+                $('#selTipo').val(tipo);
+
+                resetearFormularioMovimiento();
+
+                // Filtrar categorías por tipo
+                const categoriasFiltradas = categorias.filter(cat =>
+                    cat.tipo === tipo && cat.activo !== false
+                );
+                actualizarGridCategorias(categoriasFiltradas);
+
+                $('#movModal').modal('show');
+            }
+
+            function abrirModalCategorias() {
+                const categoriasFiltradas = categorias.filter(cat =>
+                    cat.tipo === tipoMovimientoActual && cat.activo !== false
+                );
+                actualizarGridCategorias(categoriasFiltradas);
+                $('#modalCategorias').modal('show');
+            }
+
+            function resetearFormularioMovimiento() {
+                $('#txtMovimientoId').val('0');
+                $('#txtFechaOperacion').val(new Date().toISOString().split('T')[0]);
+                $('#txtMonto').val('');
+                $('#txtComentario').val('');
+                resetearSeleccionCategoria();
+            }
+
+            function resetearSeleccionCategoria() {
+                categoriaSeleccionada = null;
+                $('#btnCategoriaBadge')
+                    .html('<i class="bi bi-palette"></i>')
+                    .css({
+                        'background': '#e9ecef',
+                        'color': '#6c757d'
+                    });
+                $('#btnCategoriaLabel').text('Seleccionar categoría');
+                $('#selCategoria').val('');
+            }
+
+            // ==================== ESTADÍSTICAS Y GRÁFICOS ====================
+            
+
+            // ==================== UTILIDADES ====================
+     
+
+            // ==================== EVENTOS ====================
+            function inicializarEventos() {
+                // Selector de cuenta
+                $('#selectCuenta').change(function() {
+                    const cuentaId = $(this).val();
+                    if (cuentaId) {
+                        seleccionarCuenta(cuentaId);
+                    } else {
+                        cuentaSeleccionada = null;
+                        $('#accountInfo').hide();
+                    }
+                });
+
+                // Botones de movimiento
+                $('#btnAgregarIngreso').click(() => abrirModalMovimiento('I'));
+                $('#btnAgregarGasto').click(() => abrirModalMovimiento('G'));
+
+                // Selección de categoría
+                $('#btnCategoriaSelected').click(abrirModalCategorias);
+                $(document).on('click', '.categoria-item', function() {
+                    const categoriaId = $(this).data('id');
+                    seleccionarCategoria(categoriaId);
+                });
+
+                // Formulario de movimiento
+                $('#formMovimiento').submit(function(e) {
+                    e.preventDefault();
+                    guardarMovimiento();
+                });
+
+                // Filtros de período
+                $('.btn-period').click(function() {
+                    $('.btn-period').removeClass('active btn-primary').addClass('btn-outline-primary');
+                    $(this).removeClass('btn-outline-primary').addClass('active btn-primary');
+                    currentPeriod = $(this).data('period');
+                    cargarEstadisticas();
+                });
+
+                // Navegación de fechas
+                $('#prevDate').click(() => navegarFecha('prev'));
+                $('#nextDate').click(() => navegarFecha('next'));
+            }
+
+            function navegarFecha(direccion) {
+                const paso = direccion === 'next' ? 1 : -1;
+
+                switch(currentPeriod) {
+                    case 'day':
+                        currentDate.setDate(currentDate.getDate() + paso);
+                        break;
+                    case 'week':
+                        currentDate.setDate(currentDate.getDate() + (paso * 7));
+                        break;
+                    case 'month':
+                        currentDate.setMonth(currentDate.getMonth() + paso);
+                        break;
+                    case 'year':
+                        currentDate.setFullYear(currentDate.getFullYear() + paso);
+                        break;
+                }
+
+                actualizarVisualizacionFecha();
+                cargarEstadisticas();
+            }
+
+            function guardarMovimiento() {
+                if (!cuentaSeleccionada) {
+                    toastr.error('Selecciona una cuenta primero');
+                    return;
+                }
+
+                if (!categoriaSeleccionada) {
+                    toastr.error('Selecciona una categoría');
+                    return;
+                }
+
+                const modelo = {
+                    MovimientoId: parseInt($('#txtMovimientoId').val()),
+                    CuentaId: cuentaSeleccionada.cuentaId,
+                    CategoriaId: categoriaSeleccionada.categoriaId,
+                    Tipo: tipoMovimientoActual,
+                    FechaOperacion: $('#txtFechaOperacion').val(),
+                    Monto: parseFloat($('#txtMonto').val()),
+                    Comentario: $('#txtComentario').val()
+                };
+
+                // Validaciones básicas
+                if (modelo.Monto <= 0 || isNaN(modelo.Monto)) {
+                    toastr.error('El monto debe ser mayor a 0');
+                    return;
+                }
+
+                if (!modelo.FechaOperacion) {
+                    toastr.error('La fecha es requerida');
+                    return;
+                }
+
+                // DEBUG: Mostrar datos en consola
+                console.log('Datos a enviar:', modelo);
+
+                // Mostrar loading
+                const $btn = $('#btnGuardarModal');
+                const originalText = $btn.html();
+                $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Guardando...');
+
+                $.ajax({
+                    url: '/Movimiento/Insertar',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(modelo),
+                    success: function(response) {
+                        $btn.prop('disabled', false).html(originalText);
+                        console.log('Respuesta del servidor:', response);
+
+                        if (response && response.valor) {
+                            toastr.success(response.mensaje || 'Movimiento guardado correctamente');
+                            $('#movModal').modal('hide');
+
+                            // Actualizar interfaz
+                            if (response.saldoActualizado !== undefined) {
+                                $('#accountBalance').text(formatearMoneda(response.saldoActualizado));
+                                // Actualizar también en el objeto cuentaSeleccionada
+                                cuentaSeleccionada.saldo = response.saldoActualizado;
+                            }
+
+                            cargarEstadisticas();
+                        } else {
+                            const mensaje = response?.mensaje || 'Error al guardar movimiento';
+                            toastr.error(mensaje);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        $btn.prop('disabled', false).html(originalText);
+
+                        let mensajeError = 'Error de conexión al guardar movimiento';
+                        if (xhr.responseText) {
+                            try {
+                                const errorData = JSON.parse(xhr.responseText);
+                                mensajeError = errorData.mensaje || errorData.message || mensajeError;
+                            } catch (e) {
+                                mensajeError = xhr.responseText;
+                            }
+                        }
+
+                        toastr.error(mensajeError);
+                        console.error('Error detallado:', {
+                            status: xhr.status,
+                            respuesta: xhr.responseText,
+                            error: error
+                        });
+                    }
+                });
+            }
+
+            // ==================== INICIAR APLICACIÓN ====================
+            inicializarAplicacion();
+        });
+    </script>
 </body>
 </html>

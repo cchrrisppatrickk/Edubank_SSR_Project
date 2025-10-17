@@ -11,7 +11,7 @@ wwwroot\js\categorias\listar.js
 wwwroot\js\categorias\modales.js
 wwwroot\js\categorias\utils.js
 wwwroot\js\movimientos\agregar.js
-wwwroot\js\movimientos\crud.funciones.js
+wwwroot\js\movimientos\crudFunctions.js
 wwwroot\js\movimientos\editar.js
 wwwroot\js\movimientos\eliminar.js
 wwwroot\js\movimientos\graficos.js

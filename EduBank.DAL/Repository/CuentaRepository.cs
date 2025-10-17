@@ -45,11 +45,18 @@ namespace EduBank.DAL.Repository
             return false;
         }
 
-        // Nuevo método para verificar propiedad
         public async Task<bool> PerteneceAUsuario(int cuentaId, int usuarioId)
         {
             return await _dbContext.Cuentas
                 .AnyAsync(c => c.CuentaId == cuentaId && c.UsuarioId == usuarioId);
+        }
+
+        // NUEVA IMPLEMENTACIÓN
+        public async Task<Cuenta?> ObtenerPorIdYUsuario(int id, int usuarioId)
+        {
+            return await _dbContext.Cuentas
+                .Where(c => c.CuentaId == id && c.UsuarioId == usuarioId)
+                .FirstOrDefaultAsync();
         }
     }
 }

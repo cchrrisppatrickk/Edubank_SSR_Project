@@ -8,32 +8,26 @@ using System.Threading.Tasks;
 
 namespace EduBank.BLL.Services
 {
-    public class MovimientoService : IMovimientoService
+    public interface IMovimientoService
     {
-        private readonly IMovimientoRepository _repo;
-        public MovimientoService(IMovimientoRepository repo) { _repo = repo; }
+        Task<bool> Insertar(Movimiento modelo);
+        Task<bool> Actualizar(Movimiento modelo);
 
-        public Task<bool> Insertar(Movimiento modelo) => _repo.Insertar(modelo);
-        public Task<bool> Actualizar(Movimiento modelo) => _repo.Actualizar(modelo);
-        public Task<bool> Eliminar(long id) => _repo.Eliminar((int)id).ContinueWith(t => t.Result); // or change repo signature
-        public Task<Movimiento?> Obtener(long id) => _repo.Obtener((int)id);
-        public Task<List<Movimiento>> ObtenerTodos() => _repo.ObtenerTodos();
-        public Task<decimal> ObtenerTotalPorTipo(char tipo) => _repo.ObtenerTotalPorTipo(tipo);
-        public Task<IEnumerable<(int CategoriaId, string CategoriaNombre, decimal Total)>> ObtenerTotalesPorCategoria(char? tipo = null) => _repo.ObtenerTotalesPorCategoria(tipo);
-        public Task<IEnumerable<Movimiento>> ObtenerRecientes(int top = 10) => _repo.ObtenerRecientes(top);
-        public Task<IEnumerable<Movimiento>> ObtenerPorRango(DateTime desde, DateTime hasta) => _repo.ObtenerPorRango(desde, hasta);
+        // MÉTODOS SEGUROS
+        Task<bool> Eliminar(long id, int usuarioId);
+        Task<Movimiento?> Obtener(long id, int usuarioId);
+        Task<List<Movimiento>> ObtenerPorUsuario(int usuarioId);
 
+        // ELIMINAR métodos inseguros
+        // Task<bool> Eliminar(long id);
+        // Task<Movimiento?> Obtener(long id);
+        // Task<List<Movimiento>> ObtenerTodos();
 
-        //NUeva actualización de Filtro de Fechas
-
-        public async Task<IEnumerable<Movimiento>> ObtenerPorPeriodo(string periodo, DateTime fechaReferencia)
-        {
-            return await _repo.ObtenerPorPeriodo(periodo, fechaReferencia);
-        }
-
-        public async Task<(DateTime Inicio, DateTime Fin)> ObtenerRangoPeriodo(string periodo, DateTime fechaReferencia)
-        {
-            return await _repo.ObtenerRangoPeriodo(periodo, fechaReferencia);
-        }
+        Task<decimal> ObtenerTotalPorTipo(char tipo, int usuarioId);
+        Task<IEnumerable<(int CategoriaId, string CategoriaNombre, decimal Total)>> ObtenerTotalesPorCategoria(int usuarioId, char? tipo = null);
+        Task<IEnumerable<Movimiento>> ObtenerRecientes(int usuarioId, int top = 10);
+        Task<IEnumerable<Movimiento>> ObtenerPorRango(int usuarioId, DateTime desde, DateTime hasta);
+        Task<IEnumerable<Movimiento>> ObtenerPorPeriodo(int usuarioId, string periodo, DateTime fechaReferencia);
+        Task<(DateTime Inicio, DateTime Fin)> ObtenerRangoPeriodo(string periodo, DateTime fechaReferencia);
     }
 }

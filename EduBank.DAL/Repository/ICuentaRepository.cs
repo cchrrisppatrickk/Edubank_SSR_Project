@@ -10,5 +10,8 @@ namespace EduBank.DAL.Repository
         Task<IEnumerable<Cuenta>> ObtenerPorUsuario(int usuarioId);
         Task<decimal> ObtenerSaldoTotal(int usuarioId);
         Task<bool> ActualizarSaldo(int cuentaId, decimal nuevoSaldo);
+        Task<bool> PerteneceAUsuario(int cuentaId, int usuarioId);
+        // NUEVO MÉTODO
+        Task<Cuenta?> ObtenerPorIdYUsuario(int cuentaId, int usuarioId);
     }
 }

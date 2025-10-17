@@ -11,10 +11,7 @@ class MovimientosManager {
 
         // Inicializar módulos
         this.utils = MovimientosUtils;
-        this.listar = new ListarMovimientos(this);
-        this.agregar = new AgregarMovimientos(this);
-        this.editar = new EditarMovimientos(this);
-        this.eliminar = new EliminarMovimientos(this);
+        this.crud = new CRUDMovimientos(this); // NUEVO: Módulo CRUD
         this.graficos = new GraficosMovimientos(this);
         this.modales = new ModalesMovimientos(this);
 
@@ -24,10 +21,13 @@ class MovimientosManager {
     // Inicialización principal
     async init() {
         this.configurarToastr();
-        this.configurarEventos();
+        this.configurarEventosGlobales(); // Simplificado
         await this.cargarCategorias();
         await this.cargarEstadisticas();
         await this.graficos.fetchPorPeriodo(this.currentPeriod, this.currentDate);
+
+        // Inicializar módulos
+        this.crud.inicializar();
     }
 
     // Configurar toastr
@@ -48,31 +48,11 @@ class MovimientosManager {
         };
     }
 
-    // Configurar eventos globales
-    configurarEventos() {
-        // Eventos de botones de tipo de movimiento
-        $('.btn-mov-type').on('click', (e) => {
-            const tipo = $(e.currentTarget).data('type');
-            this.agregar.mostrarFormNuevo(tipo);
-        });
-
-        // Evento para formulario de movimiento
-        $('#formMovimiento').submit((e) => this.editar.manejarEnvioFormulario(e));
-
-        // Eventos de calendario y períodos
+    // Configurar eventos globales (simplificado)
+    configurarEventosGlobales() {
+        // Solo eventos que no son del CRUD
         this.configurarEventosCalendario();
-
-        // Configurar eventos de modales
         this.modales.inicializar();
-
-        // Configurar eventos de eliminación
-        this.eliminar.configurarEventListeners();
-
-        // Eventos para edición desde listas
-        $(document).on('click', '.btn-editar', async (e) => {
-            const movimientoId = $(e.currentTarget).data('id');
-            await this.editar.cargarMovimientoParaEditar(movimientoId);
-        });
     }
 
     // Configurar eventos de calendario

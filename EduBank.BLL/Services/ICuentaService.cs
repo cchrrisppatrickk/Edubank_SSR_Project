@@ -15,5 +15,8 @@ namespace EduBank.BLL.Services
         Task<IEnumerable<Cuenta>> ObtenerPorUsuario(int usuarioId);
         Task<decimal> ObtenerSaldoTotal(int usuarioId);
         Task<bool> ActualizarSaldo(int cuentaId, decimal nuevoSaldo);
+
+        // NUEVO MÉTODO - Para validar que la cuenta pertenece al usuario
+        Task<Cuenta?> ObtenerPorIdYUsuario(int cuentaId, int usuarioId);
     }
 }

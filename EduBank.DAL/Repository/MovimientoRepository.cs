@@ -14,6 +14,16 @@ namespace EduBank.DAL.Repository
         private readonly EdubanckssrContext _db;
         public MovimientoRepository(EdubanckssrContext context) { _db = context; }
 
+        // QUERY BASE CON FILTRO POR USUARIO (a través de Cuenta)
+        private IQueryable<Movimiento> QueryPorUsuario(int usuarioId)
+        {
+            return _db.Movimientos
+                .Include(m => m.Categoria)
+                .Include(m => m.Cuenta)
+                .Where(m => m.Cuenta.UsuarioId == usuarioId); // ← FILTRO POR USUARIO VÍA CUENTA
+        }
+
+        // MÉTODOS DEL IGenericRepository (para operaciones internas)
         public async Task<bool> Insertar(Movimiento modelo)
         {
             await _db.Movimientos.AddAsync(modelo);
@@ -22,45 +32,71 @@ namespace EduBank.DAL.Repository
 
         public async Task<bool> Actualizar(Movimiento modelo)
         {
+            // VERIFICAR que el movimiento pertenezca al usuario
+            var existe = await QueryPorUsuario(modelo.Cuenta.UsuarioId)
+                .AnyAsync(m => m.MovimientoId == modelo.MovimientoId);
+            if (!existe) return false;
+
             modelo.ActualizadoEn = DateTime.Now;
             _db.Movimientos.Update(modelo);
             return await _db.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> Eliminar(int id)
+        // MÉTODO SEGURO PARA ELIMINAR
+        public async Task<bool> EliminarPorUsuario(long id, int usuarioId)
         {
-            var entidad = await _db.Movimientos.FindAsync((long)id);
+            var entidad = await QueryPorUsuario(usuarioId)
+                .FirstOrDefaultAsync(m => m.MovimientoId == id);
             if (entidad == null) return false;
+
             _db.Movimientos.Remove(entidad);
             return await _db.SaveChangesAsync() > 0;
         }
 
-        public async Task<Movimiento?> Obtener(int id)
+        // MÉTODO DEL IGenericRepository (marcar como obsoleto)
+        public async Task<bool> Eliminar(int id)
         {
-            return await _db.Movimientos
-                .Include(m => m.Categoria)
+            throw new InvalidOperationException("Usar EliminarPorUsuario en su lugar");
+        }
+
+        // MÉTODO SEGURO PARA OBTENER
+        public async Task<Movimiento?> ObtenerPorUsuario(long id, int usuarioId)
+        {
+            return await QueryPorUsuario(usuarioId)
                 .FirstOrDefaultAsync(m => m.MovimientoId == id);
         }
 
-        public async Task<List<Movimiento>> ObtenerTodos()
+        // MÉTODO DEL IGenericRepository (marcar como obsoleto)
+        public async Task<Movimiento?> Obtener(int id)
         {
-            return await _db.Movimientos
-                .Include(m => m.Categoria)
-                .AsNoTracking()
+            throw new InvalidOperationException("Usar ObtenerPorUsuario en su lugar");
+        }
+
+        // MÉTODO SEGURO PARA LISTAR
+        public async Task<List<Movimiento>> ObtenerPorUsuario(int usuarioId)
+        {
+            return await QueryPorUsuario(usuarioId)
                 .OrderByDescending(m => m.FechaOperacion)
                 .ToListAsync();
         }
 
-        public async Task<decimal> ObtenerTotalPorTipo(char tipo)
+        // MÉTODO DEL IGenericRepository (marcar como obsoleto)
+        public async Task<List<Movimiento>> ObtenerTodos()
         {
-            return await _db.Movimientos
+            throw new InvalidOperationException("Usar ObtenerPorUsuario en su lugar");
+        }
+
+        // MÉTODOS ESPECÍFICOS ACTUALIZADOS
+        public async Task<decimal> ObtenerTotalPorTipo(char tipo, int usuarioId)
+        {
+            return await QueryPorUsuario(usuarioId)
                 .Where(m => m.Tipo == tipo.ToString())
                 .SumAsync(m => (decimal?)m.Monto) ?? 0m;
         }
 
-        public async Task<IEnumerable<(int CategoriaId, string CategoriaNombre, decimal Total)>> ObtenerTotalesPorCategoria(char? tipo = null)
+        public async Task<IEnumerable<(int CategoriaId, string CategoriaNombre, decimal Total)>> ObtenerTotalesPorCategoria(int usuarioId, char? tipo = null)
         {
-            var q = _db.Movimientos.AsQueryable();
+            var q = QueryPorUsuario(usuarioId);
 
             if (tipo.HasValue)
                 q = q.Where(m => m.Tipo == tipo.Value.ToString());
@@ -77,36 +113,26 @@ namespace EduBank.DAL.Repository
             return grouped.Select(x => (x.CategoriaId, x.CategoriaNombre, x.Total));
         }
 
-        public async Task<IEnumerable<Movimiento>> ObtenerRecientes(int top = 10)
+        public async Task<IEnumerable<Movimiento>> ObtenerRecientes(int usuarioId, int top = 10)
         {
-            return await _db.Movimientos
-                .Include(m => m.Categoria)
+            return await QueryPorUsuario(usuarioId)
                 .OrderByDescending(m => m.FechaOperacion)
                 .ThenByDescending(m => m.CreadoEn)
                 .Take(top)
-                .AsNoTracking()
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Movimiento>> ObtenerPorRango(DateTime desde, DateTime hasta)
+        public async Task<IEnumerable<Movimiento>> ObtenerPorRango(int usuarioId, DateTime desde, DateTime hasta)
         {
-            return await _db.Movimientos
-                .Include(m => m.Categoria)
+            return await QueryPorUsuario(usuarioId)
                 .Where(m => m.FechaOperacion >= desde && m.FechaOperacion <= hasta)
                 .OrderByDescending(m => m.FechaOperacion)
-                .AsNoTracking()
                 .ToListAsync();
         }
 
-
-        ///ACTUALIZACION - FILTRO FECHA
-
-
-        public async Task<IEnumerable<Movimiento>> ObtenerPorPeriodo(string periodo, DateTime fechaReferencia)
+        public async Task<IEnumerable<Movimiento>> ObtenerPorPeriodo(int usuarioId, string periodo, DateTime fechaReferencia)
         {
-            var query = _db.Movimientos.Include(m => m.Categoria).AsQueryable();
-
-            // Calcular el rango de fechas según el período
+            var query = QueryPorUsuario(usuarioId);
             var (fechaInicio, fechaFin) = CalcularRangoFechas(periodo, fechaReferencia);
 
             return await query
@@ -117,9 +143,8 @@ namespace EduBank.DAL.Repository
 
         public async Task<(DateTime Inicio, DateTime Fin)> ObtenerRangoPeriodo(string periodo, DateTime fechaReferencia)
         {
-            return CalcularRangoFechas(periodo, fechaReferencia);
+            return await Task.FromResult(CalcularRangoFechas(periodo, fechaReferencia));
         }
-
         private (DateTime Inicio, DateTime Fin) CalcularRangoFechas(string periodo, DateTime fechaReferencia)
         {
             DateTime inicio, fin;
@@ -156,6 +181,8 @@ namespace EduBank.DAL.Repository
         }
 
 
+
+    
     }
 
 }
