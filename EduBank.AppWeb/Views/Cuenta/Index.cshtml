@@ -232,7 +232,7 @@
         <!-- ================= CONTADOR ================= -->
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div></div>
-            <span class="badge bg-gradient fs-6 px-3 py-2" id="contadorCuentas">0 cuentas</span>
+            <span class="badge bg-gradient text-dark fs-6 px-3 py-2" id="contadorCuentas">0 cuentas</span>
         </div>
 
         <!-- ================= NUEVO TÍTULO: LISTA DE CUENTAS ================= -->
@@ -240,8 +240,10 @@
             <h4 class="section-title">
                 <i class="bi bi-list-ul text-primary"></i> Lista de Cuentas
             </h4>
-            <span class="badge bg-gradient fs-6 px-3 py-2" id="contadorCuentas">0 cuentas</span>
+            <!-- 🔹 Eliminado el contador duplicado -->
         </div>
+
+
 
         <!-- ================= LISTADO DE CUENTAS ================= -->
         <div class="cuentas-grid">
@@ -340,9 +342,91 @@
         </div>
     </div>
 
+
+    <!-- ================= MODAL TRANSFERENCIA ================= -->
+    <div class="modal fade" id="modalTransferencia" tabindex="-1" aria-labelledby="modalTransferenciaLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTransferenciaLabel">
+                        <i class="bi bi-arrow-left-right text-success me-2"></i>Nueva Transferencia
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formTransferencia">
+                        <input type="hidden" id="TransferenciaId" value="0">
+
+                        <!-- Cuenta Origen -->
+                        <div class="mb-3">
+                            <label for="CuentaOrigenId" class="form-label required-field">Cuenta Origen</label>
+                            <select class="form-select" id="CuentaOrigenId" required>
+                                <option value="">Seleccionar cuenta origen...</option>
+                            </select>
+                            <div class="form-text">Selecciona la cuenta desde donde enviarás el dinero</div>
+                        </div>
+
+                        <!-- Cuenta Destino -->
+                        <div class="mb-3">
+                            <label for="CuentaDestinoId" class="form-label required-field">Cuenta Destino</label>
+                            <select class="form-select" id="CuentaDestinoId" required>
+                                <option value="">Seleccionar cuenta destino...</option>
+                            </select>
+                            <div class="form-text">Selecciona la cuenta que recibirá el dinero</div>
+                        </div>
+
+                        <!-- Monto -->
+                        <div class="mb-3">
+                            <label for="MontoTransferencia" class="form-label required-field">Monto a Transferir</label>
+                            <div class="input-group">
+                                <span class="input-group-text">S/</span>
+                                <input type="number" class="form-control" id="MontoTransferencia"
+                                       placeholder="0.00" min="0.01" step="0.01" required>
+                            </div>
+                            <div class="form-text" id="saldoDisponible">Saldo disponible: S/ 0.00</div>
+                        </div>
+
+                        <!-- Fecha -->
+                        <div class="mb-3">
+                            <label for="FechaTransferencia" class="form-label required-field">Fecha de Transferencia</label>
+                            <input type="datetime-local" class="form-control" id="FechaTransferencia" required>
+                        </div>
+
+                        <!-- Comentario -->
+                        <div class="mb-3">
+                            <label for="ComentarioTransferencia" class="form-label">Comentario (Opcional)</label>
+                            <textarea class="form-control" id="ComentarioTransferencia"
+                                      placeholder="Agrega una descripción de la transferencia..."
+                                      rows="2" maxlength="200"></textarea>
+                            <div class="form-text">
+                                <span id="contadorCaracteres">0</span>/200 caracteres
+                            </div>
+                        </div>
+
+                        <!-- Resumen -->
+                        <div class="alert alert-info" id="resumenTransferencia" style="display: none;">
+                            <h6 class="alert-heading mb-2">Resumen de Transferencia</h6>
+                            <div class="row small">
+                                <div class="col-6"><strong>Desde:</strong> <span id="resumenOrigen">-</span></div>
+                                <div class="col-6"><strong>Hacia:</strong> <span id="resumenDestino">-</span></div>
+                                <div class="col-12 mt-1"><strong>Monto:</strong> <span id="resumenMonto" class="fw-bold">S/ 0.00</span></div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success" id="btnRealizarTransferencia">
+                        <i class="bi bi-check-lg me-1"></i>Realizar Transferencia
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Toast -->
     <div class="toast-container position-fixed top-0 end-0 p-3"></div>
 
+    <!-- JS -->
     <!-- JS -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -351,17 +435,44 @@
     <script>
         // Variables globales
         let cuentas = [];
+        let cuentasDisponibles = [];
 
         $(document).ready(function () {
             cargarCuentas();
             cargarSaldoTotal();
 
             $("#btnGuardarCuenta").click(guardarCuenta);
+            $("#btnRealizarTransferencia").click(realizarTransferencia);
 
             $('#modalCuenta').on('hidden.bs.modal', function () {
                 limpiarFormulario();
             });
+
+            // Eventos para el modal de transferencia
+            $('#modalTransferencia').on('hidden.bs.modal', limpiarFormularioTransferencia);
+            $('#modalTransferencia').on('show.bs.modal', cargarCuentasParaTransferencia);
+
+            // Eventos en tiempo real para transferencias
+            $('#CuentaOrigenId').change(actualizarSaldoDisponible);
+            $('#MontoTransferencia').on('input', validarMontoYMostrarResumen);
+            $('#ComentarioTransferencia').on('input', actualizarContadorCaracteres);
+
+            // Configurar botones de la sección de saldo total
+            configurarBotonesSaldoTotal();
         });
+
+        // Configurar los botones del saldo total
+        function configurarBotonesSaldoTotal() {
+            const botones = $('.btn-light');
+
+            // Botón de Historial de Transferencias (primer botón)
+            botones.eq(0).click(function() {
+                window.location.href = '/Transferencia/Historial';
+            });
+
+            // Botón de Nueva Transferencia (segundo botón)
+            botones.eq(1).click(abrirModalTransferencia);
+        }
 
         // Cargar lista de cuentas
         async function cargarCuentas() {
@@ -385,7 +496,8 @@
                     nombre: c.nombre || c.Nombre,
                     tipo: c.tipo || c.Tipo,
                     moneda: c.moneda || c.Moneda,
-                    saldo: c.saldo || c.Saldo
+                    saldo: c.saldo || c.Saldo,
+                    activo: c.activo !== undefined ? c.activo : true
                 }));
 
                 renderizarCuentas();
@@ -601,7 +713,191 @@
             }
         }
 
-        // Funciones de utilidad
+        // ================= FUNCIONES DE TRANSFERENCIAS =================
+
+        // Abrir modal de transferencia
+        function abrirModalTransferencia() {
+            $('#modalTransferencia').modal('show');
+        }
+
+        // Cargar cuentas en los selectores de transferencia
+        async function cargarCuentasParaTransferencia() {
+            try {
+                cuentasDisponibles = cuentas.filter(c => c.activo !== false);
+
+                const selectOrigen = $('#CuentaOrigenId');
+                const selectDestino = $('#CuentaDestinoId');
+
+                // Limpiar selects
+                selectOrigen.empty().append('<option value="">Seleccionar cuenta origen...</option>');
+                selectDestino.empty().append('<option value="">Seleccionar cuenta destino...</option>');
+
+                // Llenar con cuentas disponibles
+                cuentasDisponibles.forEach(cuenta => {
+                    const option = `<option value="${cuenta.cuentaId}" data-saldo="${cuenta.saldo}">
+                        ${cuenta.nombre} - ${formatearMoneda(cuenta.saldo)} (${cuenta.tipo})
+                    </option>`;
+
+                    selectOrigen.append(option);
+                    selectDestino.append(option);
+                });
+
+                // Establecer fecha actual
+                const now = new Date();
+                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                $('#FechaTransferencia').val(now.toISOString().slice(0, 16));
+
+            } catch (error) {
+                console.error('Error al cargar cuentas para transferencia:', error);
+                toastr.error('Error al cargar las cuentas disponibles');
+            }
+        }
+
+        // Actualizar saldo disponible cuando cambia la cuenta origen
+        function actualizarSaldoDisponible() {
+            const cuentaOrigenId = $('#CuentaOrigenId').val();
+            const cuentaSeleccionada = cuentasDisponibles.find(c => c.cuentaId == cuentaOrigenId);
+
+            if (cuentaSeleccionada) {
+                $('#saldoDisponible').text(`Saldo disponible: ${formatearMoneda(cuentaSeleccionada.saldo)}`);
+                $('#saldoDisponible').removeClass('text-danger').addClass('text-success');
+            } else {
+                $('#saldoDisponible').text('Saldo disponible: S/ 0.00');
+            }
+
+            validarMontoYMostrarResumen();
+        }
+
+        // Validar monto y mostrar resumen
+        function validarMontoYMostrarResumen() {
+            const cuentaOrigenId = $('#CuentaOrigenId').val();
+            const cuentaDestinoId = $('#CuentaDestinoId').val();
+            const monto = parseFloat($('#MontoTransferencia').val()) || 0;
+
+            const cuentaOrigen = cuentasDisponibles.find(c => c.cuentaId == cuentaOrigenId);
+            const cuentaDestino = cuentasDisponibles.find(c => c.cuentaId == cuentaDestinoId);
+
+            const resumen = $('#resumenTransferencia');
+
+            // Validaciones básicas
+            if (!cuentaOrigenId || !cuentaDestinoId || monto <= 0) {
+                resumen.hide();
+                return;
+            }
+
+            // Validar que no sea la misma cuenta
+            if (cuentaOrigenId === cuentaDestinoId) {
+                resumen.html('<div class="text-danger"><i class="bi bi-exclamation-triangle me-1"></i>No puedes transferir a la misma cuenta</div>').show();
+                return;
+            }
+
+            // Validar saldo suficiente
+            if (cuentaOrigen && monto > cuentaOrigen.saldo) {
+                $('#saldoDisponible').removeClass('text-success').addClass('text-danger');
+                resumen.html('<div class="text-danger"><i class="bi bi-exclamation-triangle me-1"></i>Saldo insuficiente para realizar la transferencia</div>').show();
+                return;
+            }
+
+            // Mostrar resumen válido
+            if (cuentaOrigen && cuentaDestino) {
+                $('#resumenOrigen').text(cuentaOrigen.nombre);
+                $('#resumenDestino').text(cuentaDestino.nombre);
+                $('#resumenMonto').text(formatearMoneda(monto));
+
+                resumen.removeClass('alert-danger').addClass('alert-info');
+                resumen.find('.alert-heading').html('<i class="bi bi-check-circle me-1"></i>Transferencia válida');
+                resumen.show();
+            }
+        }
+
+        // Actualizar contador de caracteres
+        function actualizarContadorCaracteres() {
+            const texto = $('#ComentarioTransferencia').val();
+            $('#contadorCaracteres').text(texto.length);
+        }
+
+        // Realizar transferencia
+        async function realizarTransferencia() {
+            const form = $('#formTransferencia')[0];
+            if (!form.checkValidity()) {
+                form.classList.add('was-validated');
+                return;
+            }
+
+            const cuentaOrigenId = parseInt($('#CuentaOrigenId').val());
+            const cuentaDestinoId = parseInt($('#CuentaDestinoId').val());
+            const monto = parseFloat($('#MontoTransferencia').val());
+
+            // Validaciones adicionales
+            if (cuentaOrigenId === cuentaDestinoId) {
+                toastr.warning('No puedes transferir a la misma cuenta');
+                return;
+            }
+
+            const cuentaOrigen = cuentasDisponibles.find(c => c.cuentaId === cuentaOrigenId);
+            if (!cuentaOrigen) {
+                toastr.error('Cuenta origen no encontrada');
+                return;
+            }
+
+            if (monto > cuentaOrigen.saldo) {
+                toastr.error('Saldo insuficiente para realizar la transferencia');
+                return;
+            }
+
+            const transferencia = {
+                CuentaOrigenId: cuentaOrigenId,
+                CuentaDestinoId: cuentaDestinoId,
+                Monto: monto,
+                FechaTransferencia: $('#FechaTransferencia').val(),
+                Comentario: $('#ComentarioTransferencia').val().trim()
+            };
+
+            const btn = $('#btnRealizarTransferencia');
+            const originalText = btn.html();
+
+            try {
+                btn.prop('disabled', true).html('<i class="bi bi-hourglass-split me-1"></i>Procesando...');
+
+                const response = await fetch('/Transferencia/RealizarTransferencia', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(transferencia)
+                });
+
+                const resultado = await response.json();
+
+                if (resultado.success) {
+                    toastr.success(resultado.message);
+                    $("#modalTransferencia").modal('hide');
+                    // Recargar datos
+                    await cargarCuentas();
+                    await cargarSaldoTotal();
+                } else {
+                    throw new Error(resultado.message);
+                }
+
+            } catch (error) {
+                toastr.error('Error al realizar la transferencia: ' + error.message);
+            } finally {
+                btn.prop('disabled', false).html(originalText);
+            }
+        }
+
+        // Limpiar formulario de transferencia
+        function limpiarFormularioTransferencia() {
+            $('#formTransferencia')[0].reset();
+            $('#formTransferencia').removeClass('was-validated');
+            $('#TransferenciaId').val('0');
+            $('#resumenTransferencia').hide();
+            $('#saldoDisponible').text('Saldo disponible: S/ 0.00');
+            $('#contadorCaracteres').text('0');
+        }
+
+        // ================= FUNCIONES DE UTILIDAD =================
+
         function abrirModalCrear() {
             $('#modalCuentaLabel').text('Nueva Cuenta');
             $('#modalCuenta').modal('show');

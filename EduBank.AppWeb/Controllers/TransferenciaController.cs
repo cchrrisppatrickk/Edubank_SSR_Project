@@ -16,16 +16,24 @@ namespace EduBank.AppWeb.Controllers
             _cuentaService = cuentaService;
         }
 
-        public async Task<IActionResult> Index()
+        //public async Task<IActionResult> Index()
+        //{
+        //    var usuarioId = ObtenerUsuarioId();
+        //    var cuentas = await _cuentaService.ObtenerPorUsuario(usuarioId);
+        //    var model = new VMTransferencia
+        //    {
+        //        CuentasUsuario = cuentas.ToList(),
+        //        FechaTransferencia = DateTime.Now
+        //    };
+        //    return View(model);
+        //}
+
+        // VISTA PARA VER HISTORIAL
+        public async Task<IActionResult> Historial()
         {
             var usuarioId = ObtenerUsuarioId();
-            var cuentas = await _cuentaService.ObtenerPorUsuario(usuarioId);
-            var model = new VMTransferencia
-            {
-                CuentasUsuario = cuentas.ToList(),
-                FechaTransferencia = DateTime.Now
-            };
-            return View(model);
+            var transferencias = await _transferenciaService.ObtenerTransferenciasPorUsuario(usuarioId);
+            return View(transferencias);
         }
 
         [HttpPost]

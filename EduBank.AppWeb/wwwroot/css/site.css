@@ -11,23 +11,11 @@ html {
     }
 }
 
-
-/* Agregar estos estilos si es necesario */
-.btn-editar, .btn-eliminar {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.875rem;
-}
-
-.cat-cell {
-    flex: 1;
-}
-
-
 body {
-    margin-bottom: 0; /* Cambiado de 60px a 0 porque ahora tenemos un footer fijo */
+    margin-bottom: 0;
     background: #f8fafc;
     color: #1f2937;
-    padding-top: 0; /* Eliminar padding superior que podría interferir */
+    padding-top: 0;
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
@@ -83,11 +71,17 @@ body {
     color: #374151;
 }
 
+/* Botones pequeños para acciones */
+.btn-editar, .btn-eliminar {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
 /* ===== ESTILOS PARA TARJETAS ===== */
 .card {
     border-radius: 10px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    margin-bottom: 1.5rem; /* Añadido para separación consistente */
+    margin-bottom: 1.5rem;
 }
 
     .card:hover {
@@ -95,9 +89,12 @@ body {
         box-shadow: 0 10px 25px rgba(0,0,0,0.1);
     }
 
-.summary-card {
+.summary-card, .saldo-card {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border-radius: 10px;
+    border-radius: 14px;
+    padding: 1.25rem 0;
+    background: linear-gradient(180deg,#ffffff,#f1f5f9);
+    text-align: center;
 }
 
 .card-surface {
@@ -105,13 +102,6 @@ body {
     border-radius: 12px;
     border: 1px solid rgba(0,0,0,0.04);
     overflow: hidden;
-}
-
-.saldo-card {
-    border-radius: 14px;
-    padding: 1.25rem 0;
-    background: linear-gradient(180deg,#ffffff,#f1f5f9);
-    text-align: center;
 }
 
 /* ===== ESTILOS PARA CATEGORÍAS ===== */
@@ -196,6 +186,10 @@ body {
     }
 
 /* ===== ESTILOS PARA MODALES ===== */
+.modal {
+    z-index: 1060;
+}
+
 .modal-content {
     background: #fff;
     color: #212529;
@@ -211,28 +205,22 @@ body {
     font-weight: 600;
 }
 
-/* Asegurar que los modales aparezcan sobre el sidebar */
-.modal {
-    z-index: 1060; /* Mayor que el z-index del sidebar (1000) */
+.modal.fade .modal-dialog {
+    transform: translateY(-8px) scale(0.96);
+    transform-origin: center center;
+    opacity: 0;
+    transition: transform .22s cubic-bezier(.2,.8,.2,1), opacity .18s ease;
+    will-change: transform, opacity;
 }
 
-    /* --- Animación modal: fade + scale --- */
-    .modal.fade .modal-dialog {
-        transform: translateY(-8px) scale(0.96);
-        transform-origin: center center;
-        opacity: 0;
-        transition: transform .22s cubic-bezier(.2,.8,.2,1), opacity .18s ease;
-        will-change: transform, opacity;
-    }
-
-    .modal.show .modal-dialog {
-        transform: translateY(0) scale(1);
-        opacity: 1;
-    }
+.modal.show .modal-dialog {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
 
 .modal-backdrop {
     transition: opacity .22s linear !important;
-    z-index: 1050; /* Debajo del modal pero sobre el sidebar */
+    z-index: 1050;
 }
 
 /* ===== ESTILOS PARA FORMULARIOS ===== */
@@ -283,6 +271,7 @@ body {
     }
 
 .cat-cell {
+    flex: 1;
     display: flex;
     align-items: center;
     gap: .625rem;
@@ -336,6 +325,20 @@ body {
     color: #374151;
     border-top: none;
     border-bottom: 2px solid #e5e7eb;
+}
+
+.table td, .table th {
+    padding: 0.75rem;
+    vertical-align: middle;
+}
+
+.table .btn {
+    margin: 2px;
+}
+
+.table-responsive {
+    border-radius: 10px;
+    overflow: hidden;
 }
 
 .list-group-item {
@@ -402,87 +405,15 @@ body {
 }
 
 /* ===== AJUSTES ESPECÍFICOS PARA EL NUEVO SIDEBAR ===== */
-/* Asegurar que el contenido principal no se superponga con el sidebar */
 .main-content {
     padding-top: 20px;
 }
 
-/* Ajustar el margen superior de los títulos */
 .content-header h2 {
     margin-top: 0;
 }
 
-/* Asegurar que las tablas sean responsivas */
-.table-responsive {
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-/* Ajustar el padding de las celdas de tabla para mejor visualización */
-.table td, .table th {
-    padding: 0.75rem;
-    vertical-align: middle;
-}
-
-/* Asegurar que los botones de acción en tablas tengan espacio suficiente */
-.table .btn {
-    margin: 2px;
-}
-
-/* ===== MEDIA QUERIES ===== */
-@media (max-width: 576px) {
-    .categoria-card {
-        min-height: 150px;
-    }
-
-    .rounded-circle {
-        width: 70px !important;
-        height: 70px !important;
-    }
-
-    .action-buttons-saldo .btn {
-        width: 56px;
-        height: 56px;
-        font-size: 1.2rem;
-    }
-
-    .display-6 {
-        font-size: 1.8rem;
-    }
-
-    .modal-dialog {
-        margin: 0.5rem;
-    }
-
-    /* Ajustes específicos para móviles con sidebar */
-    .main-content {
-        padding: 15px;
-    }
-
-    .content-header {
-        padding: 1rem;
-    }
-}
-
-@media (max-width: 768px) {
-    /* Ajustar el padding cuando el sidebar está oculto en móviles */
-    .main-content {
-        margin-left: 0 !important;
-        width: 100%;
-        padding: 15px;
-    }
-
-    /* Asegurar que los elementos se ajusten correctamente */
-    .container-fluid {
-        padding-left: 10px;
-        padding-right: 10px;
-    }
-}
-
-/*=============================================
-// FUNCIONALIDAD DE CALENDARIO
-// =============================================
-/* Estilos para el selector de fecha */
+/* ===== FUNCIONALIDAD DE CALENDARIO ===== */
 .date-selector {
     display: flex;
     align-items: center;
@@ -532,7 +463,7 @@ body {
     border-radius: 10px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     padding: 15px;
-    z-index: 1040; /* Debajo de modales pero sobre otros elementos */
+    z-index: 1040;
     margin-top: 5px;
     display: none;
     width: 280px;
@@ -609,3 +540,49 @@ body {
     text-align: center;
 }
 
+/* ===== MEDIA QUERIES ===== */
+@media (max-width: 576px) {
+    .categoria-card {
+        min-height: 150px;
+    }
+
+        .categoria-card .rounded-circle {
+            width: 70px !important;
+            height: 70px !important;
+        }
+
+    .action-buttons-saldo .btn {
+        width: 56px;
+        height: 56px;
+        font-size: 1.2rem;
+    }
+
+    .display-6 {
+        font-size: 1.8rem;
+    }
+
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+
+    .main-content {
+        padding: 15px;
+    }
+
+    .content-header {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 0 !important;
+        width: 100%;
+        padding: 15px;
+    }
+
+    .container-fluid {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+}
