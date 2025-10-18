@@ -10,14 +10,8 @@ wwwroot\js\categorias\index.js
 wwwroot\js\categorias\listar.js
 wwwroot\js\categorias\modales.js
 wwwroot\js\categorias\utils.js
-wwwroot\js\movimientos\agregar.js
-wwwroot\js\movimientos\crudFunctions.js
-wwwroot\js\movimientos\editar.js
-wwwroot\js\movimientos\eliminar.js
-wwwroot\js\movimientos\graficos.js
-wwwroot\js\movimientos\index.js
-wwwroot\js\movimientos\listar.js
-wwwroot\js\movimientos\modales.js
+wwwroot\js\movimientos\listas.js
+wwwroot\js\movimientos\movimientos-manager.js
 wwwroot\js\movimientos\utils.js
 wwwroot\js\site.js
 wwwroot\lib\bootstrap\dist\css\bootstrap.css

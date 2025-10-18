@@ -20,7 +20,6 @@ class MovimientosUtils {
         }
     }
 
-    // Formateador de moneda
     static fmt(v) {
         try {
             return new Intl.NumberFormat('es-PE', {
@@ -32,7 +31,6 @@ class MovimientosUtils {
         }
     }
 
-    // Generador de paleta de colores para gráficos
     static palette(n) {
         const base = ['#4dc9f6', '#f67019', '#f53794', '#537bc4', '#acc236', '#166a8f', '#00a950', '#58595b', '#8549ba', '#b91d47'];
         const out = [];
@@ -40,7 +38,6 @@ class MovimientosUtils {
         return out;
     }
 
-    // Funciones para determinar tipo de movimiento
     static isGasto(t) {
         return (t || '').toString().toUpperCase().startsWith('G');
     }
@@ -49,7 +46,6 @@ class MovimientosUtils {
         return (t || '').toString().toUpperCase().startsWith('I');
     }
 
-    // Normalizador de colores hexadecimales
     static normalizeHex(c) {
         if (!c) return null;
         c = c.toString().trim();
@@ -63,13 +59,11 @@ class MovimientosUtils {
         return null;
     }
 
-    // Validador de clases de iconos
     static isValidIconClass(cls) {
         if (!cls) return false;
         return /^([a-z0-9\-\s]+)$/i.test(cls);
     }
 
-    // Calculador de color de texto según fondo
     static textColorForBg(hex) {
         try {
             const c = (hex || '#000').replace('#', '');
@@ -83,7 +77,6 @@ class MovimientosUtils {
         }
     }
 
-    // Normalizador de tipo de categoría
     static normalizeTipo(t) {
         if (t === null || t === undefined) return null;
         const s = String(t).trim().toUpperCase();
@@ -93,7 +86,6 @@ class MovimientosUtils {
         return null;
     }
 
-    // Formatea a ISO yyyy-MM-dd
     static formatDateISO(d) {
         if (!(d instanceof Date)) d = new Date(d);
         const yyyy = d.getFullYear();
@@ -102,7 +94,6 @@ class MovimientosUtils {
         return `${yyyy}-${mm}-${dd}`;
     }
 
-    // Debounce helper
     static debounce(fn, wait = 180) {
         let t;
         return (...args) => {
@@ -111,7 +102,6 @@ class MovimientosUtils {
         };
     }
 
-    // Escape HTML para prevenir XSS
     static escapeHtml(unsafe) {
         if (unsafe === null || unsafe === undefined) return '';
         return String(unsafe)

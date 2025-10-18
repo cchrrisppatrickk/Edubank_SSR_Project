@@ -7,16 +7,12 @@
       "RelativeMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|solutionrelative:edubank.appweb\\views\\movimiento\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|c:\\users\\krieg.desktop-6u3iqmj\\onedrive\\im\u00E1genes\\escritorio\\dev\\_dev_web\\edubanck\\edubank_ssr_net\\edubank.appweb\\wwwroot\\css\\site.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|solutionrelative:edubank.appweb\\wwwroot\\css\\site.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|c:\\users\\krieg.desktop-6u3iqmj\\onedrive\\im\u00E1genes\\escritorio\\dev\\_dev_web\\edubanck\\edubank_ssr_net\\edubank.appweb\\controllers\\movimientocontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|solutionrelative:edubank.appweb\\controllers\\movimientocontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|c:\\users\\krieg.desktop-6u3iqmj\\onedrive\\im\u00E1genes\\escritorio\\dev\\_dev_web\\edubanck\\edubank_ssr_net\\edubank.appweb\\controllers\\categoriacontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|solutionrelative:edubank.appweb\\controllers\\categoriacontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|c:\\users\\krieg.desktop-6u3iqmj\\onedrive\\im\u00E1genes\\escritorio\\dev\\_dev_web\\edubanck\\edubank_ssr_net\\edubank.appweb\\controllers\\cuentacontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{63562243-3B2C-4679-B9DD-55EBA0500EEC}|EduBank.AppWeb\\EduBank.AppWeb.csproj|solutionrelative:edubank.appweb\\controllers\\cuentacontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -26,47 +22,8 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 0,
           "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "CategoriaController.cs",
-              "DocumentMoniker": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\Controllers\\CategoriaController.cs",
-              "RelativeDocumentMoniker": "EduBank.AppWeb\\Controllers\\CategoriaController.cs",
-              "ToolTip": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\Controllers\\CategoriaController.cs",
-              "RelativeToolTip": "EduBank.AppWeb\\Controllers\\CategoriaController.cs",
-              "ViewState": "AgIAABAAAAAAAAAAAAAkwPoAAAAJAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-17T21:59:19.535Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "CuentaController.cs",
-              "DocumentMoniker": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\Controllers\\CuentaController.cs",
-              "RelativeDocumentMoniker": "EduBank.AppWeb\\Controllers\\CuentaController.cs",
-              "ToolTip": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\Controllers\\CuentaController.cs",
-              "RelativeToolTip": "EduBank.AppWeb\\Controllers\\CuentaController.cs",
-              "ViewState": "AgIAABwAAAAAAAAAAAAuwDsBAAARAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-17T21:55:26.406Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "MovimientoController.cs",
-              "DocumentMoniker": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\Controllers\\MovimientoController.cs",
-              "RelativeDocumentMoniker": "EduBank.AppWeb\\Controllers\\MovimientoController.cs",
-              "ToolTip": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\Controllers\\MovimientoController.cs",
-              "RelativeToolTip": "EduBank.AppWeb\\Controllers\\MovimientoController.cs",
-              "ViewState": "AgIAAB0AAAAAAAAAAAA7wPwAAAAmAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-17T21:55:22.766Z",
-              "EditorCaption": ""
-            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
@@ -75,9 +32,35 @@
               "RelativeDocumentMoniker": "EduBank.AppWeb\\Views\\Movimiento\\Index.cshtml",
               "ToolTip": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\Views\\Movimiento\\Index.cshtml",
               "RelativeToolTip": "EduBank.AppWeb\\Views\\Movimiento\\Index.cshtml",
-              "ViewState": "AgIAAHACAAAAAAAAAAAmwJkCAAAHAAAAAAAAAA==",
+              "ViewState": "AgIAANMDAAAAAAAAAAAUwOQDAABQAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-10-17T21:27:57.885Z",
+              "WhenOpened": "2025-10-18T19:13:37.193Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "site.css",
+              "DocumentMoniker": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\wwwroot\\css\\site.css",
+              "RelativeDocumentMoniker": "EduBank.AppWeb\\wwwroot\\css\\site.css",
+              "ToolTip": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\wwwroot\\css\\site.css",
+              "RelativeToolTip": "EduBank.AppWeb\\wwwroot\\css\\site.css",
+              "ViewState": "AgIAAEwCAAAAAAAAAAAAAEwCAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2025-10-18T18:31:51.284Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "MovimientoController.cs",
+              "DocumentMoniker": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\Controllers\\MovimientoController.cs",
+              "RelativeDocumentMoniker": "EduBank.AppWeb\\Controllers\\MovimientoController.cs",
+              "ToolTip": "C:\\Users\\krieg.DESKTOP-6U3IQMJ\\OneDrive\\Im\u00E1genes\\Escritorio\\Dev\\_Dev_Web\\EduBanck\\EduBank_SSR_NET\\EduBank.AppWeb\\Controllers\\MovimientoController.cs",
+              "RelativeToolTip": "EduBank.AppWeb\\Controllers\\MovimientoController.cs",
+              "ViewState": "AgIAABsAAAAAAAAAAAAcwPsBAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-17T21:55:22.766Z",
               "EditorCaption": ""
             }
           ]

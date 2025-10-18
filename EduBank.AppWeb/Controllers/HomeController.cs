@@ -7,7 +7,7 @@ using System.Diagnostics;
 
 namespace EduBank.AppWeb.Controllers
 {
-    //[Authorize]
+    [Authorize]
     public class HomeController : Controller
     {
        

@@ -10,7 +10,32 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
-    
+    <style>
+     
+        .cat-icon-badge {
+            flex-shrink: 0;
+            transition: transform 0.2s ease;
+        }
+
+        .cat-icon-badge:hover {
+            transform: scale(1.05);
+        }
+
+        .list-group-item {
+            border: none;
+            border-bottom: 1px solid #e9ecef;
+            transition: background-color 0.2s ease;
+        }
+
+            .list-group-item:hover {
+                background-color: #f8f9fa;
+            }
+
+        .ultra-small {
+            font-size: 0.75rem;
+        }
+    </style>
+
 </head>
 
 <body>
@@ -41,6 +66,7 @@
         </div>
 
         <!-- Resumen: Ingresos | Acciones | Gastos -->
+        <!-- ACTUALIZA el bloque de resumen existente con esto: -->
         <div class="row g-3 align-items-center mb-4">
             <div class="col-md-3">
                 <div class="card shadow-sm border-0 h-100 summary-card">
@@ -54,11 +80,10 @@
                 </div>
             </div>
 
-            <!-- Centro con botones de acción -->
             <div class="col-md-6">
                 <div class="card shadow-lg border-0 text-center h-100">
                     <div class="card-body d-flex flex-column align-items-center justify-content-center">
-                   
+                        
 
                         <div class="action-buttons-saldo d-flex justify-content-center gap-4 mt-3">
                             <div class="text-center">
@@ -91,7 +116,6 @@
                 </div>
             </div>
         </div>
-
         <!-- Contenido principal -->
         <div class="row g-4">
             <div class="col-md-12">
@@ -291,375 +315,908 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
     <script>
-        // JavaScript unificado y corregido
+        // JavaScript modularizado y organizado
         $(document).ready(function() {
             'use strict';
 
-            // ==================== VARIABLES GLOBALES ====================
-            let cuentas = [];
-            let cuentaSeleccionada = null;
-            let categorias = [];
-            let categoriaSeleccionada = null;
-            let tipoMovimientoActual = 'G';
-            let chartGastos = null;
-            let chartIngresos = null;
-            let currentDate = new Date();
-            let currentPeriod = 'day';
+            // ==================== MÓDULO PRINCIPAL ====================
+            const EduBankApp = {
+                // Variables globales
+                cuentas: [],
+                cuentaSeleccionada: null,
+                categorias: [],
+                categoriaSeleccionada: null,
+                tipoMovimientoActual: 'G',
+                chartGastos: null,
+                chartIngresos: null,
+                currentDate: new Date(),
+                currentPeriod: 'day',
 
-            // ==================== INICIALIZACIÓN ====================
-            function inicializarAplicacion() {
-                cargarCuentas();
-                cargarCategorias();
-                inicializarEventos();
-                actualizarVisualizacionFecha();
-            }
+                // Inicialización
+                inicializar() {
+                    this.cargarCuentas();
+                    this.cargarCategorias();
+                    this.inicializarEventos();
+                    this.actualizarVisualizacionFecha();
 
-            // ==================== MANEJO DE CUENTAS ====================
-            function cargarCuentas() {
-                $.ajax({
-                    url: '/Cuenta/ObtenerActivas',
-                    type: 'GET',
-                    success: function(response) {
-                        if (Array.isArray(response)) {
-                            cuentas = response;
-                            actualizarSelectorCuentas();
-                            if (cuentas.length > 0) {
-                                $('#selectCuenta').val(cuentas[0].cuentaId);
-                                seleccionarCuenta(cuentas[0].cuentaId);
-                            }
-                        } else {
-                            console.error('Respuesta inesperada:', response);
-                            toastr.error('Error al cargar cuentas');
+                    setTimeout(() => {
+                        if (this.cuentaSeleccionada) {
+                            EstadisticasManager.cargarEstadisticas();
                         }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error al cargar cuentas:', error);
-                        $('#selectCuenta').html('<option value="">Error al cargar cuentas</option>');
-                        toastr.error('Error al cargar las cuentas');
-                    }
-                });
-            }
+                    }, 1000);
+                },
 
-            function actualizarSelectorCuentas() {
-                const select = $('#selectCuenta');
-                select.empty();
-
-                if (cuentas.length === 0) {
-                    select.append('<option value="">No hay cuentas disponibles</option>');
-                    return;
-                }
-
-                select.append('<option value="">Selecciona una cuenta</option>');
-                cuentas.forEach(cuenta => {
-                    select.append(
-                        $('<option></option>')
-                            .val(cuenta.cuentaId)
-                            .text(`${cuenta.nombre} (${cuenta.tipo}) - S/ ${(cuenta.saldo || 0).toFixed(2)}`)
-                    );
-                });
-            }
-
-            function seleccionarCuenta(cuentaId) {
-                const cuenta = cuentas.find(c => c.cuentaId == cuentaId);
-                if (cuenta) {
-                    cuentaSeleccionada = cuenta;
-                    mostrarInfoCuenta(cuenta);
-                    cargarEstadisticas();
-                }
-            }
-
-            function mostrarInfoCuenta(cuenta) {
-                $('#accountBalance').text(`S/ ${(cuenta.saldo || 0).toFixed(2)}`);
-                $('#accountName').text(cuenta.nombre);
-                $('#accountType').text(`${cuenta.tipo} • ${cuenta.moneda || 'PEN'}`);
-                $('#accountInfo').show();
-            }
-
-            // ==================== MANEJO DE CATEGORÍAS ====================
-            function cargarCategorias() {
-                $.ajax({
-                    url: '/Categoria/ObtenerActivas',
-                    type: 'GET',
-                    success: function(response) {
-                        if (Array.isArray(response)) {
-                            categorias = response;
-                            console.log('Categorías cargadas:', categorias.length);
+                // Eventos
+                inicializarEventos() {
+                    // Selector de cuenta
+                    $('#selectCuenta').change(() => {
+                        const cuentaId = $('#selectCuenta').val();
+                        if (cuentaId) {
+                            this.seleccionarCuenta(cuentaId);
                         } else {
-                            console.error('Respuesta inesperada:', response);
+                            this.cuentaSeleccionada = null;
+                            $('#accountInfo').hide();
+                        }
+                    });
+
+                    // Botones de movimiento
+                    $('#btnAgregarIngreso').click(() => MovimientoManager.abrirModalMovimiento('I'));
+                    $('#btnAgregarGasto').click(() => MovimientoManager.abrirModalMovimiento('G'));
+
+                    // Selección de categoría
+                    $('#btnCategoriaSelected').click(() => MovimientoManager.abrirModalCategorias());
+                    $(document).on('click', '.categoria-item', function() {
+                        const categoriaId = $(this).data('id');
+                        MovimientoManager.seleccionarCategoria(categoriaId);
+                    });
+
+                    // Formulario de movimiento
+                    $('#formMovimiento').submit(function(e) {
+                        e.preventDefault();
+                        MovimientoManager.guardarMovimiento();
+                    });
+
+                    // Filtros de período
+                    $('.btn-period').click(function() {
+                        $('.btn-period').removeClass('active btn-primary').addClass('btn-outline-primary');
+                        $(this).removeClass('btn-outline-primary').addClass('active btn-primary');
+                        EduBankApp.currentPeriod = $(this).data('period');
+                        EstadisticasManager.cargarEstadisticas();
+                    });
+
+                    // Navegación de fechas
+                    $('#prevDate').click(() => this.navegarFecha('prev'));
+                    $('#nextDate').click(() => this.navegarFecha('next'));
+                },
+
+                navegarFecha(direccion) {
+                    const paso = direccion === 'next' ? 1 : -1;
+
+                    switch(this.currentPeriod) {
+                        case 'day':
+                            this.currentDate.setDate(this.currentDate.getDate() + paso);
+                            break;
+                        case 'week':
+                            this.currentDate.setDate(this.currentDate.getDate() + (paso * 7));
+                            break;
+                        case 'month':
+                            this.currentDate.setMonth(this.currentDate.getMonth() + paso);
+                            break;
+                        case 'year':
+                            this.currentDate.setFullYear(this.currentDate.getFullYear() + paso);
+                            break;
+                    }
+
+                    this.actualizarVisualizacionFecha();
+                    EstadisticasManager.cargarEstadisticas();
+                },
+
+                actualizarVisualizacionFecha() {
+                    let textoFecha = '';
+                    const opciones = {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        timeZone: 'America/Lima'
+                    };
+
+                    switch(this.currentPeriod) {
+                        case 'day':
+                            textoFecha = this.currentDate.toLocaleDateString('es-PE', opciones);
+                            break;
+                        case 'week':
+                            const inicioSemana = new Date(this.currentDate);
+                            inicioSemana.setDate(this.currentDate.getDate() - this.currentDate.getDay());
+                            const finSemana = new Date(inicioSemana);
+                            finSemana.setDate(inicioSemana.getDate() + 6);
+
+                            textoFecha = `${inicioSemana.toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit' })} - ${finSemana.toLocaleDateString('es-PE', opciones)}`;
+                            break;
+                        case 'month':
+                            textoFecha = this.currentDate.toLocaleDateString('es-PE', {
+                                year: 'numeric',
+                                month: 'long'
+                            });
+                            break;
+                        case 'year':
+                            textoFecha = this.currentDate.toLocaleDateString('es-PE', {
+                                year: 'numeric'
+                            });
+                            break;
+                    }
+
+                    $('#dateDisplay').text(textoFecha);
+                }
+            };
+
+            // ==================== MÓDULO DE CUENTAS ====================
+            const CuentasManager = {
+                cargarCuentas() {
+                    $.ajax({
+                        url: '/Cuenta/ObtenerActivas',
+                        type: 'GET',
+                        success: (response) => {
+                            if (Array.isArray(response)) {
+                                EduBankApp.cuentas = response;
+                                this.actualizarSelectorCuentas();
+                                if (EduBankApp.cuentas.length > 0) {
+                                    $('#selectCuenta').val(EduBankApp.cuentas[0].cuentaId);
+                                    this.seleccionarCuenta(EduBankApp.cuentas[0].cuentaId);
+                                }
+                            } else {
+                                console.error('Respuesta inesperada:', response);
+                                toastr.error('Error al cargar cuentas');
+                            }
+                        },
+                        error: (xhr, status, error) => {
+                            console.error('Error al cargar cuentas:', error);
+                            $('#selectCuenta').html('<option value="">Error al cargar cuentas</option>');
+                            toastr.error('Error al cargar las cuentas');
+                        }
+                    });
+                },
+
+                actualizarSelectorCuentas() {
+                    const select = $('#selectCuenta');
+                    select.empty();
+
+                    if (EduBankApp.cuentas.length === 0) {
+                        select.append('<option value="">No hay cuentas disponibles</option>');
+                        return;
+                    }
+
+                    select.append('<option value="">Selecciona una cuenta</option>');
+                    EduBankApp.cuentas.forEach(cuenta => {
+                        select.append(
+                            $('<option></option>')
+                                .val(cuenta.cuentaId)
+                                .text(`${cuenta.nombre} (${cuenta.tipo}) - S/ ${(cuenta.saldo || 0).toFixed(2)}`)
+                        );
+                    });
+                },
+
+                seleccionarCuenta(cuentaId) {
+                    const cuenta = EduBankApp.cuentas.find(c => c.cuentaId == cuentaId);
+                    if (cuenta) {
+                        EduBankApp.cuentaSeleccionada = cuenta;
+                        this.mostrarInfoCuenta(cuenta);
+                        EstadisticasManager.cargarEstadisticas();
+                    }
+                },
+
+                mostrarInfoCuenta(cuenta) {
+                    $('#accountBalance').text(`S/ ${(cuenta.saldo || 0).toFixed(2)}`);
+                    $('#accountName').text(cuenta.nombre);
+                    $('#accountType').text(`${cuenta.tipo} • ${cuenta.moneda || 'PEN'}`);
+                    $('#accountInfo').show();
+                }
+            };
+
+            // ==================== MÓDULO DE CATEGORÍAS ====================
+            const CategoriasManager = {
+                cargarCategorias() {
+                    $.ajax({
+                        url: '/Categoria/ObtenerActivas',
+                        type: 'GET',
+                        success: (response) => {
+                            if (Array.isArray(response)) {
+                                EduBankApp.categorias = response;
+                                console.log('Categorías cargadas:', EduBankApp.categorias.length);
+                            } else {
+                                console.error('Respuesta inesperada:', response);
+                                toastr.error('Error al cargar categorías');
+                            }
+                        },
+                        error: (xhr, status, error) => {
+                            console.error('Error al cargar categorías:', error);
                             toastr.error('Error al cargar categorías');
                         }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error al cargar categorías:', error);
-                        toastr.error('Error al cargar categorías');
+                    });
+                },
+
+                actualizarGridCategorias(categoriasLista) {
+                    const grid = $('#gridCategorias');
+                    grid.empty();
+
+                    if (categoriasLista.length === 0) {
+                        grid.html(`
+                            <div class="col-12 text-center py-4">
+                                <i class="bi bi-inbox fs-1 text-muted"></i>
+                                <p class="text-muted mt-2">No hay categorías disponibles</p>
+                            </div>
+                        `);
+                        return;
                     }
-                });
-            }
 
-            // ==================== GRID DE CATEGORÍAS  ====================
-            function actualizarGridCategorias(categoriasLista) {
-                const grid = $('#gridCategorias');
-                grid.empty();
-
-                if (categoriasLista.length === 0) {
-                    grid.html(`
-                        <div class="col-12 text-center py-4">
-                            <i class="bi bi-inbox fs-1 text-muted"></i>
-                            <p class="text-muted mt-2">No hay categorías disponibles</p>
-                        </div>
-                    `);
-                    return;
-                }
-
-                categoriasLista.forEach(categoria => {
-                    const categoriaHtml = `
-                        <div class="col">
-                            <div class="categoria-item card h-100 border-0 shadow-sm cursor-pointer"
-                                 data-id="${categoria.categoriaId}"
-                                 title="${categoria.nombre}">
-                                <div class="card-body text-center p-3">
-                                    <div class="cat-icon-badge mb-2 mx-auto"
-                                         style="background: ${categoria.color || '#6c757d'}; color: white; width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
-                                        <i class="bi ${categoria.icono || 'bi-tag'}"></i>
+                    categoriasLista.forEach(categoria => {
+                        const categoriaHtml = `
+                            <div class="col">
+                                <div class="categoria-item card h-100 border-0 shadow-sm cursor-pointer"
+                                     data-id="${categoria.categoriaId}"
+                                     title="${categoria.nombre}">
+                                    <div class="card-body text-center p-3">
+                                        <div class="cat-icon-badge mb-2 mx-auto"
+                                             style="background: ${categoria.color || '#6c757d'}; color: white; width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                                            <i class="bi ${categoria.icono || 'bi-tag'}"></i>
+                                        </div>
+                                        <div class="categoria-name small fw-bold">${categoria.nombre}</div>
+                                        ${categoria.descripcion ? `<div class="categoria-desc ultra-small text-muted mt-1">${categoria.descripcion}</div>` : ''}
                                     </div>
-                                    <div class="categoria-name small fw-bold">${categoria.nombre}</div>
-                                    ${categoria.descripcion ? `<div class="categoria-desc ultra-small text-muted mt-1">${categoria.descripcion}</div>` : ''}
                                 </div>
                             </div>
-                        </div>
-                    `;
-                    grid.append(categoriaHtml);
-                });
-            }
-
-            function seleccionarCategoria(categoriaId) {
-                const categoria = categorias.find(cat => cat.categoriaId == categoriaId);
-                if (categoria) {
-                    categoriaSeleccionada = categoria;
-                    $('#btnCategoriaBadge')
-                        .html(`<i class="bi ${categoria.icono || 'bi-tag'}"></i>`)
-                        .css({
-                            'background': categoria.color || '#6c757d',
-                            'color': 'white'
-                        });
-                    $('#btnCategoriaLabel').text(categoria.nombre);
-                    $('#selCategoria').val(categoriaId);
-                    $('#modalCategorias').modal('hide');
-                }
-            }
-
-            // ==================== MANEJO DE MODALES ====================
-            function abrirModalMovimiento(tipo) {
-                tipoMovimientoActual = tipo;
-                const titulo = tipo === 'I' ? 'Agregar Ingreso' : 'Agregar Gasto';
-                const badgeClass = tipo === 'I' ? 'bg-success' : 'bg-danger';
-                const badgeText = tipo === 'I' ? 'INGRESO' : 'GASTO';
-
-                $('#movModalLabel').text(titulo);
-                $('#movModalTypeBadge').html(`<span class="badge ${badgeClass}">${badgeText}</span>`);
-                $('#selTipo').val(tipo);
-
-                resetearFormularioMovimiento();
-
-                // Filtrar categorías por tipo
-                const categoriasFiltradas = categorias.filter(cat =>
-                    cat.tipo === tipo && cat.activo !== false
-                );
-                actualizarGridCategorias(categoriasFiltradas);
-
-                $('#movModal').modal('show');
-            }
-
-            function abrirModalCategorias() {
-                const categoriasFiltradas = categorias.filter(cat =>
-                    cat.tipo === tipoMovimientoActual && cat.activo !== false
-                );
-                actualizarGridCategorias(categoriasFiltradas);
-                $('#modalCategorias').modal('show');
-            }
-
-            function resetearFormularioMovimiento() {
-                $('#txtMovimientoId').val('0');
-                $('#txtFechaOperacion').val(new Date().toISOString().split('T')[0]);
-                $('#txtMonto').val('');
-                $('#txtComentario').val('');
-                resetearSeleccionCategoria();
-            }
-
-            function resetearSeleccionCategoria() {
-                categoriaSeleccionada = null;
-                $('#btnCategoriaBadge')
-                    .html('<i class="bi bi-palette"></i>')
-                    .css({
-                        'background': '#e9ecef',
-                        'color': '#6c757d'
+                        `;
+                        grid.append(categoriaHtml);
                     });
-                $('#btnCategoriaLabel').text('Seleccionar categoría');
-                $('#selCategoria').val('');
-            }
+                }
+            };
 
-            // ==================== ESTADÍSTICAS Y GRÁFICOS ====================
-            
+            // ==================== MÓDULO DE MOVIMIENTOS ====================
+            const MovimientoManager = {
+                abrirModalMovimiento(tipo) {
+                    EduBankApp.tipoMovimientoActual = tipo;
+                    const titulo = tipo === 'I' ? 'Agregar Ingreso' : 'Agregar Gasto';
+                    const badgeClass = tipo === 'I' ? 'bg-success' : 'bg-danger';
+                    const badgeText = tipo === 'I' ? 'INGRESO' : 'GASTO';
 
-            // ==================== UTILIDADES ====================
-     
+                    $('#movModalLabel').text(titulo);
+                    $('#movModalTypeBadge').html(`<span class="badge ${badgeClass}">${badgeText}</span>`);
+                    $('#selTipo').val(tipo);
 
-            // ==================== EVENTOS ====================
-            function inicializarEventos() {
-                // Selector de cuenta
-                $('#selectCuenta').change(function() {
-                    const cuentaId = $(this).val();
-                    if (cuentaId) {
-                        seleccionarCuenta(cuentaId);
-                    } else {
-                        cuentaSeleccionada = null;
-                        $('#accountInfo').hide();
+                    this.resetearFormularioMovimiento();
+
+                    // Filtrar categorías por tipo
+                    const categoriasFiltradas = EduBankApp.categorias.filter(cat =>
+                        cat.tipo === tipo && cat.activo !== false
+                    );
+                    CategoriasManager.actualizarGridCategorias(categoriasFiltradas);
+
+                    $('#movModal').modal('show');
+                },
+
+                abrirModalCategorias() {
+                    const categoriasFiltradas = EduBankApp.categorias.filter(cat =>
+                        cat.tipo === EduBankApp.tipoMovimientoActual && cat.activo !== false
+                    );
+                    CategoriasManager.actualizarGridCategorias(categoriasFiltradas);
+                    $('#modalCategorias').modal('show');
+                },
+
+                seleccionarCategoria(categoriaId) {
+                    const categoria = EduBankApp.categorias.find(cat => cat.categoriaId == categoriaId);
+                    if (categoria) {
+                        EduBankApp.categoriaSeleccionada = categoria;
+                        $('#btnCategoriaBadge')
+                            .html(`<i class="bi ${categoria.icono || 'bi-tag'}"></i>`)
+                            .css({
+                                'background': categoria.color || '#6c757d',
+                                'color': 'white'
+                            });
+                        $('#btnCategoriaLabel').text(categoria.nombre);
+                        $('#selCategoria').val(categoriaId);
+                        $('#modalCategorias').modal('hide');
                     }
-                });
+                },
 
-                // Botones de movimiento
-                $('#btnAgregarIngreso').click(() => abrirModalMovimiento('I'));
-                $('#btnAgregarGasto').click(() => abrirModalMovimiento('G'));
+                resetearFormularioMovimiento() {
+                    $('#txtMovimientoId').val('0');
+                    $('#txtFechaOperacion').val(new Date().toISOString().split('T')[0]);
+                    $('#txtMonto').val('');
+                    $('#txtComentario').val('');
+                    this.resetearSeleccionCategoria();
+                },
 
-                // Selección de categoría
-                $('#btnCategoriaSelected').click(abrirModalCategorias);
-                $(document).on('click', '.categoria-item', function() {
-                    const categoriaId = $(this).data('id');
-                    seleccionarCategoria(categoriaId);
-                });
+                resetearSeleccionCategoria() {
+                    EduBankApp.categoriaSeleccionada = null;
+                    $('#btnCategoriaBadge')
+                        .html('<i class="bi bi-palette"></i>')
+                        .css({
+                            'background': '#e9ecef',
+                            'color': '#6c757d'
+                        });
+                    $('#btnCategoriaLabel').text('Seleccionar categoría');
+                    $('#selCategoria').val('');
+                },
 
-                // Formulario de movimiento
-                $('#formMovimiento').submit(function(e) {
-                    e.preventDefault();
-                    guardarMovimiento();
-                });
+                guardarMovimiento() {
+                    if (!EduBankApp.cuentaSeleccionada) {
+                        toastr.error('Selecciona una cuenta primero');
+                        return;
+                    }
 
-                // Filtros de período
-                $('.btn-period').click(function() {
-                    $('.btn-period').removeClass('active btn-primary').addClass('btn-outline-primary');
-                    $(this).removeClass('btn-outline-primary').addClass('active btn-primary');
-                    currentPeriod = $(this).data('period');
-                    cargarEstadisticas();
-                });
+                    if (!EduBankApp.categoriaSeleccionada) {
+                        toastr.error('Selecciona una categoría');
+                        return;
+                    }
 
-                // Navegación de fechas
-                $('#prevDate').click(() => navegarFecha('prev'));
-                $('#nextDate').click(() => navegarFecha('next'));
-            }
+                    const modelo = {
+                        MovimientoId: parseInt($('#txtMovimientoId').val()),
+                        CuentaId: EduBankApp.cuentaSeleccionada.cuentaId,
+                        CategoriaId: EduBankApp.categoriaSeleccionada.categoriaId,
+                        Tipo: EduBankApp.tipoMovimientoActual,
+                        FechaOperacion: $('#txtFechaOperacion').val(),
+                        Monto: parseFloat($('#txtMonto').val()),
+                        Comentario: $('#txtComentario').val()
+                    };
 
-            function navegarFecha(direccion) {
-                const paso = direccion === 'next' ? 1 : -1;
+                    // Validaciones básicas
+                    if (modelo.Monto <= 0 || isNaN(modelo.Monto)) {
+                        toastr.error('El monto debe ser mayor a 0');
+                        return;
+                    }
 
-                switch(currentPeriod) {
-                    case 'day':
-                        currentDate.setDate(currentDate.getDate() + paso);
-                        break;
-                    case 'week':
-                        currentDate.setDate(currentDate.getDate() + (paso * 7));
-                        break;
-                    case 'month':
-                        currentDate.setMonth(currentDate.getMonth() + paso);
-                        break;
-                    case 'year':
-                        currentDate.setFullYear(currentDate.getFullYear() + paso);
-                        break;
-                }
+                    if (!modelo.FechaOperacion) {
+                        toastr.error('La fecha es requerida');
+                        return;
+                    }
 
-                actualizarVisualizacionFecha();
-                cargarEstadisticas();
-            }
+                    console.log('Datos a enviar:', modelo);
 
-            function guardarMovimiento() {
-                if (!cuentaSeleccionada) {
-                    toastr.error('Selecciona una cuenta primero');
-                    return;
-                }
+                    // Mostrar loading
+                    const $btn = $('#btnGuardarModal');
+                    const originalText = $btn.html();
+                    $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Guardando...');
 
-                if (!categoriaSeleccionada) {
-                    toastr.error('Selecciona una categoría');
-                    return;
-                }
+                    $.ajax({
+                        url: '/Movimiento/Insertar',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(modelo),
+                        success: (response) => {
+                            $btn.prop('disabled', false).html(originalText);
+                            console.log('Respuesta del servidor:', response);
 
-                const modelo = {
-                    MovimientoId: parseInt($('#txtMovimientoId').val()),
-                    CuentaId: cuentaSeleccionada.cuentaId,
-                    CategoriaId: categoriaSeleccionada.categoriaId,
-                    Tipo: tipoMovimientoActual,
-                    FechaOperacion: $('#txtFechaOperacion').val(),
-                    Monto: parseFloat($('#txtMonto').val()),
-                    Comentario: $('#txtComentario').val()
-                };
+                            if (response && response.valor) {
+                                toastr.success(response.mensaje || 'Movimiento guardado correctamente');
+                                $('#movModal').modal('hide');
 
-                // Validaciones básicas
-                if (modelo.Monto <= 0 || isNaN(modelo.Monto)) {
-                    toastr.error('El monto debe ser mayor a 0');
-                    return;
-                }
+                                // Actualizar interfaz
+                                if (response.saldoActualizado !== undefined) {
+                                    $('#accountBalance').text(Utilidades.formatearMoneda(response.saldoActualizado));
+                                    EduBankApp.cuentaSeleccionada.saldo = response.saldoActualizado;
+                                }
 
-                if (!modelo.FechaOperacion) {
-                    toastr.error('La fecha es requerida');
-                    return;
-                }
+                                EstadisticasManager.cargarEstadisticas();
+                            } else {
+                                const mensaje = response?.mensaje || 'Error al guardar movimiento';
+                                toastr.error(mensaje);
+                            }
+                        },
+                        error: (xhr, status, error) => {
+                            $btn.prop('disabled', false).html(originalText);
 
-                // DEBUG: Mostrar datos en consola
-                console.log('Datos a enviar:', modelo);
-
-                // Mostrar loading
-                const $btn = $('#btnGuardarModal');
-                const originalText = $btn.html();
-                $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Guardando...');
-
-                $.ajax({
-                    url: '/Movimiento/Insertar',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(modelo),
-                    success: function(response) {
-                        $btn.prop('disabled', false).html(originalText);
-                        console.log('Respuesta del servidor:', response);
-
-                        if (response && response.valor) {
-                            toastr.success(response.mensaje || 'Movimiento guardado correctamente');
-                            $('#movModal').modal('hide');
-
-                            // Actualizar interfaz
-                            if (response.saldoActualizado !== undefined) {
-                                $('#accountBalance').text(formatearMoneda(response.saldoActualizado));
-                                // Actualizar también en el objeto cuentaSeleccionada
-                                cuentaSeleccionada.saldo = response.saldoActualizado;
+                            let mensajeError = 'Error de conexión al guardar movimiento';
+                            if (xhr.responseText) {
+                                try {
+                                    const errorData = JSON.parse(xhr.responseText);
+                                    mensajeError = errorData.mensaje || errorData.message || mensajeError;
+                                } catch (e) {
+                                    mensajeError = xhr.responseText;
+                                }
                             }
 
-                            cargarEstadisticas();
-                        } else {
-                            const mensaje = response?.mensaje || 'Error al guardar movimiento';
-                            toastr.error(mensaje);
+                            toastr.error(mensajeError);
+                            console.error('Error detallado:', {
+                                status: xhr.status,
+                                respuesta: xhr.responseText,
+                                error: error
+                            });
+                        }
+                    });
+                }
+            };
+
+            // ==================== MÓDULO DE ESTADÍSTICAS Y GRÁFICOS ====================
+            const EstadisticasManager = {
+                cargarEstadisticas() {
+                    if (!EduBankApp.cuentaSeleccionada) return;
+
+                    const fechaStr = EduBankApp.currentDate.toISOString().split('T')[0];
+                    const periodosMap = {
+                        'day': 'dia',
+                        'week': 'semana',
+                        'month': 'mes',
+                        'year': 'año'
+                    };
+
+                    const periodoBackend = periodosMap[EduBankApp.currentPeriod] || 'dia';
+
+                    console.log('📊 Solicitando estadísticas:', {
+                        periodo: periodoBackend,
+                        fecha: fechaStr,
+                        cuenta: EduBankApp.cuentaSeleccionada.cuentaId
+                    });
+
+                    $.ajax({
+                        url: `/Movimiento/EstadisticasPorPeriodo?periodo=${periodoBackend}&fecha=${fechaStr}`,
+                        type: 'GET',
+                        success: (response) => {
+                            console.log('✅ Respuesta estadísticas:', response);
+
+                            if (response && response.valor) {
+                                this.actualizarEstadisticas(response);
+                                GraficosManager.actualizarGraficos(response);
+                                this.cargarMovimientosDelPeriodo(periodoBackend, fechaStr);
+                            } else {
+                                const mensaje = response?.mensaje || 'Error en la respuesta del servidor';
+                                console.error('❌ Error en respuesta:', response);
+
+                                this.actualizarEstadisticas({
+                                    totalIngresos: 0,
+                                    totalGastos: 0,
+                                    saldo: 0,
+                                    ingresosPorCategoria: [],
+                                    gastosPorCategoria: []
+                                });
+
+                                toastr.warning('No hay datos para el período seleccionado');
+                            }
+                        },
+                        error: (xhr, status, error) => {
+                            console.error('❌ Error al cargar estadísticas:', {
+                                status: xhr.status,
+                                statusText: xhr.statusText,
+                                error: error
+                            });
+
+                            this.actualizarEstadisticas({
+                                totalIngresos: 0,
+                                totalGastos: 0,
+                                saldo: 0,
+                                ingresosPorCategoria: [],
+                                gastosPorCategoria: []
+                            });
+
+                            if (xhr.status === 400) {
+                                toastr.error('Parámetros inválidos para el filtro');
+                            } else {
+                                toastr.error('Error al cargar estadísticas');
+                            }
+                        }
+                    });
+                },
+
+                cargarMovimientosDelPeriodo(periodo, fecha) {
+                    $.ajax({
+                        url: `/Movimiento/ObtenerPorPeriodo?periodo=${periodo}&fecha=${fecha}`,
+                        type: 'GET',
+                        success: (response) => {
+                            console.log('📋 Movimientos del período:', response);
+                            if (response && response.valor) {
+                                ListasManager.mostrarMovimientosRecientes(response.movimientos || []);
+
+                                if (response.totalIngresos !== undefined) {
+                                    $('#cardIngresos').text(Utilidades.formatearMoneda(response.totalIngresos));
+                                    $('#totalIngresosLabel').text(Utilidades.formatearMoneda(response.totalIngresos));
+                                }
+                                if (response.totalGastos !== undefined) {
+                                    $('#cardGastos').text(Utilidades.formatearMoneda(response.totalGastos));
+                                    $('#totalGastosLabel').text(Utilidades.formatearMoneda(response.totalGastos));
+                                }
+                            } else {
+                                console.warn('No se pudieron cargar movimientos:', response?.mensaje);
+                                ListasManager.mostrarMovimientosRecientes([]);
+                            }
+                        },
+                        error: (xhr, status, error) => {
+                            console.error('Error al cargar movimientos:', error);
+                            ListasManager.mostrarMovimientosRecientes([]);
+                        }
+                    });
+                },
+
+                actualizarEstadisticas(data) {
+                    $('#cardIngresos').text(Utilidades.formatearMoneda(data.totalIngresos || 0));
+                    $('#cardGastos').text(Utilidades.formatearMoneda(data.totalGastos || 0));
+                    $('#saldoTotal').text(Utilidades.formatearMoneda(data.saldo || 0));
+
+                    $('#totalIngresosLabel').text(Utilidades.formatearMoneda(data.totalIngresos || 0));
+                    $('#totalGastosLabel').text(Utilidades.formatearMoneda(data.totalGastos || 0));
+                }
+            };
+
+            // ==================== MÓDULO DE GRÁFICOS ====================
+                    // ==================== MÓDULO DE GRÁFICOS ====================
+        const GraficosManager = {
+            actualizarGraficos(data) {
+                console.log('🎨 Actualizando gráficos con datos:', data);
+
+                const gastosData = data.gastosPorCategoria || [];
+                console.log('Datos de gastos para gráfico:', gastosData);
+                this.actualizarChartGastos(gastosData);
+
+                const ingresosData = data.ingresosPorCategoria || [];
+                console.log('Datos de ingresos para gráfico:', ingresosData);
+                this.actualizarChartIngresos(ingresosData);
+            },
+
+            actualizarChartGastos(gastosData) {
+                const ctx = document.getElementById('chartGastos').getContext('2d');
+
+                if (EduBankApp.chartGastos) {
+                    EduBankApp.chartGastos.destroy();
+                }
+
+                console.log('📊 Actualizando gráfico de gastos con:', gastosData);
+
+                if (!gastosData || gastosData.length === 0) {
+                    $('#noDataGastos').show();
+                    $('#totalGastosLabel').text('S/ 0.00');
+                    return;
+                }
+
+                $('#noDataGastos').hide();
+
+                const labels = gastosData.map(item => {
+                    return item.Nombre || item.nombre || item.CategoriaNombre || 'Sin nombre';
+                });
+
+                const data = gastosData.map(item => {
+                    return item.Total || item.total || 0;
+                });
+
+                // OBTENER COLORES DE LAS CATEGORÍAS
+                const colores = gastosData.map(item => {
+                    // Buscar la categoría en las categorías cargadas
+                    const categoriaId = item.CategoriaId || item.categoriaId;
+                    const categoria = EduBankApp.categorias.find(cat => cat.categoriaId == categoriaId);
+
+                    // Si encontramos la categoría, usar su color, sino generar uno
+                    return categoria ? (categoria.color || this.generarColorFallback(item.Nombre)) : this.generarColorFallback(item.Nombre);
+                });
+
+                console.log('🎨 Colores de categorías (gastos):', colores);
+                console.log('Etiquetas gastos:', labels);
+                console.log('Datos gastos:', data);
+
+                EduBankApp.chartGastos = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: data,
+                            backgroundColor: colores, // Usar colores de categorías
+                            borderWidth: 2,
+                            borderColor: '#fff'
+                        }]
+                    },
+                    options: this.obtenerOpcionesGrafico()
+                });
+            },
+
+            actualizarChartIngresos(ingresosData) {
+                const ctx = document.getElementById('chartIngresos').getContext('2d');
+
+                if (EduBankApp.chartIngresos) {
+                    EduBankApp.chartIngresos.destroy();
+                }
+
+                console.log('📊 Actualizando gráfico de ingresos con:', ingresosData);
+
+                if (!ingresosData || ingresosData.length === 0) {
+                    $('#noDataIngresos').show();
+                    $('#totalIngresosLabel').text('S/ 0.00');
+                    return;
+                }
+
+                $('#noDataIngresos').hide();
+
+                const labels = ingresosData.map(item => {
+                    return item.Nombre || item.nombre || item.CategoriaNombre || 'Sin nombre';
+                });
+
+                const data = ingresosData.map(item => {
+                    return item.Total || item.total || 0;
+                });
+
+                // OBTENER COLORES DE LAS CATEGORÍAS
+                const colores = ingresosData.map(item => {
+                    // Buscar la categoría en las categorías cargadas
+                    const categoriaId = item.CategoriaId || item.categoriaId;
+                    const categoria = EduBankApp.categorias.find(cat => cat.categoriaId == categoriaId);
+
+                    // Si encontramos la categoría, usar su color, sino generar uno
+                    return categoria ? (categoria.color || this.generarColorFallback(item.Nombre)) : this.generarColorFallback(item.Nombre);
+                });
+
+                console.log('🎨 Colores de categorías (ingresos):', colores);
+                console.log('Etiquetas ingresos:', labels);
+                console.log('Datos ingresos:', data);
+
+                EduBankApp.chartIngresos = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: data,
+                            backgroundColor: colores, // Usar colores de categorías
+                            borderWidth: 2,
+                            borderColor: '#fff'
+                        }]
+                    },
+                    options: this.obtenerOpcionesGrafico()
+                });
+            },
+
+            // Función para generar colores fallback consistentes
+            generarColorFallback(nombre) {
+                // Generar un color basado en el nombre para consistencia
+                const coloresBase = [
+                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+                    '#FF9F40', '#FF6384', '#C9CBCF', '#7CFFB2', '#FF6384',
+                    '#4DC9F6', '#F67019', '#537BC4', '#ACC236', '#166A8F',
+                    '#00A8C6', '#40C0CB', '#AEE239', '#8FBE00', '#F9F2E7'
+                ];
+
+                // Crear un hash simple del nombre para seleccionar color consistentemente
+                let hash = 0;
+                for (let i = 0; i < nombre.length; i++) {
+                    hash = nombre.charCodeAt(i) + ((hash << 5) - hash);
+                }
+
+                return coloresBase[Math.abs(hash) % coloresBase.length];
+            },
+
+            obtenerOpcionesGrafico() {
+                return {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12,
+                                font: { size: 11 },
+                                // Opcional: mostrar íconos en la leyenda
+                                generateLabels: (chart) => {
+                                    const datasets = chart.data.datasets;
+                                    return chart.data.labels.map((label, i) => {
+                                        const dataset = datasets[0];
+                                        return {
+                                            text: label,
+                                            fillStyle: dataset.backgroundColor[i],
+                                            strokeStyle: dataset.borderColor[i],
+                                            lineWidth: dataset.borderWidth,
+                                            pointStyle: 'circle',
+                                            hidden: false,
+                                            index: i
+                                        };
+                                    });
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0';
+                                    return `${context.label}: ${Utilidades.formatearMoneda(value)} (${percentage}%)`;
+                                }
+                            }
                         }
                     },
-                    error: function(xhr, status, error) {
-                        $btn.prop('disabled', false).html(originalText);
+                    cutout: '65%'
+                };
+            }
+        };
 
-                        let mensajeError = 'Error de conexión al guardar movimiento';
-                        if (xhr.responseText) {
-                            try {
-                                const errorData = JSON.parse(xhr.responseText);
-                                mensajeError = errorData.mensaje || errorData.message || mensajeError;
-                            } catch (e) {
-                                mensajeError = xhr.responseText;
-                            }
-                        }
+            // ==================== MÓDULO DE LISTAS ====================
+            const ListasManager = {
+                mostrarMovimientosRecientes(movimientos) {
+                    console.log('👀 Mostrando movimientos recientes - RAW:', movimientos);
 
-                        toastr.error(mensajeError);
-                        console.error('Error detallado:', {
-                            status: xhr.status,
-                            respuesta: xhr.responseText,
-                            error: error
+                    if (!movimientos || !Array.isArray(movimientos)) {
+                        console.error('❌ Movimientos no es un array válido:', movimientos);
+                        movimientos = [];
+                    }
+
+                    const gastos = movimientos
+                        .filter(m => {
+                            const tipo = m.Tipo || m.tipo;
+                            return tipo === 'G';
+                        })
+                        .slice(0, 5);
+
+                    const ingresos = movimientos
+                        .filter(m => {
+                            const tipo = m.Tipo || m.tipo;
+                            return tipo === 'I';
+                        })
+                        .slice(0, 5);
+
+                    console.log('📋 Gastos filtrados:', gastos);
+                    console.log('📈 Ingresos filtrados:', ingresos);
+
+                    this.actualizarListaGastos(gastos);
+                    this.actualizarListaIngresos(ingresos);
+                },
+
+                actualizarListaGastos(gastos) {
+                    const listaGastos = $('#listaGastosChart');
+                    listaGastos.empty();
+
+                    if (gastos.length === 0) {
+                        listaGastos.append(`
+                            <li class="list-group-item text-center text-muted py-3">
+                                <i class="bi bi-inbox me-2"></i>
+                                No hay gastos en este período
+                            </li>
+                        `);
+                    } else {
+                        gastos.forEach((movimiento, index) => {
+                            console.log(`📝 Procesando gasto ${index + 1}:`, movimiento);
+                            listaGastos.append(this.crearItemMovimiento(movimiento));
                         });
                     }
-                });
-            }
+                },
 
-            // ==================== INICIAR APLICACIÓN ====================
-            inicializarAplicacion();
+                actualizarListaIngresos(ingresos) {
+                    const listaIngresos = $('#listaIngresosChart');
+                    listaIngresos.empty();
+
+                    if (ingresos.length === 0) {
+                        listaIngresos.append(`
+                            <li class="list-group-item text-center text-muted py-3">
+                                <i class="bi bi-inbox me-2"></i>
+                                No hay ingresos en este período
+                            </li>
+                        `);
+                    } else {
+                        ingresos.forEach((movimiento, index) => {
+                            console.log(`📝 Procesando ingreso ${index + 1}:`, movimiento);
+                            listaIngresos.append(this.crearItemMovimiento(movimiento));
+                        });
+                    }
+                },
+        crearItemMovimiento(movimiento) {
+               console.log('📝 Creando item para movimiento:', movimiento);
+
+               const esGasto = (movimiento.Tipo === 'G') || (movimiento.tipo === 'G');
+               const claseMonto = esGasto ? 'text-danger' : 'text-success';
+               const signo = esGasto ? '-' : '+';
+
+               // Obtener información de la categoría
+               const categoriaNombre = movimiento.CategoriaNombre ||
+                                     movimiento.categoriaNombre ||
+                                     movimiento.Nombre ||
+                                     (movimiento.Categoria && movimiento.Categoria.nombre) ||
+                                     'Sin categoría';
+
+               // Buscar la categoría en las categorías cargadas para obtener ícono y color
+               let categoriaInfo = EduBankApp.categorias.find(cat =>
+                   cat.categoriaId == (movimiento.CategoriaId || movimiento.categoriaId)
+               );
+
+               // Si no encontramos la categoría, usar valores por defecto según el tipo
+               const iconoCategoria = categoriaInfo ?
+                   categoriaInfo.icono || 'bi-tag' :
+                   (esGasto ? 'bi-arrow-down-circle' : 'bi-arrow-up-circle');
+
+               const colorCategoria = categoriaInfo ?
+                   (categoriaInfo.color || '#6c757d') :
+                   (esGasto ? '#dc3545' : '#198754');
+
+               const fechaFormateada = Utilidades.formatearFechaRobusta(
+                   movimiento.FechaOperacion || movimiento.fechaOperacion
+               );
+
+               const monto = movimiento.Monto || movimiento.monto || 0;
+               const comentario = movimiento.Comentario || movimiento.comentario || '';
+
+               return `
+                   <li class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
+                       <div class="d-flex align-items-center">
+                           <!-- Ícono de la categoría con su color -->
+                           <div class="cat-icon-badge me-2" style="
+                               background: ${colorCategoria};
+                               color: white;
+                               width: 32px;
+                               height: 32px;
+                               border-radius: 8px;
+                               display: flex;
+                               align-items: center;
+                               justify-content: center;
+                               font-size: 0.9rem;">
+                               <i class="bi ${iconoCategoria}"></i>
+                           </div>
+                           <div>
+                               <div class="small fw-bold">${categoriaNombre}</div>
+                               <div class="ultra-small text-muted">${fechaFormateada}</div>
+                               ${comentario ? `<div class="ultra-small text-muted">${comentario}</div>` : ''}
+                           </div>
+                       </div>
+                       <div class="text-end">
+                           <!-- Ícono de tipo de movimiento (flecha) -->
+                           <div class="d-flex align-items-center">
+                               <i class="bi ${esGasto ? 'bi-arrow-down-circle text-danger' : 'bi-arrow-up-circle text-success'} me-1"></i>
+                               <div class="small fw-bold ${claseMonto}">
+                                   ${signo} ${Utilidades.formatearMoneda(monto)}
+                               </div>
+                           </div>
+                       </div>
+                   </li>
+               `;
+           }
+            };
+
+            // ==================== MÓDULO DE UTILIDADES ====================
+            const Utilidades = {
+                formatearMoneda(monto) {
+                    return `S/ ${parseFloat(monto || 0).toLocaleString('es-PE', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    })}`;
+                },
+
+                formatearFechaRobusta(fechaStr) {
+                    if (!fechaStr) return 'Fecha inválida';
+
+                    try {
+                        let fecha = new Date(fechaStr);
+
+                        if (isNaN(fecha.getTime())) {
+                            const [year, month, day] = fechaStr.split('-');
+                            fecha = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                        }
+
+                        if (isNaN(fecha.getTime())) {
+                            return 'Fecha inválida';
+                        }
+
+                        return fecha.toLocaleDateString('es-PE', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric'
+                        });
+                    } catch (error) {
+                        console.warn('Error formateando fecha:', error, fechaStr);
+                        return 'Fecha inválida';
+                    }
+                },
+
+                generarColores(cantidad) {
+                    const coloresBase = [
+                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+                        '#FF9F40', '#FF6384', '#C9CBCF', '#7CFFB2', '#FF6384',
+                        '#4DC9F6', '#F67019', '#537BC4', '#ACC236', '#166A8F'
+                    ];
+
+                    let colores = [];
+                    for (let i = 0; i < cantidad; i++) {
+                        colores.push(coloresBase[i % coloresBase.length]);
+                    }
+                    return colores;
+                }
+            };
+
+            // ==================== INICIALIZACIÓN ====================
+            // Asignar métodos al objeto principal
+            EduBankApp.cargarCuentas = CuentasManager.cargarCuentas.bind(CuentasManager);
+            EduBankApp.cargarCategorias = CategoriasManager.cargarCategorias.bind(CategoriasManager);
+            EduBankApp.seleccionarCuenta = CuentasManager.seleccionarCuenta.bind(CuentasManager);
+
+            // Iniciar aplicación
+            EduBankApp.inicializar();
         });
     </script>
 </body>

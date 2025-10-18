@@ -1,1 +1,8 @@
-C:\Users\krieg.DESKTOP-6U3IQMJ\OneDrive\Imágenes\Escritorio\Dev\_Dev_Web\EduBanck\EduBank_SSR_NET\EduBank.AppWeb\wwwroot\js\movimientos\crud.funciones.js
+C:\Users\krieg.DESKTOP-6U3IQMJ\OneDrive\Imágenes\Escritorio\Dev\_Dev_Web\EduBanck\EduBank_SSR_NET\EduBank.AppWeb\wwwroot\js\movimientos\agregar.js
+C:\Users\krieg.DESKTOP-6U3IQMJ\OneDrive\Imágenes\Escritorio\Dev\_Dev_Web\EduBanck\EduBank_SSR_NET\EduBank.AppWeb\wwwroot\js\movimientos\crudFunctions.js
+C:\Users\krieg.DESKTOP-6U3IQMJ\OneDrive\Imágenes\Escritorio\Dev\_Dev_Web\EduBanck\EduBank_SSR_NET\EduBank.AppWeb\wwwroot\js\movimientos\editar.js
+C:\Users\krieg.DESKTOP-6U3IQMJ\OneDrive\Imágenes\Escritorio\Dev\_Dev_Web\EduBanck\EduBank_SSR_NET\EduBank.AppWeb\wwwroot\js\movimientos\eliminar.js
+C:\Users\krieg.DESKTOP-6U3IQMJ\OneDrive\Imágenes\Escritorio\Dev\_Dev_Web\EduBanck\EduBank_SSR_NET\EduBank.AppWeb\wwwroot\js\movimientos\graficos.js
+C:\Users\krieg.DESKTOP-6U3IQMJ\OneDrive\Imágenes\Escritorio\Dev\_Dev_Web\EduBanck\EduBank_SSR_NET\EduBank.AppWeb\wwwroot\js\movimientos\index.js
+C:\Users\krieg.DESKTOP-6U3IQMJ\OneDrive\Imágenes\Escritorio\Dev\_Dev_Web\EduBanck\EduBank_SSR_NET\EduBank.AppWeb\wwwroot\js\movimientos\listar.js
+C:\Users\krieg.DESKTOP-6U3IQMJ\OneDrive\Imágenes\Escritorio\Dev\_Dev_Web\EduBanck\EduBank_SSR_NET\EduBank.AppWeb\wwwroot\js\movimientos\modales.js
