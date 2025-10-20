@@ -1,10 +1,12 @@
 ﻿using EduBank.BLL.Services;
 using EduBank.Models;
 using EduBank.Models.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EduBank.AppWeb.Controllers
 {
+    [Authorize]
     public class TransferenciaController : BaseController
     {
         private readonly ITransferenciaService _transferenciaService;

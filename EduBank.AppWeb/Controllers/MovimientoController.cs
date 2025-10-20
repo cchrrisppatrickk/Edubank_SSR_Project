@@ -1,6 +1,7 @@
 ﻿using EduBank.BLL.Services;
 using EduBank.Models;
 using EduBank.Models.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace EduBank.AppWeb.Controllers
 {
+    [Authorize]
     public class MovimientoController : BaseController
     {
         private readonly IMovimientoService _movService;
