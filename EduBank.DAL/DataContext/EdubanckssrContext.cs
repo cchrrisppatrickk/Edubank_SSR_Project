@@ -23,7 +23,7 @@ public partial class EdubanckssrContext : DbContext
 
     public virtual DbSet<Movimiento> Movimientos { get; set; }
 
-    public virtual DbSet<PagosHabituale> PagosHabituales { get; set; }
+    public virtual DbSet<PagosHabituales> PagosHabituales { get; set; }
 
     public virtual DbSet<RecordatoriosGenerale> RecordatoriosGenerales { get; set; }
 
@@ -90,7 +90,7 @@ public partial class EdubanckssrContext : DbContext
                 .HasConstraintName("FK_Movimientos_Cuentas");
         });
 
-        modelBuilder.Entity<PagosHabituale>(entity =>
+        modelBuilder.Entity<PagosHabituales>(entity =>
         {
             entity.HasKey(e => e.PagoHabitualId).HasName("PK__PagosHab__03A10EC8089FA647");
 

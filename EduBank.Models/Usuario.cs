@@ -27,7 +27,7 @@ namespace EduBank.Models
 
         public virtual ICollection<Cuenta> Cuenta { get; set; } = new List<Cuenta>();
 
-        public virtual ICollection<PagosHabituale> PagosHabituales { get; set; } = new List<PagosHabituale>();
+        public virtual ICollection<PagosHabituales> PagosHabituales { get; set; } = new List<PagosHabituales>();
 
         public virtual ICollection<RecordatoriosGenerale> RecordatoriosGenerales { get; set; } = new List<RecordatoriosGenerale>();
     }

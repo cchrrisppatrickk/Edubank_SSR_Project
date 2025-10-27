@@ -586,3 +586,138 @@ body {
         padding-right: 10px;
     }
 }
+/* ==================== ESTILOS MEJORADOS PARA CUENTAS ==================== */
+
+/* Contenedor principal del selector de cuenta */
+.account-selector-container {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.account-selector-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    font-size: 0.95rem;
+}
+
+    .account-selector-label i {
+        color: #0d6efd;
+        font-size: 1.1rem;
+    }
+
+/* Selector de cuenta mejorado */
+.account-selector {
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background: white;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+    .account-selector:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+        transform: translateY(-1px);
+    }
+
+/* Información de la cuenta */
+.account-info {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    position: relative;
+    overflow: hidden;
+}
+
+    .account-info::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #0d6efd, #6f42c1);
+    }
+
+.account-balance {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #198754;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, #198754, #20c997);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.account-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 0.25rem;
+}
+
+.account-type {
+    font-size: 0.85rem;
+    color: #6c757d;
+    background: rgba(108, 117, 125, 0.1);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+/* Tarjetas de resumen mejoradas */
+.summary-card {
+    border-radius: 16px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    position: relative;
+}
+
+    .summary-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #198754, #20c997);
+    }
+
+    .summary-card:last-child::before {
+        background: linear-gradient(90deg, #dc3545, #e35d6a);
+    }
+
+    .summary-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .summary-card .card-body {
+        padding: 1.5rem 1rem;
+    }
+
+    .summary-card small {
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+    }
+
+    .summary-card h5 {
+        font-weight: 700;
+        font-size: 1.4rem;
+    }

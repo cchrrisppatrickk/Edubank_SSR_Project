@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EduBank Dashboard</title>
 
-    <!-- Fuentes y iconos -->
+    <!-- Fuentes y Iconos -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
@@ -16,7 +16,6 @@
     <!-- Estilos personalizados -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/EduBank.AppWeb.styles.css" asp-append-version="true" />
-
 
     <style>
         :root {
@@ -39,6 +38,7 @@
             min-height: 100vh;
         }
 
+        /* ===== SIDEBAR ===== */
         .sidebar {
             width: var(--sidebar-width);
             height: 100vh;
@@ -139,6 +139,7 @@
                 text-decoration: none;
             }
 
+        /* ===== TOGGLE ===== */
         .toggle-btn {
             position: absolute;
             right: -12px;
@@ -191,20 +192,13 @@
             margin: 6px 8px;
         }
 
-            .sidebar.collapsed .sidebar-link i {
-                margin: 0 !important;
-            }
-
         .sidebar.collapsed .logout-btn {
             justify-content: center;
             padding: 12px !important;
             margin: 6px 8px;
         }
 
-            .sidebar.collapsed .logout-btn i {
-                margin: 0 !important;
-            }
-
+        /* ===== MAIN ===== */
         .main-content {
             flex: 1;
             margin-left: var(--sidebar-width);
@@ -232,10 +226,6 @@
             border-radius: 50%;
         }
 
-        .profile-info {
-            transition: opacity 0.2s ease;
-        }
-
         .content-header {
             background: white;
             border-radius: 10px;
@@ -244,6 +234,7 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
 
+        /* ===== FOOTER ===== */
         .footer {
             background: white;
             padding: 1rem;
@@ -260,6 +251,7 @@
             width: calc(100% - var(--sidebar-width-collapsed));
         }
 
+        /* ===== MOBILE ===== */
         .mobile-toggle {
             display: none;
             position: fixed;
@@ -274,27 +266,30 @@
         }
 
         @@media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                width: var(--sidebar-width);
-            }
+            .sidebar
 
-                .sidebar.mobile-visible {
-                    transform: translateX(0);
-                }
+        {
+            transform: translateX(-100%);
+            width: var(--sidebar-width);
+        }
 
-            .main-content {
-                margin-left: 0 !important;
-                width: 100%;
-            }
+        .sidebar.mobile-visible {
+            transform: translateX(0);
+        }
 
-            .footer {
-                width: 100% !important;
-            }
+        .main-content {
+            margin-left: 0 !important;
+            width: 100%;
+        }
 
-            .mobile-toggle {
-                display: block;
-            }
+        .footer {
+            width: 100% !important;
+        }
+
+        .mobile-toggle {
+            display: block;
+        }
+
         }
     </style>
 </head>
@@ -318,33 +313,38 @@
             </div>
 
             <div class="sidebar-nav">
-                <!-- Inicio -->
                 <a asp-area="" asp-controller="Home" asp-action="Index" class="sidebar-link">
                     <i class="fas fa-house me-3"></i>
                     <span class="hide-on-collapse">Inicio</span>
                 </a>
 
-                <!-- Movimientos -->
-                <a asp-area="" asp-controller="Movimiento" asp-action="Index" class="sidebar-link">
-                    <i class="fas fa-arrow-right-arrow-left me-3"></i>
-                    <span class="hide-on-collapse">Movimientos</span>
-                </a>
-
-                <!-- Categorías -->
-                <a asp-area="" asp-controller="Categoria" asp-action="Index" class="sidebar-link">
-                    <i class="fas fa-layer-group me-3"></i>
-                    <span class="hide-on-collapse">Categorías</span>
-                </a>
-
-                <!-- Cuentas -->
                 <a asp-area="" asp-controller="Cuenta" asp-action="Index" class="sidebar-link">
                     <i class="fas fa-wallet me-3"></i>
                     <span class="hide-on-collapse">Cuentas</span>
                 </a>
+
+                <a asp-area="" asp-controller="Movimiento" asp-action="Index" class="sidebar-link">
+                    <i class="fas fa-right-left me-3"></i>
+                    <span class="hide-on-collapse">Movimientos</span>
+                </a>
+
+                <a asp-area="" asp-controller="Categoria" asp-action="Index" class="sidebar-link">
+                    <i class="fas fa-tags me-3"></i>
+                    <span class="hide-on-collapse">Categorías</span>
+                </a>
+
+                <a asp-area="" asp-controller="PagoHabitual" asp-action="Index" class="sidebar-link">
+                    <i class="fas fa-repeat me-3"></i>
+                    <span class="hide-on-collapse">Pagos Habituales</span>
+                </a>
+
+                <a asp-area="" asp-controller="Recordatorios" asp-action="Index" class="sidebar-link">
+                    <i class="fas fa-bell me-3"></i>
+                    <span class="hide-on-collapse">Recordatorios</span>
+                </a>
             </div>
 
-
-            <!-- Sección de perfil -->
+            <!-- Perfil -->
             <div class="profile-section">
                 <div class="d-flex align-items-center mb-3">
                     @{
@@ -358,10 +358,9 @@
                     </div>
                 </div>
 
-                <!-- Botón de Cerrar Sesión -->
                 <form asp-controller="Home" asp-action="Salir" method="post" class="w-100">
                     <button type="submit" class="logout-btn" title="Cerrar Sesión">
-                        <i class="fas fa-sign-out-alt me-3"></i>
+                        <i class="fas fa-right-from-bracket me-3"></i>
                         <span class="hide-on-collapse">Cerrar Sesión</span>
                     </button>
                 </form>
@@ -372,9 +371,7 @@
         <div class="main-content" id="mainContent">
             <div class="content-header">
                 <h2 class="mb-1">@ViewData["Title"]</h2>
-                <nav aria-label="breadcrumb">
-
-                </nav>
+                <nav aria-label="breadcrumb"></nav>
             </div>
 
             <div class="container-fluid p-0">
@@ -385,6 +382,7 @@
         </div>
     </div>
 
+    <!-- Footer -->
     <footer class="footer">
         <div class="container-fluid">
             <div class="row align-items-center">
@@ -398,73 +396,61 @@
         </div>
     </footer>
 
+    <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     <script>
-        // Función para alternar el sidebar
         function toggleSidebar() {
-          const sidebar = document.getElementById('sidebar');
-          sidebar.classList.toggle('collapsed');
-
-          // Guardar preferencia del usuario
-          const isCollapsed = sidebar.classList.contains('collapsed');
-          localStorage.setItem('sidebarCollapsed', isCollapsed);
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('collapsed');
+            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
         }
 
-        // Detectar elemento activo en el menú
         document.addEventListener('DOMContentLoaded', function() {
-          const currentLocation = window.location.pathname;
-          const navLinks = document.querySelectorAll('.sidebar-link');
+            const currentLocation = window.location.pathname;
+            const navLinks = document.querySelectorAll('.sidebar-link');
+            const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+            const sidebar = document.getElementById('sidebar');
 
-          // Aplicar estado colapsado si estaba guardado
-          const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-          if (isCollapsed) {
-            document.getElementById('sidebar').classList.add('collapsed');
-          }
+            if (isCollapsed) sidebar.classList.add('collapsed');
 
-          // Resaltar enlace activo
-          navLinks.forEach(link => {
-            const linkPath = link.getAttribute('href');
-            if (currentLocation.includes(linkPath) && linkPath !== '/') {
-              link.classList.add('active');
+            navLinks.forEach(link => {
+                const linkPath = link.getAttribute('href');
+                if (currentLocation.includes(linkPath) && linkPath !== '/') {
+                    link.classList.add('active');
+                }
+            });
+
+            const mobileToggle = document.getElementById('mobileToggle');
+
+            mobileToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                sidebar.classList.toggle('mobile-visible');
+            });
+
+            document.addEventListener('click', function(event) {
+                if (window.innerWidth < 768 &&
+                    !sidebar.contains(event.target) &&
+                    event.target !== mobileToggle &&
+                    sidebar.classList.contains('mobile-visible')) {
+                    sidebar.classList.remove('mobile-visible');
+                }
+            });
+
+            function checkMobile() {
+                if (window.innerWidth < 768) {
+                    mobileToggle.classList.remove('d-none');
+                } else {
+                    mobileToggle.classList.add('d-none');
+                    sidebar.classList.remove('mobile-visible');
+                }
             }
-          });
 
-          // Manejar el toggle en móviles
-          const mobileToggle = document.getElementById('mobileToggle');
-          const sidebar = document.getElementById('sidebar');
-
-          mobileToggle.addEventListener('click', function(e) {
-            e.stopPropagation();
-            sidebar.classList.toggle('mobile-visible');
-          });
-
-          // Cerrar sidebar al hacer clic fuera en móviles
-          document.addEventListener('click', function(event) {
-            if (window.innerWidth < 768 &&
-                !sidebar.contains(event.target) &&
-                event.target !== mobileToggle &&
-                sidebar.classList.contains('mobile-visible')) {
-              sidebar.classList.remove('mobile-visible');
-            }
-          });
-
-          // Mostrar u ocultar botón móvil según el tamaño de pantalla
-          function checkMobile() {
-            if (window.innerWidth < 768) {
-              mobileToggle.classList.remove('d-none');
-            } else {
-              mobileToggle.classList.add('d-none');
-              sidebar.classList.remove('mobile-visible');
-            }
-          }
-
-          // Verificar al cargar y al redimensionar
-          checkMobile();
-          window.addEventListener('resize', checkMobile);
+            checkMobile();
+            window.addEventListener('resize', checkMobile);
         });
     </script>
 

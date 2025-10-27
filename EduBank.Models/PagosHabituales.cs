@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EduBank.Models
 {
-    public partial class PagosHabituale
+    public partial class PagosHabituales
     {
         public int PagoHabitualId { get; set; }
 

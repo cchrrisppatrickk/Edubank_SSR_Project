@@ -24,7 +24,7 @@ namespace EduBank.Models
 
         public virtual ICollection<Movimiento> Movimientos { get; set; } = new List<Movimiento>();
 
-        public virtual ICollection<PagosHabituale> PagosHabituales { get; set; } = new List<PagosHabituale>();
+        public virtual ICollection<PagosHabituales> PagosHabituales { get; set; } = new List<PagosHabituales>();
 
         public virtual ICollection<Transferencia> TransferenciaCuentaDestinos { get; set; } = new List<Transferencia>();
 

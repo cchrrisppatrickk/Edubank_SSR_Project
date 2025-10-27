@@ -1,3 +1,4 @@
+
 using EduBank.BLL.Services;
 using EduBank.DAL.DataContext;
 using EduBank.DAL.Repository;
@@ -50,8 +51,9 @@ builder.Services.AddScoped<ITransferenciaService, TransferenciaService>();
 builder.Services.AddScoped<ITransferenciaRepository, TransferenciaRepository>();
 builder.Services.AddScoped<IGenericRepository<Transferencia>, GenericRepository<Transferencia>>();
 
-
-
+// Registrar servicios de Pagos Habituales
+builder.Services.AddScoped<IPagoHabitualService, PagoHabitualService>();
+builder.Services.AddScoped<IPagoHabitualRepository, PagoHabitualRepository>();
 
 var app = builder.Build();
 

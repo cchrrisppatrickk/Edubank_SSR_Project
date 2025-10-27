@@ -11,15 +11,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
     <style>
-     
         .cat-icon-badge {
             flex-shrink: 0;
             transition: transform 0.2s ease;
         }
 
-        .cat-icon-badge:hover {
-            transform: scale(1.05);
-        }
+            .cat-icon-badge:hover {
+                transform: scale(1.05);
+            }
 
         .list-group-item {
             border: none;
@@ -34,8 +33,13 @@
         .ultra-small {
             font-size: 0.75rem;
         }
-    </style>
 
+        .date-disabled {
+            background-color: #f8f9fa;
+            color: #6c757d;
+            cursor: not-allowed;
+        }
+    </style>
 </head>
 
 <body>
@@ -66,7 +70,6 @@
         </div>
 
         <!-- Resumen: Ingresos | Acciones | Gastos -->
-        <!-- ACTUALIZA el bloque de resumen existente con esto: -->
         <div class="row g-3 align-items-center mb-4">
             <div class="col-md-3">
                 <div class="card shadow-sm border-0 h-100 summary-card">
@@ -83,8 +86,6 @@
             <div class="col-md-6">
                 <div class="card shadow-lg border-0 text-center h-100">
                     <div class="card-body d-flex flex-column align-items-center justify-content-center">
-                        
-
                         <div class="action-buttons-saldo d-flex justify-content-center gap-4 mt-3">
                             <div class="text-center">
                                 <button class="btn btn-inc btn-mov-type" data-type="I" id="btnAgregarIngreso" title="Agregar ingreso">
@@ -116,6 +117,7 @@
                 </div>
             </div>
         </div>
+
         <!-- Contenido principal -->
         <div class="row g-4">
             <div class="col-md-12">
@@ -261,7 +263,11 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Fecha</label>
-                                <input type="date" id="txtFechaOperacion" class="form-control p-3" required />
+                                <input type="date" id="txtFechaOperacion" class="form-control p-3" required
+                                       max="" title="Solo se permiten fechas del día actual o anteriores" />
+                                <div class="form-text text-warning">
+                                    <i class="bi bi-exclamation-triangle"></i> Solo se permiten fechas del día actual o anteriores
+                                </div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Monto</label>
@@ -332,18 +338,51 @@
                 currentDate: new Date(),
                 currentPeriod: 'day',
 
-                // Inicialización
+                // NUEVAS VARIABLES PARA ACUMULADOS
+                todosLosMovimientos: [], // Aquí guardaremos TODOS los movimientos
+                movimientosCargados: false, // Bandera para saber si ya cargamos
+
+                // Inicialización MODIFICADA
                 inicializar() {
                     this.cargarCuentas();
                     this.cargarCategorias();
+                    this.cargarTodosLosMovimientos(); // NUEVO: Cargar todos los movimientos
                     this.inicializarEventos();
                     this.actualizarVisualizacionFecha();
+                    this.configurarFechaMaxima(); // NUEVO: Configurar fecha máxima
+                },
 
-                    setTimeout(() => {
-                        if (this.cuentaSeleccionada) {
-                            EstadisticasManager.cargarEstadisticas();
+                // NUEVO MÉTODO: Configurar fecha máxima para inputs de fecha
+                configurarFechaMaxima() {
+                    const hoy = new Date().toISOString().split('T')[0];
+                    $('#txtFechaOperacion').attr('max', hoy);
+                },
+
+                // NUEVO MÉTODO: Cargar todos los movimientos
+                cargarTodosLosMovimientos() {
+                    $.ajax({
+                        url: '/Movimiento/Lista',
+                        type: 'GET',
+                        success: (response) => {
+                            if (response && response.valor && response.movimientos) {
+                                this.todosLosMovimientos = response.movimientos;
+                                this.movimientosCargados = true;
+                                console.log('✅ Todos los movimientos cargados:', this.todosLosMovimientos.length);
+
+                                // Si ya tenemos cuenta seleccionada, cargar estadísticas
+                                if (this.cuentaSeleccionada) {
+                                    EstadisticasManager.cargarEstadisticas();
+                                }
+                            } else {
+                                console.error('Error al cargar movimientos:', response);
+                                toastr.error('Error al cargar movimientos');
+                            }
+                        },
+                        error: (xhr, status, error) => {
+                            console.error('Error al cargar todos los movimientos:', error);
+                            toastr.error('Error al cargar movimientos');
                         }
-                    }, 1000);
+                    });
                 },
 
                 // Eventos
@@ -500,7 +539,11 @@
                     if (cuenta) {
                         EduBankApp.cuentaSeleccionada = cuenta;
                         this.mostrarInfoCuenta(cuenta);
-                        EstadisticasManager.cargarEstadisticas();
+
+                        // Cargar estadísticas solo si ya tenemos los movimientos
+                        if (EduBankApp.movimientosCargados) {
+                            EstadisticasManager.cargarEstadisticas();
+                        }
                     }
                 },
 
@@ -619,6 +662,7 @@
 
                 resetearFormularioMovimiento() {
                     $('#txtMovimientoId').val('0');
+                    // Establecer fecha actual por defecto
                     $('#txtFechaOperacion').val(new Date().toISOString().split('T')[0]);
                     $('#txtMonto').val('');
                     $('#txtComentario').val('');
@@ -669,6 +713,16 @@
                         return;
                     }
 
+                    // NUEVA VALIDACIÓN: No permitir fechas futuras
+                    const fechaSeleccionada = new Date(modelo.FechaOperacion);
+                    const hoy = new Date();
+                    hoy.setHours(0, 0, 0, 0); // Resetear horas para comparar solo fechas
+
+                    if (fechaSeleccionada > hoy) {
+                        toastr.error('No se permiten fechas futuras. Solo puedes agregar movimientos del día actual o anteriores.');
+                        return;
+                    }
+
                     console.log('Datos a enviar:', modelo);
 
                     // Mostrar loading
@@ -695,7 +749,9 @@
                                     EduBankApp.cuentaSeleccionada.saldo = response.saldoActualizado;
                                 }
 
-                                EstadisticasManager.cargarEstadisticas();
+                                // NUEVO: Recargar todos los movimientos para actualizar acumulados
+                                EduBankApp.cargarTodosLosMovimientos();
+
                             } else {
                                 const mensaje = response?.mensaje || 'Error al guardar movimiento';
                                 toastr.error(mensaje);
@@ -728,6 +784,94 @@
             // ==================== MÓDULO DE ESTADÍSTICAS Y GRÁFICOS ====================
             const EstadisticasManager = {
                 cargarEstadisticas() {
+                    if (!EduBankApp.cuentaSeleccionada || !EduBankApp.movimientosCargados) {
+                        console.log('⏳ Esperando datos...');
+                        return;
+                    }
+
+                    console.log('📊 Calculando estadísticas acumuladas para cuenta:', EduBankApp.cuentaSeleccionada.cuentaId);
+
+                    // Calcular acumulados hasta la fecha seleccionada Y para la cuenta seleccionada
+                    const datosAcumulados = this.calcularAcumuladosHastaFecha();
+
+                    // Actualizar interfaz con datos acumulados
+                    this.actualizarEstadisticas(datosAcumulados);
+                    GraficosManager.actualizarGraficos(datosAcumulados);
+
+                    // También cargar movimientos del período para la lista "recientes" (filtrado por cuenta)
+                    this.cargarMovimientosDelPeriodo();
+                },
+
+                // MÉTODO MODIFICADO: Calcular acumulados hasta fecha seleccionada Y para cuenta específica
+                calcularAcumuladosHastaFecha() {
+                    const fechaLimite = new Date(EduBankApp.currentDate);
+                    fechaLimite.setHours(23, 59, 59, 999); // Hasta el final del día seleccionado
+
+                    console.log('📅 Calculando acumulados hasta:', fechaLimite, 'para cuenta:', EduBankApp.cuentaSeleccionada.cuentaId);
+
+                    // Filtrar movimientos hasta la fecha seleccionada Y para la cuenta seleccionada
+                    const movimientosHastaFecha = EduBankApp.todosLosMovimientos.filter(mov => {
+                        const fechaMov = new Date(mov.FechaOperacion || mov.fechaOperacion);
+                        const cuentaMov = mov.CuentaId || mov.cuentaId;
+
+                        return fechaMov <= fechaLimite && cuentaMov == EduBankApp.cuentaSeleccionada.cuentaId;
+                    });
+
+                    console.log('📋 Movimientos hasta fecha para cuenta seleccionada:', movimientosHastaFecha.length);
+
+                    // Calcular totales
+                    const totalIngresos = movimientosHastaFecha
+                        .filter(m => (m.Tipo || m.tipo) === 'I')
+                        .reduce((sum, m) => sum + (m.Monto || m.monto || 0), 0);
+
+                    const totalGastos = movimientosHastaFecha
+                        .filter(m => (m.Tipo || m.tipo) === 'G')
+                        .reduce((sum, m) => sum + (m.Monto || m.monto || 0), 0);
+
+                    const saldo = totalIngresos - totalGastos;
+
+                    // Calcular por categoría
+                    const ingresosPorCategoria = this.calcularPorCategoria(movimientosHastaFecha, 'I');
+                    const gastosPorCategoria = this.calcularPorCategoria(movimientosHastaFecha, 'G');
+
+                    return {
+                        totalIngresos,
+                        totalGastos,
+                        saldo,
+                        ingresosPorCategoria,
+                        gastosPorCategoria,
+                        movimientosHastaFecha
+                    };
+                },
+
+                // MÉTODO MODIFICADO: Calcular por categoría (ya incluye filtro por cuenta)
+                calcularPorCategoria(movimientos, tipo) {
+                    const movimientosFiltrados = movimientos.filter(m =>
+                        (m.Tipo || m.tipo) === tipo
+                    );
+
+                    const agrupados = {};
+
+                    movimientosFiltrados.forEach(mov => {
+                        const categoriaId = mov.CategoriaId || mov.categoriaId;
+                        const categoriaNombre = mov.CategoriaNombre || mov.categoriaNombre || 'Sin categoría';
+                        const monto = mov.Monto || mov.monto || 0;
+
+                        if (!agrupados[categoriaId]) {
+                            agrupados[categoriaId] = {
+                                CategoriaId: categoriaId,
+                                Nombre: categoriaNombre,
+                                Total: 0
+                            };
+                        }
+
+                        agrupados[categoriaId].Total += monto;
+                    });
+
+                    return Object.values(agrupados).sort((a, b) => b.Total - a.Total);
+                },
+
+                cargarMovimientosDelPeriodo() {
                     if (!EduBankApp.cuentaSeleccionada) return;
 
                     const fechaStr = EduBankApp.currentDate.toISOString().split('T')[0];
@@ -740,78 +884,19 @@
 
                     const periodoBackend = periodosMap[EduBankApp.currentPeriod] || 'dia';
 
-                    console.log('📊 Solicitando estadísticas:', {
-                        periodo: periodoBackend,
-                        fecha: fechaStr,
-                        cuenta: EduBankApp.cuentaSeleccionada.cuentaId
-                    });
-
                     $.ajax({
-                        url: `/Movimiento/EstadisticasPorPeriodo?periodo=${periodoBackend}&fecha=${fechaStr}`,
-                        type: 'GET',
-                        success: (response) => {
-                            console.log('✅ Respuesta estadísticas:', response);
-
-                            if (response && response.valor) {
-                                this.actualizarEstadisticas(response);
-                                GraficosManager.actualizarGraficos(response);
-                                this.cargarMovimientosDelPeriodo(periodoBackend, fechaStr);
-                            } else {
-                                const mensaje = response?.mensaje || 'Error en la respuesta del servidor';
-                                console.error('❌ Error en respuesta:', response);
-
-                                this.actualizarEstadisticas({
-                                    totalIngresos: 0,
-                                    totalGastos: 0,
-                                    saldo: 0,
-                                    ingresosPorCategoria: [],
-                                    gastosPorCategoria: []
-                                });
-
-                                toastr.warning('No hay datos para el período seleccionado');
-                            }
-                        },
-                        error: (xhr, status, error) => {
-                            console.error('❌ Error al cargar estadísticas:', {
-                                status: xhr.status,
-                                statusText: xhr.statusText,
-                                error: error
-                            });
-
-                            this.actualizarEstadisticas({
-                                totalIngresos: 0,
-                                totalGastos: 0,
-                                saldo: 0,
-                                ingresosPorCategoria: [],
-                                gastosPorCategoria: []
-                            });
-
-                            if (xhr.status === 400) {
-                                toastr.error('Parámetros inválidos para el filtro');
-                            } else {
-                                toastr.error('Error al cargar estadísticas');
-                            }
-                        }
-                    });
-                },
-
-                cargarMovimientosDelPeriodo(periodo, fecha) {
-                    $.ajax({
-                        url: `/Movimiento/ObtenerPorPeriodo?periodo=${periodo}&fecha=${fecha}`,
+                        url: `/Movimiento/ObtenerPorPeriodo?periodo=${periodoBackend}&fecha=${fechaStr}`,
                         type: 'GET',
                         success: (response) => {
                             console.log('📋 Movimientos del período:', response);
                             if (response && response.valor) {
-                                ListasManager.mostrarMovimientosRecientes(response.movimientos || []);
+                                // FILTRAR movimientos por cuenta seleccionada
+                                const movimientosFiltrados = (response.movimientos || []).filter(mov => {
+                                    const cuentaMov = mov.CuentaId || mov.cuentaId;
+                                    return cuentaMov == EduBankApp.cuentaSeleccionada.cuentaId;
+                                });
 
-                                if (response.totalIngresos !== undefined) {
-                                    $('#cardIngresos').text(Utilidades.formatearMoneda(response.totalIngresos));
-                                    $('#totalIngresosLabel').text(Utilidades.formatearMoneda(response.totalIngresos));
-                                }
-                                if (response.totalGastos !== undefined) {
-                                    $('#cardGastos').text(Utilidades.formatearMoneda(response.totalGastos));
-                                    $('#totalGastosLabel').text(Utilidades.formatearMoneda(response.totalGastos));
-                                }
+                                ListasManager.mostrarMovimientosRecientes(movimientosFiltrados);
                             } else {
                                 console.warn('No se pudieron cargar movimientos:', response?.mensaje);
                                 ListasManager.mostrarMovimientosRecientes([]);
@@ -835,190 +920,189 @@
             };
 
             // ==================== MÓDULO DE GRÁFICOS ====================
-                    // ==================== MÓDULO DE GRÁFICOS ====================
-        const GraficosManager = {
-            actualizarGraficos(data) {
-                console.log('🎨 Actualizando gráficos con datos:', data);
+            const GraficosManager = {
+                actualizarGraficos(data) {
+                    console.log('🎨 Actualizando gráficos con datos:', data);
 
-                const gastosData = data.gastosPorCategoria || [];
-                console.log('Datos de gastos para gráfico:', gastosData);
-                this.actualizarChartGastos(gastosData);
+                    const gastosData = data.gastosPorCategoria || [];
+                    console.log('Datos de gastos para gráfico:', gastosData);
+                    this.actualizarChartGastos(gastosData);
 
-                const ingresosData = data.ingresosPorCategoria || [];
-                console.log('Datos de ingresos para gráfico:', ingresosData);
-                this.actualizarChartIngresos(ingresosData);
-            },
+                    const ingresosData = data.ingresosPorCategoria || [];
+                    console.log('Datos de ingresos para gráfico:', ingresosData);
+                    this.actualizarChartIngresos(ingresosData);
+                },
 
-            actualizarChartGastos(gastosData) {
-                const ctx = document.getElementById('chartGastos').getContext('2d');
+                actualizarChartGastos(gastosData) {
+                    const ctx = document.getElementById('chartGastos').getContext('2d');
 
-                if (EduBankApp.chartGastos) {
-                    EduBankApp.chartGastos.destroy();
-                }
+                    if (EduBankApp.chartGastos) {
+                        EduBankApp.chartGastos.destroy();
+                    }
 
-                console.log('📊 Actualizando gráfico de gastos con:', gastosData);
+                    console.log('📊 Actualizando gráfico de gastos con:', gastosData);
 
-                if (!gastosData || gastosData.length === 0) {
-                    $('#noDataGastos').show();
-                    $('#totalGastosLabel').text('S/ 0.00');
-                    return;
-                }
+                    if (!gastosData || gastosData.length === 0) {
+                        $('#noDataGastos').show().text('No hay gastos en esta cuenta');
+                        $('#totalGastosLabel').text('S/ 0.00');
+                        return;
+                    }
 
-                $('#noDataGastos').hide();
+                    $('#noDataGastos').hide();
 
-                const labels = gastosData.map(item => {
-                    return item.Nombre || item.nombre || item.CategoriaNombre || 'Sin nombre';
-                });
+                    const labels = gastosData.map(item => {
+                        return item.Nombre || item.nombre || item.CategoriaNombre || 'Sin nombre';
+                    });
 
-                const data = gastosData.map(item => {
-                    return item.Total || item.total || 0;
-                });
+                    const data = gastosData.map(item => {
+                        return item.Total || item.total || 0;
+                    });
 
-                // OBTENER COLORES DE LAS CATEGORÍAS
-                const colores = gastosData.map(item => {
-                    // Buscar la categoría en las categorías cargadas
-                    const categoriaId = item.CategoriaId || item.categoriaId;
-                    const categoria = EduBankApp.categorias.find(cat => cat.categoriaId == categoriaId);
+                    // OBTENER COLORES DE LAS CATEGORÍAS
+                    const colores = gastosData.map(item => {
+                        // Buscar la categoría en las categorías cargadas
+                        const categoriaId = item.CategoriaId || item.categoriaId;
+                        const categoria = EduBankApp.categorias.find(cat => cat.categoriaId == categoriaId);
 
-                    // Si encontramos la categoría, usar su color, sino generar uno
-                    return categoria ? (categoria.color || this.generarColorFallback(item.Nombre)) : this.generarColorFallback(item.Nombre);
-                });
+                        // Si encontramos la categoría, usar su color, sino generar uno
+                        return categoria ? (categoria.color || this.generarColorFallback(item.Nombre)) : this.generarColorFallback(item.Nombre);
+                    });
 
-                console.log('🎨 Colores de categorías (gastos):', colores);
-                console.log('Etiquetas gastos:', labels);
-                console.log('Datos gastos:', data);
+                    console.log('🎨 Colores de categorías (gastos):', colores);
+                    console.log('Etiquetas gastos:', labels);
+                    console.log('Datos gastos:', data);
 
-                EduBankApp.chartGastos = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            data: data,
-                            backgroundColor: colores, // Usar colores de categorías
-                            borderWidth: 2,
-                            borderColor: '#fff'
-                        }]
-                    },
-                    options: this.obtenerOpcionesGrafico()
-                });
-            },
+                    EduBankApp.chartGastos = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                data: data,
+                                backgroundColor: colores, // Usar colores de categorías
+                                borderWidth: 2,
+                                borderColor: '#fff'
+                            }]
+                        },
+                        options: this.obtenerOpcionesGrafico()
+                    });
+                },
 
-            actualizarChartIngresos(ingresosData) {
-                const ctx = document.getElementById('chartIngresos').getContext('2d');
+                actualizarChartIngresos(ingresosData) {
+                    const ctx = document.getElementById('chartIngresos').getContext('2d');
 
-                if (EduBankApp.chartIngresos) {
-                    EduBankApp.chartIngresos.destroy();
-                }
+                    if (EduBankApp.chartIngresos) {
+                        EduBankApp.chartIngresos.destroy();
+                    }
 
-                console.log('📊 Actualizando gráfico de ingresos con:', ingresosData);
+                    console.log('📊 Actualizando gráfico de ingresos con:', ingresosData);
 
-                if (!ingresosData || ingresosData.length === 0) {
-                    $('#noDataIngresos').show();
-                    $('#totalIngresosLabel').text('S/ 0.00');
-                    return;
-                }
+                    if (!ingresosData || ingresosData.length === 0) {
+                        $('#noDataIngresos').show().text('No hay ingresos en esta cuenta');
+                        $('#totalIngresosLabel').text('S/ 0.00');
+                        return;
+                    }
 
-                $('#noDataIngresos').hide();
+                    $('#noDataIngresos').hide();
 
-                const labels = ingresosData.map(item => {
-                    return item.Nombre || item.nombre || item.CategoriaNombre || 'Sin nombre';
-                });
+                    const labels = ingresosData.map(item => {
+                        return item.Nombre || item.nombre || item.CategoriaNombre || 'Sin nombre';
+                    });
 
-                const data = ingresosData.map(item => {
-                    return item.Total || item.total || 0;
-                });
+                    const data = ingresosData.map(item => {
+                        return item.Total || item.total || 0;
+                    });
 
-                // OBTENER COLORES DE LAS CATEGORÍAS
-                const colores = ingresosData.map(item => {
-                    // Buscar la categoría en las categorías cargadas
-                    const categoriaId = item.CategoriaId || item.categoriaId;
-                    const categoria = EduBankApp.categorias.find(cat => cat.categoriaId == categoriaId);
+                    // OBTENER COLORES DE LAS CATEGORÍAS
+                    const colores = ingresosData.map(item => {
+                        // Buscar la categoría en las categorías cargadas
+                        const categoriaId = item.CategoriaId || item.categoriaId;
+                        const categoria = EduBankApp.categorias.find(cat => cat.categoriaId == categoriaId);
 
-                    // Si encontramos la categoría, usar su color, sino generar uno
-                    return categoria ? (categoria.color || this.generarColorFallback(item.Nombre)) : this.generarColorFallback(item.Nombre);
-                });
+                        // Si encontramos la categoría, usar su color, sino generar uno
+                        return categoria ? (categoria.color || this.generarColorFallback(item.Nombre)) : this.generarColorFallback(item.Nombre);
+                    });
 
-                console.log('🎨 Colores de categorías (ingresos):', colores);
-                console.log('Etiquetas ingresos:', labels);
-                console.log('Datos ingresos:', data);
+                    console.log('🎨 Colores de categorías (ingresos):', colores);
+                    console.log('Etiquetas ingresos:', labels);
+                    console.log('Datos ingresos:', data);
 
-                EduBankApp.chartIngresos = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            data: data,
-                            backgroundColor: colores, // Usar colores de categorías
-                            borderWidth: 2,
-                            borderColor: '#fff'
-                        }]
-                    },
-                    options: this.obtenerOpcionesGrafico()
-                });
-            },
+                    EduBankApp.chartIngresos = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                data: data,
+                                backgroundColor: colores, // Usar colores de categorías
+                                borderWidth: 2,
+                                borderColor: '#fff'
+                            }]
+                        },
+                        options: this.obtenerOpcionesGrafico()
+                    });
+                },
 
-            // Función para generar colores fallback consistentes
-            generarColorFallback(nombre) {
-                // Generar un color basado en el nombre para consistencia
-                const coloresBase = [
-                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
-                    '#FF9F40', '#FF6384', '#C9CBCF', '#7CFFB2', '#FF6384',
-                    '#4DC9F6', '#F67019', '#537BC4', '#ACC236', '#166A8F',
-                    '#00A8C6', '#40C0CB', '#AEE239', '#8FBE00', '#F9F2E7'
-                ];
+                // Función para generar colores fallback consistentes
+                generarColorFallback(nombre) {
+                    // Generar un color basado en el nombre para consistencia
+                    const coloresBase = [
+                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+                        '#FF9F40', '#FF6384', '#C9CBCF', '#7CFFB2', '#FF6384',
+                        '#4DC9F6', '#F67019', '#537BC4', '#ACC236', '#166A8F',
+                        '#00A8C6', '#40C0CB', '#AEE239', '#8FBE00', '#F9F2E7'
+                    ];
 
-                // Crear un hash simple del nombre para seleccionar color consistentemente
-                let hash = 0;
-                for (let i = 0; i < nombre.length; i++) {
-                    hash = nombre.charCodeAt(i) + ((hash << 5) - hash);
-                }
+                    // Crear un hash simple del nombre para seleccionar color consistentemente
+                    let hash = 0;
+                    for (let i = 0; i < nombre.length; i++) {
+                        hash = nombre.charCodeAt(i) + ((hash << 5) - hash);
+                    }
 
-                return coloresBase[Math.abs(hash) % coloresBase.length];
-            },
+                    return coloresBase[Math.abs(hash) % coloresBase.length];
+                },
 
-            obtenerOpcionesGrafico() {
-                return {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                boxWidth: 12,
-                                font: { size: 11 },
-                                // Opcional: mostrar íconos en la leyenda
-                                generateLabels: (chart) => {
-                                    const datasets = chart.data.datasets;
-                                    return chart.data.labels.map((label, i) => {
-                                        const dataset = datasets[0];
-                                        return {
-                                            text: label,
-                                            fillStyle: dataset.backgroundColor[i],
-                                            strokeStyle: dataset.borderColor[i],
-                                            lineWidth: dataset.borderWidth,
-                                            pointStyle: 'circle',
-                                            hidden: false,
-                                            index: i
-                                        };
-                                    });
+                obtenerOpcionesGrafico() {
+                    return {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    boxWidth: 12,
+                                    font: { size: 11 },
+                                    // Opcional: mostrar íconos en la leyenda
+                                    generateLabels: (chart) => {
+                                        const datasets = chart.data.datasets;
+                                        return chart.data.labels.map((label, i) => {
+                                            const dataset = datasets[0];
+                                            return {
+                                                text: label,
+                                                fillStyle: dataset.backgroundColor[i],
+                                                strokeStyle: dataset.borderColor[i],
+                                                lineWidth: dataset.borderWidth,
+                                                pointStyle: 'circle',
+                                                hidden: false,
+                                                index: i
+                                            };
+                                        });
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const value = context.parsed;
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0';
+                                        return `${context.label}: ${Utilidades.formatearMoneda(value)} (${percentage}%)`;
+                                    }
                                 }
                             }
                         },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const value = context.parsed;
-                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0';
-                                    return `${context.label}: ${Utilidades.formatearMoneda(value)} (${percentage}%)`;
-                                }
-                            }
-                        }
-                    },
-                    cutout: '65%'
-                };
-            }
-        };
+                        cutout: '65%'
+                    };
+                }
+            };
 
             // ==================== MÓDULO DE LISTAS ====================
             const ListasManager = {
@@ -1029,6 +1113,8 @@
                         console.error('❌ Movimientos no es un array válido:', movimientos);
                         movimientos = [];
                     }
+
+                    console.log('📋 Total de movimientos a mostrar:', movimientos.length);
 
                     const gastos = movimientos
                         .filter(m => {
@@ -1044,8 +1130,8 @@
                         })
                         .slice(0, 5);
 
-                    console.log('📋 Gastos filtrados:', gastos);
-                    console.log('📈 Ingresos filtrados:', ingresos);
+                    console.log('📋 Gastos filtrados:', gastos.length);
+                    console.log('📈 Ingresos filtrados:', ingresos.length);
 
                     this.actualizarListaGastos(gastos);
                     this.actualizarListaIngresos(ingresos);
@@ -1059,7 +1145,7 @@
                         listaGastos.append(`
                             <li class="list-group-item text-center text-muted py-3">
                                 <i class="bi bi-inbox me-2"></i>
-                                No hay gastos en este período
+                                No hay gastos en esta cuenta
                             </li>
                         `);
                     } else {
@@ -1078,7 +1164,7 @@
                         listaIngresos.append(`
                             <li class="list-group-item text-center text-muted py-3">
                                 <i class="bi bi-inbox me-2"></i>
-                                No hay ingresos en este período
+                                No hay ingresos en esta cuenta
                             </li>
                         `);
                     } else {
@@ -1088,75 +1174,98 @@
                         });
                     }
                 },
-        crearItemMovimiento(movimiento) {
-               console.log('📝 Creando item para movimiento:', movimiento);
 
-               const esGasto = (movimiento.Tipo === 'G') || (movimiento.tipo === 'G');
-               const claseMonto = esGasto ? 'text-danger' : 'text-success';
-               const signo = esGasto ? '-' : '+';
+                crearItemMovimiento(movimiento) {
+                    console.log('📝 Creando item para movimiento:', movimiento);
 
-               // Obtener información de la categoría
-               const categoriaNombre = movimiento.CategoriaNombre ||
-                                     movimiento.categoriaNombre ||
-                                     movimiento.Nombre ||
-                                     (movimiento.Categoria && movimiento.Categoria.nombre) ||
-                                     'Sin categoría';
+                    const esGasto = (movimiento.Tipo === 'G') || (movimiento.tipo === 'G');
+                    const claseMonto = esGasto ? 'text-danger' : 'text-success';
+                    const signo = esGasto ? '-' : '+';
 
-               // Buscar la categoría en las categorías cargadas para obtener ícono y color
-               let categoriaInfo = EduBankApp.categorias.find(cat =>
-                   cat.categoriaId == (movimiento.CategoriaId || movimiento.categoriaId)
-               );
+                    // Obtener información de la categoría
+                    const categoriaNombre = movimiento.CategoriaNombre ||
+                                          movimiento.categoriaNombre ||
+                                          movimiento.Nombre ||
+                                          (movimiento.Categoria && movimiento.Categoria.nombre) ||
+                                          'Sin categoría';
 
-               // Si no encontramos la categoría, usar valores por defecto según el tipo
-               const iconoCategoria = categoriaInfo ?
-                   categoriaInfo.icono || 'bi-tag' :
-                   (esGasto ? 'bi-arrow-down-circle' : 'bi-arrow-up-circle');
+                    // Buscar la categoría en las categorías cargadas para obtener ícono y color
+                    let categoriaInfo = EduBankApp.categorias.find(cat =>
+                        cat.categoriaId == (movimiento.CategoriaId || movimiento.categoriaId)
+                    );
 
-               const colorCategoria = categoriaInfo ?
-                   (categoriaInfo.color || '#6c757d') :
-                   (esGasto ? '#dc3545' : '#198754');
+                    // Si no encontramos la categoría, usar valores por defecto según el tipo
+                    const iconoCategoria = categoriaInfo ?
+                        categoriaInfo.icono || 'bi-tag' :
+                        (esGasto ? 'bi-arrow-down-circle' : 'bi-arrow-up-circle');
 
-               const fechaFormateada = Utilidades.formatearFechaRobusta(
-                   movimiento.FechaOperacion || movimiento.fechaOperacion
-               );
+                    const colorCategoria = categoriaInfo ?
+                        (categoriaInfo.color || '#6c757d') :
+                        (esGasto ? '#dc3545' : '#198754');
 
-               const monto = movimiento.Monto || movimiento.monto || 0;
-               const comentario = movimiento.Comentario || movimiento.comentario || '';
+                    const fechaFormateada = Utilidades.formatearFechaRobusta(
+                        movimiento.FechaOperacion || movimiento.fechaOperacion
+                    );
 
-               return `
-                   <li class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
-                       <div class="d-flex align-items-center">
-                           <!-- Ícono de la categoría con su color -->
-                           <div class="cat-icon-badge me-2" style="
-                               background: ${colorCategoria};
-                               color: white;
-                               width: 32px;
-                               height: 32px;
-                               border-radius: 8px;
-                               display: flex;
-                               align-items: center;
-                               justify-content: center;
-                               font-size: 0.9rem;">
-                               <i class="bi ${iconoCategoria}"></i>
-                           </div>
-                           <div>
-                               <div class="small fw-bold">${categoriaNombre}</div>
-                               <div class="ultra-small text-muted">${fechaFormateada}</div>
-                               ${comentario ? `<div class="ultra-small text-muted">${comentario}</div>` : ''}
-                           </div>
-                       </div>
-                       <div class="text-end">
-                           <!-- Ícono de tipo de movimiento (flecha) -->
-                           <div class="d-flex align-items-center">
-                               <i class="bi ${esGasto ? 'bi-arrow-down-circle text-danger' : 'bi-arrow-up-circle text-success'} me-1"></i>
-                               <div class="small fw-bold ${claseMonto}">
-                                   ${signo} ${Utilidades.formatearMoneda(monto)}
-                               </div>
-                           </div>
-                       </div>
-                   </li>
-               `;
-           }
+                    const monto = movimiento.Monto || movimiento.monto || 0;
+                    const comentario = movimiento.Comentario || movimiento.comentario || '';
+                    const movimientoId = movimiento.MovimientoId || movimiento.movimientoId || movimiento.Id || 0;
+
+                    return `
+                        <li class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
+                            <div class="d-flex align-items-center flex-grow-1">
+                                <!-- Ícono de la categoría con su color -->
+                                <div class="cat-icon-badge me-2" style="
+                                    background: ${colorCategoria};
+                                    color: white;
+                                    width: 32px;
+                                    height: 32px;
+                                    border-radius: 8px;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    font-size: 0.9rem;">
+                                    <i class="bi ${iconoCategoria}"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="small fw-bold">${categoriaNombre}</div>
+                                    <div class="ultra-small text-muted">${fechaFormateada}</div>
+                                    ${comentario ? `<div class="ultra-small text-muted">${comentario}</div>` : ''}
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-2 ms-3">
+                                <!-- Monto -->
+                                <div class="text-end me-2">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi ${esGasto ? 'bi-arrow-down-circle text-danger' : 'bi-arrow-up-circle text-success'} me-1"></i>
+                                        <div class="small fw-bold ${claseMonto}">
+                                            ${signo} ${Utilidades.formatearMoneda(monto)}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Botones de acción -->
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <!-- Botón Editar -->
+                                    <button type="button"
+                                            class="btn btn-outline-warning btn-editar"
+                                            data-movimiento-id="${movimientoId}"
+                                            title="Editar movimiento (En desarrollo)">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+
+                                    <!-- Botón Eliminar -->
+                                    <button type="button"
+                                            class="btn btn-outline-danger btn-eliminar"
+                                            data-movimiento-id="${movimientoId}"
+                                            title="Eliminar movimiento (En desarrollo)">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </li>
+                    `;
+                }
             };
 
             // ==================== MÓDULO DE UTILIDADES ====================
