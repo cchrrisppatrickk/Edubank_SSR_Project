@@ -82,5 +82,13 @@ namespace EduBank.DAL.Repository
             await _db.SaveChangesAsync();
             return true;
         }
+
+        public async Task<PagosHabituales?> ObtenerPorIdConRelaciones(int id)
+        {
+            return await _db.PagosHabituales
+                .Include(p => p.Cuenta)
+                .Include(p => p.Categoria)
+                .FirstOrDefaultAsync(p => p.PagoHabitualId == id);
+        }
     }
 }

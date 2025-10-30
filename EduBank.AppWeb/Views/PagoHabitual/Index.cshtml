@@ -1,4 +1,12 @@
-﻿@model IEnumerable<EduBank.Models.PagosHabituales>
+﻿<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+<!-- JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+@model IEnumerable<EduBank.Models.PagosHabituales>
 @{
     ViewData["Title"] = "Pagos Habituales";
     var cuentas = ViewBag.Cuentas as List<EduBank.Models.Cuenta>;
@@ -443,6 +451,25 @@
 
 @section Scripts {
     <script>
+        // Configuración global de Toastr
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": false,
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+
         // Variables globales para los modales
         let modalPagoHabitual;
         let modalConfirmacion;
@@ -468,35 +495,46 @@
         });
 
         // Función para guardar pago (crear o actualizar)
+                // Función para guardar pago (crear o actualizar) - VERSIÓN CORREGIDA
         async function guardarPago(e) {
             e.preventDefault();
 
             const form = e.target;
+
+            // ✅ CORRECCIÓN: Convertir PagoHabitualId a número
+            const pagoHabitualId = parseInt(document.getElementById('PagoHabitualId').value) || 0;
+
             const formData = {
-                PagoHabitualId: document.getElementById('PagoHabitualId').value,
+                PagoHabitualId: pagoHabitualId, // ✅ Ahora es número, no string
                 Nombre: document.getElementById('Nombre').value,
-                Frecuencia: document.getElementById('Frecuencia').value,
+                Frecuencia: parseInt(document.getElementById('Frecuencia').value) || 1,
                 UnidadFrecuencia: document.getElementById('UnidadFrecuencia').value,
                 FechaInicio: document.getElementById('FechaInicio').value,
                 Hora: document.getElementById('Hora').value || null,
                 FechaFin: document.getElementById('FechaFin').value || null,
-                CuentaId: document.getElementById('CuentaId').value,
-                CategoriaId: document.getElementById('CategoriaId').value,
-                Monto: document.getElementById('Monto').value,
+                CuentaId: parseInt(document.getElementById('CuentaId').value),
+                CategoriaId: parseInt(document.getElementById('CategoriaId').value),
+                Monto: parseFloat(document.getElementById('Monto').value) || 0,
                 Comentario: document.getElementById('Comentario').value,
                 EsActivo: document.getElementById('EsActivo').checked,
                 AgregarAutomaticamente: document.getElementById('AgregarAutomaticamente').checked
             };
 
+            console.log('📤 Datos a enviar:', formData);
+            console.log('🔍 PagoHabitualId:', formData.PagoHabitualId, 'Tipo:', typeof formData.PagoHabitualId);
+
             // Validación básica
             if (!formData.Nombre || !formData.Monto || !formData.CuentaId || !formData.CategoriaId) {
-                mostrarAlerta('Por favor complete todos los campos obligatorios.', 'error');
+                mostrarMensaje('Por favor complete todos los campos obligatorios.', 'warning');
                 return;
             }
 
-            const url = formData.PagoHabitualId == 0 ?
-                '/PagoHabitual/Insertar' :
-                '/PagoHabitual/Actualizar';
+            // ✅ CORRECCIÓN: Verificar bien si es crear o editar
+            const url = formData.PagoHabitualId > 0 ?
+                '/PagoHabitual/Actualizar' :
+                '/PagoHabitual/Insertar';
+
+            console.log('🌐 URL de envío:', url);
 
             try {
                 const response = await fetch(url, {
@@ -508,67 +546,109 @@
                 });
 
                 const result = await response.json();
+                console.log('📥 Respuesta del servidor:', result);
 
                 if (result.success) {
                     modalPagoHabitual.hide();
-                    mostrarAlerta(result.message, 'success');
+                    mostrarMensaje(result.message, 'success');
                     // Recargar la página para ver los cambios
                     setTimeout(() => {
                         window.location.reload();
                     }, 1500);
                 } else {
-                    mostrarAlerta(result.message, 'error');
+                    mostrarMensaje(result.message, 'error');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                mostrarAlerta('Error al procesar la solicitud: ' + error.message, 'error');
+                mostrarMensaje('Error al procesar la solicitud: ' + error.message, 'error');
             }
         }
 
-        // Función para editar pago
+        // FUNCIÓN EDITAR PAGO - VERSIÓN DEPURADA Y CORREGIDA
+               // FUNCIÓN EDITAR PAGO - CON MÁS DEBUGGING
+                // FUNCIÓN EDITAR PAGO CORREGIDA - USAR camelCase
         async function editarPago(id) {
             try {
-                const response = await fetch('/PagoHabitual/ObtenerJson/' + id);
+                console.log('🔍 Iniciando edición del pago ID:', id);
+
+                const response = await fetch(`/PagoHabitual/ObtenerJson?id=${id}`);
                 const result = await response.json();
 
-                if (result.success) {
+                console.log('📦 Respuesta del servidor:', result);
+
+                if (result.success && result.data) {
                     const pago = result.data;
+                    console.log('📋 Datos del pago recibidos:', pago);
 
-                    // Llenar el formulario
-                    document.getElementById('PagoHabitualId').value = pago.PagoHabitualId;
-                    document.getElementById('Nombre').value = pago.Nombre;
-                    document.getElementById('Frecuencia').value = pago.Frecuencia;
-                    document.getElementById('UnidadFrecuencia').value = pago.UnidadFrecuencia;
+                    // ✅ CORRECCIÓN: Usar camelCase (minúsculas) para las propiedades
+                    console.log('🔎 Verificando campos con camelCase:');
+                    console.log('- pagoHabitualId:', pago.pagoHabitualId);
+                    console.log('- nombre:', pago.nombre);
+                    console.log('- frecuencia:', pago.frecuencia);
+                    console.log('- unidadFrecuencia:', pago.unidadFrecuencia);
 
-                    // Formatear fechas
-                    const fechaInicio = pago.FechaInicio.split('T')[0];
-                    document.getElementById('FechaInicio').value = fechaInicio;
+                    // ✅ ASIGNACIÓN CORRECTA CON camelCase
+                    document.getElementById('PagoHabitualId').value = pago.pagoHabitualId || '0';
+                    document.getElementById('Nombre').value = pago.nombre || '';
+                    document.getElementById('Frecuencia').value = pago.frecuencia || 1;
+                    document.getElementById('UnidadFrecuencia').value = pago.unidadFrecuencia || 'D';
 
-                    document.getElementById('Hora').value = pago.Hora || '';
-
-                    if (pago.FechaFin) {
-                        const fechaFin = pago.FechaFin.split('T')[0];
-                        document.getElementById('FechaFin').value = fechaFin;
-                    } else {
-                        document.getElementById('FechaFin').value = '';
+                    // ✅ FECHA INICIO
+                    if (pago.fechaInicio) {
+                        const fechaInicio = new Date(pago.fechaInicio);
+                        document.getElementById('FechaInicio').value = fechaInicio.toISOString().split('T')[0];
                     }
 
-                    document.getElementById('CuentaId').value = pago.CuentaId;
-                    document.getElementById('CategoriaId').value = pago.CategoriaId;
-                    document.getElementById('Monto').value = pago.Monto;
-                    document.getElementById('Comentario').value = pago.Comentario || '';
-                    document.getElementById('EsActivo').checked = pago.EsActivo;
-                    document.getElementById('AgregarAutomaticamente').checked = pago.AgregarAutomaticamente;
+                    // ✅ HORA
+                    if (pago.hora) {
+                        document.getElementById('Hora').value = pago.hora;
+                    }
 
-                    // Actualizar modal
+                    // ✅ FECHA FIN
+                    if (pago.fechaFin) {
+                        const fechaFin = new Date(pago.fechaFin);
+                        document.getElementById('FechaFin').value = fechaFin.toISOString().split('T')[0];
+                    }
+
+                    // ✅ CUENTA Y CATEGORÍA
+                    document.getElementById('CuentaId').value = pago.cuentaId || '';
+                    document.getElementById('CategoriaId').value = pago.categoriaId || '';
+
+                    // ✅ MONTO
+                    document.getElementById('Monto').value = pago.monto || '0.00';
+
+                    // ✅ COMENTARIO
+                    document.getElementById('Comentario').value = pago.comentario || '';
+
+                    // ✅ CHECKBOXES
+                    document.getElementById('EsActivo').checked = Boolean(pago.esActivo);
+                    document.getElementById('AgregarAutomaticamente').checked = Boolean(pago.agregarAutomaticamente);
+
+                    // ✅ VERIFICACIÓN FINAL
+                    console.log('🎯 Verificación final de campos asignados:');
+                    console.log('- PagoHabitualId en hidden:', document.getElementById('PagoHabitualId').value);
+                    console.log('- Nombre en input:', document.getElementById('Nombre').value);
+                    console.log('- Monto en input:', document.getElementById('Monto').value);
+                    console.log('- CuentaId seleccionada:', document.getElementById('CuentaId').value);
+                    console.log('- CategoriaId seleccionada:', document.getElementById('CategoriaId').value);
+
+                    // Actualizar título del modal
                     document.getElementById('modalPagoHabitualLabel').textContent = 'Editar Pago Habitual';
-                    modalPagoHabitual.show();
+
+                    // Mostrar modal
+                    console.log('🚀 Mostrando modal de edición...');
+                    const modal = new bootstrap.Modal(document.getElementById('modalPagoHabitual'));
+                    modal.show();
+
+                    console.log('✅ Modal abierto exitosamente');
+
                 } else {
-                    mostrarAlerta(result.message, 'error');
+                    console.error('❌ Error: No se recibieron datos válidos del servidor');
+                    mostrarMensaje(result.message || 'Error al cargar los datos del pago', 'error');
                 }
             } catch (error) {
-                console.error('Error:', error);
-                mostrarAlerta('Error al cargar el pago: ' + error.message, 'error');
+                console.error('💥 Error crítico al cargar pago:', error);
+                mostrarMensaje('Error al cargar el pago: ' + error.message, 'error');
             }
         }
 
@@ -591,16 +671,16 @@
 
                     if (result.success) {
                         modalConfirmacion.hide();
-                        mostrarAlerta(result.message, 'success');
+                        mostrarMensaje(result.message, 'success');
                         // Eliminar la fila de la tabla sin recargar
                         document.getElementById('pago-' + id)?.remove();
                         actualizarEstadisticas();
                     } else {
-                        mostrarAlerta(result.message, 'error');
+                        mostrarMensaje(result.message, 'error');
                     }
                 } catch (error) {
                     console.error('Error:', error);
-                    mostrarAlerta('Error al eliminar el pago: ' + error.message, 'error');
+                    mostrarMensaje('Error al eliminar el pago: ' + error.message, 'error');
                 }
             };
 
@@ -627,17 +707,17 @@
 
                     if (result.success) {
                         modalConfirmacion.hide();
-                        mostrarAlerta(result.message, 'success');
+                        mostrarMensaje(result.message, 'success');
                         // Recargar para ver cambios
                         setTimeout(() => {
                             window.location.reload();
                         }, 1000);
                     } else {
-                        mostrarAlerta(result.message, 'error');
+                        mostrarMensaje(result.message, 'error');
                     }
                 } catch (error) {
                     console.error('Error:', error);
-                    mostrarAlerta('Error al cambiar estado: ' + error.message, 'error');
+                    mostrarMensaje('Error al cambiar estado: ' + error.message, 'error');
                 }
             };
 
@@ -663,15 +743,15 @@
 
                     if (result.success) {
                         modalConfirmacion.hide();
-                        mostrarAlerta(result.message, 'success');
+                        mostrarMensaje(result.message, 'success');
                     // Pequeña actualización sin recargar toda la página
                         actualizarEstadisticas();
                     } else {
-                        mostrarAlerta(result.message, 'error');
+                        mostrarMensaje(result.message, 'error');
                     }
                 } catch (error) {
                     console.error('Error:', error);
-                    mostrarAlerta('Error al ejecutar pago: ' + error.message, 'error');
+                    mostrarMensaje('Error al ejecutar pago: ' + error.message, 'error');
                 }
             };
 
@@ -698,29 +778,24 @@
             }, 2000);
         }
 
-        // Función para mostrar alertas
-        function mostrarAlerta(mensaje, tipo) {
-            const icono = tipo === 'success' ? 'check-circle' : 'exclamation-triangle';
-            const color = tipo === 'success' ? 'success' : 'danger';
-
-            const alerta = `
-                <div class="alert alert-${color} alert-dismissible fade show" role="alert">
-                    <i class="fas fa-${icono} me-2"></i>${mensaje}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            `;
-
-            // Insertar al inicio del container
-            const container = document.querySelector('.container-fluid');
-            container.insertAdjacentHTML('afterbegin', alerta);
-
-            // Auto-eliminar después de 5 segundos
-            setTimeout(() => {
-                const alertElement = document.querySelector('.alert');
-                if (alertElement) {
-                    bootstrap.Alert.getInstance(alertElement)?.close();
-                }
-            }, 5000);
+        // FUNCIÓN MODIFICADA: Mostrar mensajes con Toastr
+        function mostrarMensaje(mensaje, tipo) {
+            switch (tipo) {
+                case 'success':
+                    toastr.success(mensaje, 'Éxito');
+                    break;
+                case 'error':
+                    toastr.error(mensaje, 'Error');
+                    break;
+                case 'warning':
+                    toastr.warning(mensaje, 'Advertencia');
+                    break;
+                case 'info':
+                    toastr.info(mensaje, 'Información');
+                    break;
+                default:
+                    toastr.info(mensaje, 'Mensaje');
+            }
         }
     </script>
 }

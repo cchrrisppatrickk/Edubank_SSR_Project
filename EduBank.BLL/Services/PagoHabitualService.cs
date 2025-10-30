@@ -50,11 +50,12 @@ namespace EduBank.BLL.Services
             }
         }
 
+        // EduBank.BLL/Services/PagoHabitualService.cs
         public async Task<bool> Actualizar(PagosHabituales modelo)
         {
             try
             {
-                // Validar que el pago existe y pertenece al usuario
+                // Obtener el pago existente
                 var pagoExistente = await _genericRepo.Obtener(modelo.PagoHabitualId);
                 if (pagoExistente == null)
                     throw new Exception("Pago habitual no encontrado");
@@ -62,7 +63,7 @@ namespace EduBank.BLL.Services
                 if (pagoExistente.UsuarioId != modelo.UsuarioId)
                     throw new Exception("No tiene permisos para editar este pago");
 
-                // Validaciones adicionales
+                // Validar cuenta y categoría
                 var pertenece = await _pagoRepo.ValidarCuentaYCategoria(modelo.CuentaId, modelo.CategoriaId, modelo.UsuarioId);
                 if (!pertenece)
                     throw new Exception("La cuenta o categoría no pertenece al usuario");
@@ -70,7 +71,22 @@ namespace EduBank.BLL.Services
                 if (modelo.FechaFin.HasValue && modelo.FechaFin <= modelo.FechaInicio)
                     throw new Exception("La fecha de fin debe ser posterior a la fecha de inicio");
 
-                return await _genericRepo.Actualizar(modelo);
+                // ✅ CORRECCIÓN: Actualizar propiedades del pago existente
+                pagoExistente.Nombre = modelo.Nombre;
+                pagoExistente.Frecuencia = modelo.Frecuencia;
+                pagoExistente.UnidadFrecuencia = modelo.UnidadFrecuencia;
+                pagoExistente.FechaInicio = modelo.FechaInicio;
+                pagoExistente.Hora = modelo.Hora;
+                pagoExistente.FechaFin = modelo.FechaFin;
+                pagoExistente.CuentaId = modelo.CuentaId;
+                pagoExistente.CategoriaId = modelo.CategoriaId;
+                pagoExistente.Monto = modelo.Monto;
+                pagoExistente.Comentario = modelo.Comentario;
+                pagoExistente.EsActivo = modelo.EsActivo;
+                pagoExistente.AgregarAutomaticamente = modelo.AgregarAutomaticamente;
+
+                // ✅ Actualizar la entidad existente
+                return await _genericRepo.Actualizar(pagoExistente);
             }
             catch (Exception ex)
             {
@@ -94,7 +110,9 @@ namespace EduBank.BLL.Services
 
         public async Task<PagosHabituales?> Obtener(int id)
         {
-            return await _genericRepo.Obtener(id);
+            // En lugar de usar _genericRepo, usa el repositorio específico
+            var pagos = await _pagoRepo.ObtenerPorUsuario(0); // Obtener todos temporalmente
+            return pagos.FirstOrDefault(p => p.PagoHabitualId == id);
         }
 
         public async Task<IEnumerable<PagosHabituales>> ObtenerPorUsuario(int usuarioId)
@@ -186,5 +204,7 @@ namespace EduBank.BLL.Services
             var pago = await _genericRepo.Obtener(pagoHabitualId);
             return pago?.UsuarioId == usuarioId;
         }
+
+
     }
 }

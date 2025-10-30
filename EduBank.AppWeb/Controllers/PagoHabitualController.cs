@@ -164,35 +164,54 @@ namespace EduBank.AppWeb.Controllers
         {
             try
             {
-                var pago = await _pagoService.Obtener(id);
+                Console.WriteLine($"🔍 ObtenerJson - ID solicitado: {id}");
+
+                var usuarioId = ObtenerUsuarioId();
+                Console.WriteLine($"🔍 ObtenerJson - UsuarioId: {usuarioId}");
+
+                // Obtener todos los pagos del usuario (que ya incluyen relaciones)
+                var pagosUsuario = await _pagoService.ObtenerPorUsuario(usuarioId);
+                Console.WriteLine($"🔍 ObtenerJson - Total pagos del usuario: {pagosUsuario.Count()}");
+
+                var pago = pagosUsuario.FirstOrDefault(p => p.PagoHabitualId == id);
+
                 if (pago == null)
+                {
+                    Console.WriteLine($"❌ ObtenerJson - Pago no encontrado para ID: {id}");
                     return Json(new { success = false, message = "Pago habitual no encontrado" });
+                }
 
-                // Validar que pertenece al usuario
-                if (pago.UsuarioId != ObtenerUsuarioId())
-                    return Json(new { success = false, message = "No tiene permisos para ver este pago" });
+                Console.WriteLine($"✅ ObtenerJson - Pago encontrado: {pago.Nombre}");
 
+                // ✅ CREAR EL VIEW MODEL CORRECTAMENTE
                 var vm = new VMPagoHabitual
                 {
                     PagoHabitualId = pago.PagoHabitualId,
-                    Nombre = pago.Nombre,
+                    Nombre = pago.Nombre ?? string.Empty,
                     Frecuencia = pago.Frecuencia,
-                    UnidadFrecuencia = pago.UnidadFrecuencia,
+                    UnidadFrecuencia = pago.UnidadFrecuencia ?? "D",
                     FechaInicio = pago.FechaInicio,
                     Hora = pago.Hora,
                     FechaFin = pago.FechaFin,
                     CuentaId = pago.CuentaId,
                     CategoriaId = pago.CategoriaId,
                     Monto = pago.Monto,
-                    Comentario = pago.Comentario,
+                    Comentario = pago.Comentario ?? string.Empty,
                     EsActivo = pago.EsActivo,
                     AgregarAutomaticamente = pago.AgregarAutomaticamente
                 };
+
+                Console.WriteLine($"📦 ObtenerJson - ViewModel creado:");
+                Console.WriteLine($"   - PagoHabitualId: {vm.PagoHabitualId}");
+                Console.WriteLine($"   - Nombre: {vm.Nombre}");
+                Console.WriteLine($"   - Monto: {vm.Monto}");
 
                 return Json(new { success = true, data = vm });
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"💥 ObtenerJson - Error: {ex.Message}");
+                Console.WriteLine($"💥 ObtenerJson - StackTrace: {ex.StackTrace}");
                 return Json(new { success = false, message = ex.Message });
             }
         }
