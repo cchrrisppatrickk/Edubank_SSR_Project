@@ -348,21 +348,156 @@
         }
 
         // Función para cargar iconos disponibles
-        function cargarIconos() {
-            // Lista de iconos de Bootstrap Icons comúnmente usados
+                function cargarIconos() {
+            // Lista ampliada de iconos de Bootstrap Icons organizados por categorías
             iconosDisponibles = [
-                'bi bi-house', 'bi bi-cart', 'bi bi-car', 'bi bi-heart-pulse', 'bi bi-phone',
-                'bi bi-laptop', 'bi bi-tv', 'bi bi-cup-straw', 'bi bi-utensils', 'bi bi-bag',
-                'bi bi-gift', 'bi bi-airplane', 'bi bi-fuel-pump', 'bi bi-wifi', 'bi bi-droplet',
-                'bi bi-lightning', 'bi bi-house-door', 'bi bi-building', 'bi bi-bank', 'bi bi-cash-coin',
-                'bi bi-credit-card', 'bi bi-wallet', 'bi bi-graph-up', 'bi bi-piggy-bank', 'bi bi-safe',
-                'bi bi-briefcase', 'bi bi-cash-stack', 'bi bi-coin', 'bi bi-currency-dollar', 'bi bi-currency-euro',
-                'bi bi-award', 'bi bi-gem', 'bi bi-trophy', 'bi bi-star', 'bi bi-heart',
-                'bi bi-basket', 'bi bi-tag', 'bi bi-receipt', 'bi bi-file-text', 'bi bi-calendar',
-                'bi bi-clock', 'bi bi-gear', 'bi bi-tools', 'bi bi-shield-check', 'bi bi-key',
-                'bi bi-lock', 'bi bi-unlock', 'bi bi-bell', 'bi bi-megaphone', 'bi bi-chat',
-                'bi bi-envelope', 'bi bi-telephone', 'bi bi-camera', 'bi bi-music-note', 'bi bi-book',
-                'bi bi-pencil', 'bi bi-eraser', 'bi bi-scissors', 'bi bi-brush', 'bi bi-palette'
+                // 🏠 HOGAR Y CONSTRUCCIÓN
+                'bi bi-house', 'bi bi-house-door', 'bi bi-house-heart', 'bi bi-house-check',
+                'bi bi-house-gear', 'bi bi-house-lock', 'bi bi-building', 'bi bi-buildings',
+                'bi bi-home', 'bi bi-door-closed', 'bi bi-door-open', 'bi bi-window',
+                'bi bi-lightbulb', 'bi bi-lamp', 'bi bi-fan', 'bi bi-thermometer',
+                'bi bi-snow', 'bi bi-fire', 'bi bi-plug', 'bi bi-outlet',
+
+                // 🛒 COMPRAS Y COMERCIO
+                'bi bi-cart', 'bi bi-cart-check', 'bi bi-cart-plus', 'bi bi-cart-dash',
+                'bi bi-cart-x', 'bi bi-bag', 'bi bi-bag-check', 'bi bi-bag-plus',
+                'bi bi-bag-dash', 'bi bi-bag-x', 'bi bi-basket', 'bi bi-basket2',
+                'bi bi-basket3', 'bi bi-shop', 'bi bi-shop-window', 'bi bi-tag',
+                'bi bi-tags', 'bi bi-receipt', 'bi bi-receipt-cutoff',
+
+                // 🚗 TRANSPORTE Y VEHÍCULOS
+                'bi bi-car', 'bi bi-car-front', 'bi bi-truck', 'bi bi-bus-front',
+                'bi bi-train-front', 'bi bi-airplane', 'bi bi-airplane-engines',
+                'bi bi-bicycle', 'bi bi-scooter', 'bi bi-fuel-pump', 'bi bi-ev-front',
+                'bi bi-speedometer', 'bi bi-gear', 'bi bi-gear-wide', 'bi bi-tools',
+                'bi bi-wrench', 'bi bi-screwdriver',
+
+                // 🏥 SALUD Y BIENESTAR
+                'bi bi-heart', 'bi bi-heart-pulse', 'bi bi-heartbreak', 'bi bi-hospital',
+                'bi bi-capsule', 'bi bi-capsule-pill', 'bi bi-prescription',
+                'bi bi-thermometer-high', 'bi bi-thermometer-low', 'bi bi-activity',
+                'bi bi-plus-circle', 'bi bi-plus-square', 'bi bi-droplet',
+                'bi bi-prescription2', 'bi bi-capsule', 'bi bi-file-medical',
+
+                // 📱 TECNOLOGÍA Y ELECTRÓNICOS
+                'bi bi-phone', 'bi bi-phone-fill', 'bi bi-tablet', 'bi bi-laptop',
+                'bi bi-pc', 'bi bi-display', 'bi bi-tv', 'bi bi-camera',
+                'bi bi-camera-video', 'bi bi-headphones', 'bi bi-speaker',
+                'bi bi-mouse', 'bi bi-keyboard', 'bi bi-printer', 'bi bi-router',
+                'bi bi-wifi', 'bi bi-bluetooth', 'bi bi-usb', 'bi bi-usb-drive',
+
+                // 🍽️ ALIMENTOS Y BEBIDAS
+                'bi bi-cup-straw', 'bi bi-cup', 'bi bi-egg', 'bi bi-egg-fried',
+                'bi bi-apple', 'bi bi-banana', 'bi bi-grapes', 'bi bi-carrot',
+                'bi bi-cheese', 'bi bi-bread-slice', 'bi bi-cake', 'bi bi-cookie',
+                'bi bi-utensils', 'bi bi-egg-fill', 'bi bi-cup-hot', 'bi bi-cup-straw',
+
+                // 👗 MODA Y VESTUARIO
+                'bi bi-bag', 'bi bi-handbag', 'bi bi-sunglasses', 'bi bi-watch',
+                'bi bi-gem', 'bi bi-necklace', 'bi bi-brilliance', 'bi bi-tshirt',
+
+                // 🎁 REGALOS Y ENTRETENIMIENTO
+                'bi bi-gift', 'bi bi-gift-fill', 'bi bi-balloon', 'bi bi-balloon-heart',
+                'bi bi-controller', 'bi bi-joystick', 'bi bi-dice-1', 'bi bi-dice-2',
+                'bi bi-dice-3', 'bi bi-dice-4', 'bi bi-dice-5', 'bi bi-dice-6',
+                'bi bi-film', 'bi bi-ticket', 'bi bi-ticket-perforated',
+
+                // 💰 FINANZAS Y DINERO
+                'bi bi-cash', 'bi bi-cash-coin', 'bi bi-cash-stack', 'bi bi-coin',
+                'bi bi-currency-dollar', 'bi bi-currency-euro', 'bi bi-currency-pound',
+                'bi bi-currency-yen', 'bi bi-currency-bitcoin', 'bi bi-credit-card',
+                'bi bi-credit-card-2-front', 'bi bi-wallet', 'bi bi-wallet2',
+                'bi bi-piggy-bank', 'bi bi-safe', 'bi bi-safe2', 'bi bi-bank',
+                'bi bi-graph-up', 'bi bi-graph-down', 'bi bi-bar-chart',
+                'bi bi-pie-chart', 'bi bi-calculator',
+
+                // 💼 NEGOCIOS Y OFICINA
+                'bi bi-briefcase', 'bi bi-briefcase-fill', 'bi bi-clipboard',
+                'bi bi-clipboard-check', 'bi bi-clipboard-data', 'bi bi-clipboard-plus',
+                'bi bi-folder', 'bi bi-folder2', 'bi bi-folder-check', 'bi bi-folder-plus',
+                'bi bi-folder-symlink', 'bi bi-file', 'bi bi-file-text', 'bi bi-file-earmark',
+                'bi bi-file-earmark-text', 'bi bi-printer', 'bi bi-archive',
+
+                // 🏆 LOGROS Y RECOMPENSAS
+                'bi bi-award', 'bi bi-award-fill', 'bi bi-trophy', 'bi bi-trophy-fill',
+                'bi bi-star', 'bi bi-star-fill', 'bi bi-star-half', 'bi bi-medal',
+                'bi bi-patch-check', 'bi bi-patch-check-fill', 'bi bi-emoji-smile',
+                'bi bi-emoji-laughing', 'bi bi-emoji-heart-eyes',
+
+                // 🔒 SEGURIDAD Y ACCESO
+                'bi bi-shield', 'bi bi-shield-check', 'bi bi-shield-lock', 'bi bi-shield-exclamation',
+                'bi bi-key', 'bi bi-key-fill', 'bi bi-lock', 'bi bi-lock-fill',
+                'bi bi-unlock', 'bi bi-unlock-fill', 'bi bi-eye', 'bi bi-eye-slash',
+
+                // 📧 COMUNICACIÓN
+                'bi bi-envelope', 'bi bi-envelope-fill', 'bi bi-envelope-open',
+                'bi bi-envelope-check', 'bi bi-chat', 'bi bi-chat-left', 'bi bi-chat-right',
+                'bi bi-chat-dots', 'bi bi-chat-quote', 'bi bi-telephone', 'bi bi-telephone-fill',
+                'bi bi-telephone-outbound', 'bi bi-megaphone', 'bi bi-megaphone-fill',
+                'bi bi-bell', 'bi bi-bell-fill', 'bi bi-bell-slash',
+
+                // 🎨 ARTE Y CREATIVIDAD
+                'bi bi-palette', 'bi bi-palette2', 'bi bi-brush', 'bi bi-brush-fill',
+                'bi bi-easel', 'bi bi-easel2', 'bi bi-easel3', 'bi bi-pencil',
+                'bi bi-pencil-fill', 'bi bi-pencil-square', 'bi bi-eraser',
+                'bi bi-eraser-fill', 'bi bi-scissors', 'bi bi-pen', 'bi bi-pen-fill',
+
+                // 📚 EDUCACIÓN Y APRENDIZAJE
+                'bi bi-book', 'bi bi-book-fill', 'bi bi-book-half', 'bi bi-journal',
+                'bi bi-journal-bookmark', 'bi bi-journal-text', 'bi bi-journal-check',
+                'bi bi-backpack', 'bi bi-backpack2', 'bi bi-backpack3', 'bi bi-backpack4',
+
+                // ⚡ ENERGÍA Y SERVICIOS
+                'bi bi-lightning', 'bi bi-lightning-charge', 'bi bi-lightning-fill',
+                'bi bi-power', 'bi bi-plug', 'bi bi-plug-fill', 'bi bi-outlet',
+                'bi bi-water', 'bi bi-fuel-pump', 'bi bi-fuel-pump-diesel',
+
+                // 🛠️ HERRAMIENTAS Y CONFIGURACIÓN
+                'bi bi-gear', 'bi bi-gear-fill', 'bi bi-gear-wide', 'bi bi-gear-wide-connected',
+                'bi bi-tools', 'bi bi-hammer', 'bi bi-screwdriver', 'bi bi-wrench',
+                'bi bi-wrench-adjustable', 'bi bi-nut', 'bi bi-sliders',
+                'bi bi-sliders2', 'bi bi-sliders2-vertical',
+
+                // 📅 TIEMPO Y CALENDARIO
+                'bi bi-calendar', 'bi bi-calendar-check', 'bi bi-calendar-plus',
+                'bi bi-calendar-week', 'bi bi-calendar-month', 'bi bi-calendar-date',
+                'bi bi-clock', 'bi bi-clock-fill', 'bi bi-clock-history',
+                'bi bi-stopwatch', 'bi bi-stopwatch-fill', 'bi bi-hourglass',
+                'bi bi-hourglass-split', 'bi bi-hourglass-bottom', 'bi bi-hourglass-top',
+
+                // 🌍 NATURALEZA Y MEDIO AMBIENTE
+                'bi bi-tree', 'bi bi-tree-fill', 'bi bi-flower1', 'bi bi-flower2',
+                'bi bi-flower3', 'bi bi-sun', 'bi bi-sun-fill', 'bi bi-moon',
+                'bi bi-moon-fill', 'bi bi-moon-stars', 'bi bi-cloud', 'bi bi-cloud-fill',
+                'bi bi-cloud-drizzle', 'bi bi-cloud-rain', 'bi bi-cloud-snow',
+                'bi bi-umbrella', 'bi bi-droplet', 'bi bi-droplet-fill',
+
+                // 🎵 MÚSICA Y AUDIO
+                'bi bi-music-note', 'bi bi-music-note-beamed', 'bi bi-music-note-list',
+                'bi bi-speaker', 'bi bi-speaker-fill', 'bi bi-volume-up', 'bi bi-volume-down',
+                'bi bi-volume-mute', 'bi bi-volume-off', 'bi bi-headphones',
+                'bi bi-mic', 'bi bi-mic-fill', 'bi bi-mic-mute', 'bi bi-mic-mute-fill',
+
+                // 🏃 DEPORTES Y ACTIVIDADES
+                'bi bi-bicycle', 'bi bi-person-walking', 'bi bi-person-running',
+                'bi bi-trophy', 'bi bi-award', 'bi bi-dribbble', 'bi bi-balloon',
+                'bi bi-activity', 'bi bi-heart-pulse',
+
+                // 🛒 SUPERMERCADO Y PRODUCTOS
+                'bi bi-basket', 'bi bi-basket2', 'bi bi-basket3', 'bi bi-cart',
+                'bi bi-cart-check', 'bi bi-cart-plus', 'bi bi-cart-dash',
+                'bi bi-tag', 'bi bi-tags', 'bi bi-receipt', 'bi bi-scale',
+
+                // 🎭 VARIOS Y GENERALES
+                'bi bi-emoji-smile', 'bi bi-emoji-laughing', 'bi bi-emoji-heart-eyes',
+                'bi bi-emoji-angry', 'bi bi-emoji-dizzy', 'bi bi-emoji-expressionless',
+                'bi bi-flag', 'bi bi-flag-fill', 'bi bi-bookmark', 'bi bi-bookmark-fill',
+                'bi bi-bookmark-check', 'bi bi-bookmark-plus', 'bi bi-bookmark-star',
+                'bi bi-link', 'bi bi-link-45deg', 'bi bi-box', 'bi bi-box-arrow-up',
+                'bi bi-box-arrow-down', 'bi bi-arrow-left-right', 'bi bi-arrow-up-down',
+                'bi bi-plus', 'bi bi-dash', 'bi bi-x', 'bi bi-check', 'bi bi-check-circle',
+                'bi bi-exclamation', 'bi bi-exclamation-circle', 'bi bi-exclamation-triangle',
+                'bi bi-question', 'bi bi-question-circle', 'bi bi-info', 'bi bi-info-circle'
             ];
 
             renderizarIconos(iconosDisponibles);
@@ -491,11 +626,82 @@ async function eliminarCategoria(categoriaId) {
 
         // Función para cargar colores predefinidos
         function cargarColores() {
-            const colores = [
-                '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16',
-                '#22c55e', '#10b981', '#14b8a6', '#06b6d4', '#0ea5e9',
-                '#3b82f6', '#6366f1', '#8b5cf6', '#a855f7', '#d946ef',
-                '#ec4899', '#f43f5e', '#6b7280', '#374151', '#000000'
+                    const colores = [
+                // 🟥 ROJOS - Gastos esenciales, urgentes
+                '#dc2626', '#ef4444', '#f87171', '#fca5a5', '#b91c1c',
+                '#991b1b', '#7f1d1d', '#450a0a', '#fee2e2', '#fecaca',
+
+                // 🟧 NARANJAS - Gastos personales, ocio
+                '#ea580c', '#f97316', '#fb923c', '#fdba74', '#c2410c',
+                '#9a3412', '#7c2d12', '#431407', '#ffedd5', '#fed7aa',
+
+                // 🟨 AMARILLOS - Ahorros, inversiones
+                '#ca8a04', '#eab308', '#facc15', '#fde047', '#a16207',
+                '#854d0e', '#713f12', '#422006', '#fef9c3', '#fef08a',
+
+                // 🟩 VERDES - Ingresos, crecimiento
+                '#16a34a', '#22c55e', '#4ade80', '#86efac', '#15803d',
+                '#166534', '#14532d', '#052e16', '#dcfce7', '#bbf7d0',
+
+                // 🟦 AZULES - Servicios, tecnología
+                '#2563eb', '#3b82f6', '#60a5fa', '#93c5fd', '#1d4ed8',
+                '#1e40af', '#1e3a8a', '#172554', '#dbeafe', '#bfdbfe',
+
+                // 🟪 MORADOS - Lujos, entretenimiento
+                '#7c3aed', '#8b5cf6', '#a78bfa', '#c4b5fd', '#6d28d9',
+                '#5b21b6', '#4c1d95', '#2e1065', '#ede9fe', '#ddd6fe',
+
+                // 🎀 ROSAS - Salud, belleza, cuidado personal
+                '#db2777', '#ec4899', '#f472b6', '#f9a8d4', '#be185d',
+                '#9d174d', '#831843', '#500724', '#fce7f3', '#fbcfe8',
+
+                // 🟫 MARRONES - Hogar, alimentos
+                '#92400e', '#a16207', '#b45309', '#d97706', '#78350f',
+                '#854d0e', '#713f12', '#451a03', '#fef3c7', '#fde68a',
+
+                // 🌫️ GRISES - Gastos fijos, administrativos
+                '#4b5563', '#6b7280', '#9ca3af', '#d1d5db', '#374151',
+                '#1f2937', '#111827', '#030712', '#f3f4f6', '#e5e7eb',
+
+                // 💎 TURQUESAS - Viajes, experiencias
+                '#0d9488', '#14b8a6', '#2dd4bf', '#5eead4', '#0f766e',
+                '#115e59', '#134e4a', '#042f2e', '#ccfbf1', '#99f6e4',
+
+                // �️ CÍAN - Educación, desarrollo
+                '#0891b2', '#06b6d4', '#22d3ee', '#67e8f9', '#0e7490',
+                '#155e75', '#164e63', '#083344', '#cffafe', '#a5f3fc',
+
+                // 🍃 VERDE AZULADO - Naturaleza, deportes
+                '#0f766e', '#14b8a6', '#2dd4bf', '#5eead4', '#115e59',
+                '#134e4a', '#0d4b47', '#042f2e', '#ccfbf1', '#99f6e4',
+
+                // 🍇 VIOLETAS - Cultura, arte
+                '#7e22ce', '#9333ea', '#a855f7', '#c084fc', '#6b21a8',
+                '#581c87', '#3b0764', '#1e0b33', '#f3e8ff', '#e9d5ff',
+
+                // 🥑 VERDES OSCUROS - Finanzas, negocios
+                '#059669', '#10b981', '#34d399', '#6ee7b7', '#047857',
+                '#065f46', '#064e3b', '#022c22', '#d1fae5', '#a7f3d0',
+
+                // 🌅 DORADOS - Ingresos premium, bonos
+                '#d97706', '#f59e0b', '#fbbf24', '#fcd34d', '#b45309',
+                '#92400e', '#78350f', '#451a03', '#fef3c7', '#fde68a',
+
+                // 🏮 CORALES - Restaurantes, comida fuera
+                '#ea580c', '#f97316', '#fb923c', '#fdba74', '#c2410c',
+                '#9a3412', '#7c2d12', '#431407', '#ffedd5', '#fed7aa',
+
+                // 🌊 AZULES PROFUNDOS - Seguros, protección
+                '#1e40af', '#2563eb', '#3b82f6', '#60a5fa', '#1d4ed8',
+                '#1e3a8a', '#172554', '#0f1a3d', '#dbeafe', '#bfdbfe',
+
+                // 🍂 TERRA - Automóvil, transporte
+                '#b45309', '#d97706', '#f59e0b', '#fbbf24', '#92400e',
+                '#78350f', '#451a03', '#2a1501', '#fef3c7', '#fde68a',
+
+                // 🌸 LILAS - Regalos, donaciones
+                '#a855f7', '#c084fc', '#d8b4fe', '#e9d5ff', '#9333ea',
+                '#7e22ce', '#6b21a8', '#3b0764', '#f3e8ff', '#e9d5ff'
             ];
 
             const grid = $('#gridColores');

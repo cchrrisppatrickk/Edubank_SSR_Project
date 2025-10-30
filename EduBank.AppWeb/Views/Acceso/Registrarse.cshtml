@@ -14,10 +14,62 @@
     <link rel="stylesheet" href="~/css/Regis.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
     <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
+    <style>
+        .password-strength {
+            margin-top: 5px;
+            font-size: 0.875rem;
+        }
+
+        .strength-weak {
+            color: #dc3545;
+        }
+
+        .strength-medium {
+            color: #fd7e14;
+        }
+
+        .strength-strong {
+            color: #198754;
+        }
+
+        .requirement {
+            font-size: 0.8rem;
+            margin-bottom: 2px;
+        }
+
+            .requirement.met {
+                color: #198754;
+            }
+
+            .requirement.unmet {
+                color: #6c757d;
+            }
+
+            .requirement i {
+                width: 16px;
+                margin-right: 5px;
+            }
+
+        .password-input-group {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #6c757d;
+            cursor: pointer;
+            z-index: 3;
+        }
+    </style>
 </head>
 
 <body>
-    
+
     <div class="overlay"></div>
 
     <div class="container d-flex justify-content-center align-items-center min-vh-100" data-aos="zoom-in">
@@ -28,7 +80,6 @@
                     <img src="~/img/3.jpg" alt="EduBank Registro" class="img-fluid side-illustration" />
                 </div>
 
-
                 <div class="col-md-6 p-4 d-flex flex-column justify-content-center">
                     <div class="text-center mb-4">
                         <i class="fa-solid fa-user-plus fa-3x text-primary mb-2"></i>
@@ -36,7 +87,7 @@
                         <p class="login-subtitle">Forma parte de <strong>EduBank</strong> 💰</p>
                     </div>
 
-                    <form asp-controller="Acceso" asp-action="Registrarse" method="post" novalidate>
+                    <form asp-controller="Acceso" asp-action="Registrarse" method="post" novalidate id="registroForm">
                         <div class="input-group mb-3 cartoon-input">
                             <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
                             <input type="text" class="form-control" placeholder="Nombre" asp-for="Nombre" required>
@@ -55,20 +106,64 @@
                         </div>
                         <span asp-validation-for="CorreoElectronico" class="text-danger"></span>
 
-                        <div class="input-group mb-3 cartoon-input">
-                            <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
-                            <input type="password" class="form-control" placeholder="Contraseña" asp-for="Contrasena" required>
-                        </div>
-                        <span asp-validation-for="Contrasena" class="text-danger"></span>
+                        <!-- Campo de Contraseña Mejorado -->
+                        <div class="mb-3">
+                            <div class="input-group cartoon-input password-input-group">
+                                <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                                <input type="password" class="form-control" placeholder="Contraseña"
+                                       asp-for="Contrasena" required id="passwordField">
+                                <button type="button" class="password-toggle" id="togglePassword">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                            </div>
+                            <span asp-validation-for="Contrasena" class="text-danger"></span>
 
-                        <div class="input-group mb-3 cartoon-input">
+                            <!-- Indicador de Fortaleza -->
+                            <div class="password-strength mt-2">
+                                <small id="strengthText">Fortaleza de la contraseña</small>
+                                <div class="progress mt-1" style="height: 5px;">
+                                    <div id="strengthBar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Requisitos de Contraseña -->
+                            <div class="requirements mt-2">
+                                <div class="requirement unmet" id="reqLength">
+                                    <i class="fa-solid fa-circle"></i>
+                                    <span>Mínimo 8 caracteres</span>
+                                </div>
+                                <div class="requirement unmet" id="reqUpper">
+                                    <i class="fa-solid fa-circle"></i>
+                                    <span>Una letra mayúscula</span>
+                                </div>
+                                <div class="requirement unmet" id="reqLower">
+                                    <i class="fa-solid fa-circle"></i>
+                                    <span>Una letra minúscula</span>
+                                </div>
+                                <div class="requirement unmet" id="reqNumber">
+                                    <i class="fa-solid fa-circle"></i>
+                                    <span>Un número</span>
+                                </div>
+                                <div class="requirement unmet" id="reqSpecial">
+                                    <i class="fa-solid fa-circle"></i>
+                                    <span>Un carácter especial</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="input-group mb-3 cartoon-input password-input-group">
                             <span class="input-group-text"><i class="fa-solid fa-key"></i></span>
-                            <input type="password" class="form-control" placeholder="Confirmar contraseña" asp-for="ConfirmarContrasena" required>
+                            <input type="password" class="form-control" placeholder="Confirmar contraseña"
+                                   asp-for="ConfirmarContrasena" required id="confirmPasswordField">
+                            <button type="button" class="password-toggle" id="toggleConfirmPassword">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
                         </div>
                         <span asp-validation-for="ConfirmarContrasena" class="text-danger"></span>
+                        <div id="confirmMessage" class="text-danger small mt-1"></div>
 
                         <div class="d-grid mb-3">
-                            <button class="btn btn-primary btn-lg" type="submit">
+                            <button class="btn btn-primary btn-lg" type="submit" id="submitBtn">
                                 <i class="fa-solid fa-paper-plane me-2"></i>Registrarse
                             </button>
                         </div>
@@ -89,12 +184,113 @@
         </div>
     </div>
 
-
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
     <script>
         AOS.init({ duration: 1200, once: true });
+
+        // Función para mostrar/ocultar contraseña
+        function setupPasswordToggle(passwordFieldId, toggleButtonId) {
+            const passwordField = document.getElementById(passwordFieldId);
+            const toggleButton = document.getElementById(toggleButtonId);
+
+            toggleButton.addEventListener('click', function() {
+                const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordField.setAttribute('type', type);
+                this.innerHTML = type === 'password' ? '<i class="fa-solid fa-eye"></i>' : '<i class="fa-solid fa-eye-slash"></i>';
+            });
+        }
+
+        // Configurar toggles
+        setupPasswordToggle('passwordField', 'togglePassword');
+        setupPasswordToggle('confirmPasswordField', 'toggleConfirmPassword');
+
+        // Validación en tiempo real de contraseña
+        document.getElementById('passwordField').addEventListener('input', function(e) {
+            const password = e.target.value;
+            checkPasswordStrength(password);
+            checkPasswordMatch();
+        });
+
+        document.getElementById('confirmPasswordField').addEventListener('input', checkPasswordMatch);
+
+        function checkPasswordStrength(password) {
+            let strength = 0;
+            const requirements = {
+                length: password.length >= 8,
+                upper: /[A-Z]/.test(password),
+                lower: /[a-z]/.test(password),
+                number: /[0-9]/.test(password),
+                special: /[^A-Za-z0-9]/.test(password)
+            };
+
+            // Actualizar requisitos visualmente
+            Object.keys(requirements).forEach(key => {
+                const element = document.getElementById('req' + key.charAt(0).toUpperCase() + key.slice(1));
+                if (requirements[key]) {
+                    element.classList.remove('unmet');
+                    element.classList.add('met');
+                    element.innerHTML = '<i class="fa-solid fa-check-circle"></i>' + element.textContent;
+                    strength++;
+                } else {
+                    element.classList.remove('met');
+                    element.classList.add('unmet');
+                    element.innerHTML = '<i class="fa-solid fa-circle"></i>' + element.textContent;
+                }
+            });
+
+            // Actualizar barra de progreso y texto
+            const strengthBar = document.getElementById('strengthBar');
+            const strengthText = document.getElementById('strengthText');
+            const percentage = (strength / 5) * 100;
+
+            strengthBar.style.width = percentage + '%';
+
+            if (password.length === 0) {
+                strengthText.textContent = 'Fortaleza de la contraseña';
+                strengthBar.className = 'progress-bar';
+            } else if (strength <= 2) {
+                strengthText.textContent = 'Débil';
+                strengthBar.className = 'progress-bar bg-danger';
+            } else if (strength <= 4) {
+                strengthText.textContent = 'Media';
+                strengthBar.className = 'progress-bar bg-warning';
+            } else {
+                strengthText.textContent = 'Fuerte';
+                strengthBar.className = 'progress-bar bg-success';
+            }
+        }
+
+        function checkPasswordMatch() {
+            const password = document.getElementById('passwordField').value;
+            const confirmPassword = document.getElementById('confirmPasswordField').value;
+            const message = document.getElementById('confirmMessage');
+
+            if (confirmPassword === '') {
+                message.textContent = '';
+            } else if (password !== confirmPassword) {
+                message.textContent = 'Las contraseñas no coinciden';
+            } else {
+                message.textContent = 'Las contraseñas coinciden';
+                message.className = 'text-success small mt-1';
+            }
+        }
+
+        // Validación antes del envío
+        document.getElementById('registroForm').addEventListener('submit', function(e) {
+            const password = document.getElementById('passwordField').value;
+            const confirmPassword = document.getElementById('confirmPasswordField').value;
+
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                alert('Las contraseñas no coinciden. Por favor, verifica.');
+                return false;
+            }
+        });
     </script>
 </body>
 </html>
