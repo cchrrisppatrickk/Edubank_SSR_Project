@@ -402,6 +402,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
+    <!-- Incluir el chatbot solo si el usuario está autenticado -->
+    @if (User.Identity.IsAuthenticated)
+    {
+        <partial name="_Chatbot" />
+    }
+
     <script>
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
