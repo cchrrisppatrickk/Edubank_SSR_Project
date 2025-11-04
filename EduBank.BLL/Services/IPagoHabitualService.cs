@@ -25,5 +25,6 @@ namespace EduBank.BLL.Services
 
         // Validaciones
         Task<bool> PerteneceAUsuario(int pagoHabitualId, int usuarioId);
+        //void ObtenerPorUsuario(string usuarioId);
     }
 }

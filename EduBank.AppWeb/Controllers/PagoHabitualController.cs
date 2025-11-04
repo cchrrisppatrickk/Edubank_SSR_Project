@@ -287,6 +287,12 @@ namespace EduBank.AppWeb.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
+
+        public class CambiarEstadoRequest : Controllers.CambiarEstadoRequest
+        {
+            public int PagoHabitualId { get; set; }
+            public bool Activo { get; set; }
+        }
     }
 
     // Clase auxiliar para el request de cambiar estado
