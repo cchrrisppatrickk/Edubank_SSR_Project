@@ -6,7 +6,9 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace EduBank.AppWeb.Controllers
 {
@@ -31,12 +33,18 @@ namespace EduBank.AppWeb.Controllers
             var gastosM = await homeRepository.ResumenMensualGastos();
             var GastosIngresos = await homeRepository.GastosIngresos();
             var recordatorios = await homeRepository.Recordatorio();
+            var graficos = new VMGraficos
+            {
+                ResumenGastos = (await homeRepository.ResumenGastos()).ResumenGastos,
+                ResumenIngresos = (await homeRepository.ResumenIngresos()).ResumenIngresos
+            };
             var home = new VMHome
             {
                 GastoM = gastosM,
                 IngresoM = ingresosM,
                 GastosIngresos = GastosIngresos,
-                Recor = recordatorios
+                Recor = recordatorios,
+                Graficos = graficos
 
             };
 

@@ -4,6 +4,9 @@ using EduBank.Models.ViewModel;
 using EduBank.Models;
 
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
+using System.Linq;
+using System;
 
 namespace EduBank.DAL;
 
@@ -93,4 +96,40 @@ public class HomeRepository : IHomeRepository
         };
     }
 
+    public async Task<VMGraficos> ResumenGastos()
+    {
+        var movimientos = await _dbContext.Movimientos
+            .Where(m => m.Tipo == "G")
+            .ToListAsync();
+
+        var resumen = movimientos
+            .GroupBy(m => new { Mes = m.CreadoEn.ToString("MMM") })
+            .Select(g => new ResumenGastos
+            {
+                Mes = g.Key.Mes,
+                Total = g.Sum(m => m.Monto)
+            })
+            .ToList();
+
+        return new VMGraficos { ResumenGastos = resumen };
+    }
+
+    public async Task<VMGraficos> ResumenIngresos()
+    {
+        var movimientos = await _dbContext.Movimientos
+            .Where(m => m.Tipo == "I")
+            .Include(m => m.Categoria)
+            .ToListAsync();
+
+        var resumen = movimientos
+            .GroupBy(m => m.Categoria.Nombre)
+            .Select(g => new ResumenIngresos
+            {
+                Categoria = g.Key,
+                Total = g.Sum(m => m.Monto)
+            })
+            .ToList();
+
+        return new VMGraficos { ResumenIngresos = resumen };
+    }
 }

@@ -1,0 +1,97 @@
+is_global = true
+build_property.TargetFramework = net8.0
+build_property.TargetFramework = net8.0
+build_property.TargetPlatformMinVersion = 
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = EduBank.AppWeb
+build_property.RootNamespace = EduBank.AppWeb
+build_property.ProjectDir = /home/syntia/capstone/Edubank_SSR_Project/EduBank.AppWeb/
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 8.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = /home/syntia/capstone/Edubank_SSR_Project/EduBank.AppWeb
+build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 8.0
+build_property.EnableCodeStyleSeverity = 
+
+[/home/syntia/capstone/Edubank_SSR_Project/EduBank.AppWeb/Views/Acceso/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjZXNvL0xvZ2luLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syntia/capstone/Edubank_SSR_Project/EduBank.AppWeb/Views/Acceso/Registrarse.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjZXNvL1JlZ2lzdHJhcnNlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syntia/capstone/Edubank_SSR_Project/EduBank.AppWeb/Views/Categoria/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ2F0ZWdvcmlhL0luZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syntia/capstone/Edubank_SSR_Project/EduBank.AppWeb/Views/Cuenta/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ3VlbnRhL0luZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syntia/capstone/Edubank_SSR_Project/EduBank.AppWeb/Views/Home/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9JbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syntia/capstone/Edubank_SSR_Project/EduBank.AppWeb/Views/Home/Privacy.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9Qcml2YWN5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syntia/capstone/Edubank_SSR_Project/EduBank.AppWeb/Views/Movimiento/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvTW92aW1pZW50by9JbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syntia/capstone/Edubank_SSR_Project/EduBank.AppWeb/Views/PagoHabitual/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUGFnb0hhYml0dWFsL0luZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syntia/capstone/Edubank_SSR_Project/EduBank.AppWeb/Views/PagoHabitual/Lista.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUGFnb0hhYml0dWFsL0xpc3RhLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syntia/capstone/Edubank_SSR_Project/EduBank.AppWeb/Views/Presentacion/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUHJlc2VudGFjaW9uL0luZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syntia/capstone/Edubank_SSR_Project/EduBank.AppWeb/Views/Shared/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL0Vycm9yLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syntia/capstone/Edubank_SSR_Project/EduBank.AppWeb/Views/Shared/_LayoutPresentation.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19MYXlvdXRQcmVzZW50YXRpb24uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syntia/capstone/Edubank_SSR_Project/EduBank.AppWeb/Views/Shared/_ValidationScriptsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syntia/capstone/Edubank_SSR_Project/EduBank.AppWeb/Views/Transferencia/Historial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVHJhbnNmZXJlbmNpYS9IaXN0b3JpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syntia/capstone/Edubank_SSR_Project/EduBank.AppWeb/Views/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syntia/capstone/Edubank_SSR_Project/EduBank.AppWeb/Views/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syntia/capstone/Edubank_SSR_Project/EduBank.AppWeb/Views/Shared/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = b-amselsouii

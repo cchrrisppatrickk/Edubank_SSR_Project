@@ -1,0 +1,15 @@
+/home/syntia/capstone/Edubank_SSR_Project/EduBank.Models/bin/Debug/net8.0/EduBank.Models.deps.json
+/home/syntia/capstone/Edubank_SSR_Project/EduBank.Models/bin/Debug/net8.0/EduBank.Models.runtimeconfig.json
+/home/syntia/capstone/Edubank_SSR_Project/EduBank.Models/bin/Debug/net8.0/EduBank.Models.dll
+/home/syntia/capstone/Edubank_SSR_Project/EduBank.Models/bin/Debug/net8.0/EduBank.Models.pdb
+/home/syntia/capstone/Edubank_SSR_Project/EduBank.Models/obj/Debug/net8.0/EduBank.Models.csproj.AssemblyReference.cache
+/home/syntia/capstone/Edubank_SSR_Project/EduBank.Models/obj/Debug/net8.0/EduBank.Models.GeneratedMSBuildEditorConfig.editorconfig
+/home/syntia/capstone/Edubank_SSR_Project/EduBank.Models/obj/Debug/net8.0/EduBank.Models.AssemblyInfoInputs.cache
+/home/syntia/capstone/Edubank_SSR_Project/EduBank.Models/obj/Debug/net8.0/EduBank.Models.AssemblyInfo.cs
+/home/syntia/capstone/Edubank_SSR_Project/EduBank.Models/obj/Debug/net8.0/EduBank.Models.csproj.CoreCompileInputs.cache
+/home/syntia/capstone/Edubank_SSR_Project/EduBank.Models/obj/Debug/net8.0/EduBank.Models.sourcelink.json
+/home/syntia/capstone/Edubank_SSR_Project/EduBank.Models/obj/Debug/net8.0/EduBank.Models.dll
+/home/syntia/capstone/Edubank_SSR_Project/EduBank.Models/obj/Debug/net8.0/refint/EduBank.Models.dll
+/home/syntia/capstone/Edubank_SSR_Project/EduBank.Models/obj/Debug/net8.0/EduBank.Models.pdb
+/home/syntia/capstone/Edubank_SSR_Project/EduBank.Models/obj/Debug/net8.0/EduBank.Models.genruntimeconfig.cache
+/home/syntia/capstone/Edubank_SSR_Project/EduBank.Models/obj/Debug/net8.0/ref/EduBank.Models.dll

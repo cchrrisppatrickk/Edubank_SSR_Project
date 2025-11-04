@@ -1,11 +1,15 @@
 
+using System;
 using EduBank.BLL.Services;
 using EduBank.DAL.DataContext;
 using EduBank.DAL.Repository;
 using EduBank.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
 

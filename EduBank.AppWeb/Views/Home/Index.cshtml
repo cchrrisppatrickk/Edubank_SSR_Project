@@ -1,9 +1,8 @@
-﻿@using System.Security.Claims;
-@using Azure.Identity
+﻿@using Azure.Identity
 @using EduBank.Models.ViewModel
 @model EduBank.Models.ViewModel.VMHome;
 @{
-    ViewData["Title"] = "Dashboard Financiero";
+   
     string iniciales = "";
     if (User.Identity.IsAuthenticated)
     {
@@ -46,10 +45,7 @@
                     <div style="font-weight: 600;">@User.Identity.Name</div>
                     <div style="font-size: 14px; color: var(--sy-text-secondary);">Administrador</div>
                 </div>
-                <div style="position: relative;">
-                    <i class="fas fa-bell" style="font-size: 20px; color: var(--sy-gray); cursor: pointer;"></i>
-                    <div class="sy-notification-badge">3</div>
-                </div>
+               
             </div>
         }
     </header>
@@ -149,39 +145,21 @@
                 Recordatorios
             </div>
             <ul class="sy-reminders-list">
-                <li class="sy-reminder-item">
+                @foreach(var data in Model.Recor.recordatorio){
+                    <li class="sy-reminder-item">
                     <div class="sy-reminder-icon">
                         <i class="fas fa-bolt"></i>
                     </div>
                     <div class="sy-reminder-text">
-                        <div class="sy-reminder-title">Paga el servicio de gas antes del 21/11/25</div>
+                        <div class="sy-reminder-title">@data.Nombre  </div>
+                            <div class="sy-reminder-description"> @data.Comentario</div>
                         <div class="sy-reminder-date">
-                            <i class="far fa-clock"></i> Vence en 5 días
+                            <i class="far fa-clock"></i>Vence  @data.FechaFin 
                         </div>
                     </div>
                 </li>
-                <li class="sy-reminder-item">
-                    <div class="sy-reminder-icon">
-                        <i class="fas fa-file-invoice-dollar"></i>
-                    </div>
-                    <div class="sy-reminder-text">
-                        <div class="sy-reminder-title">Revisar estado de cuenta bancaria</div>
-                        <div class="sy-reminder-date">
-                            <i class="far fa-clock"></i> Vence en 2 días
-                        </div>
-                    </div>
-                </li>
-                <li class="sy-reminder-item">
-                    <div class="sy-reminder-icon">
-                        <i class="fas fa-shopping-cart"></i>
-                    </div>
-                    <div class="sy-reminder-text">
-                        <div class="sy-reminder-title">Renovar suscripción a servicios</div>
-                        <div class="sy-reminder-date">
-                            <i class="far fa-clock"></i> Vence en 7 días
-                        </div>
-                    </div>
-                </li>
+                }
+               
             </ul>
         </div>
     </div>
@@ -197,13 +175,14 @@
         document.addEventListener('DOMContentLoaded', function () {
             // Gráfico de gastos (área)
             const expensesCtx = document.getElementById('sy-expensesChart').getContext('2d');
+            const expensesData = @Html.Raw(Json.Serialize(Model.Graficos.ResumenGastos));
             const expensesChart = new Chart(expensesCtx, {
                 type: 'line',
-                data: {<
-                    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                data: {
+                    labels: expensesData.map(d => d.mes),
                     datasets: [{
                         label: 'Gastos',
-                        data: [18000, 19000, 21000, 22000, 20000, 23000, 25000, 24000, 22000, 21000, 23000, 21500],
+                        data: expensesData.map(d => d.total),
                         backgroundColor: 'rgba(255, 107, 139, 0.1)',
                         borderColor: '#FF6B8B',
                         borderWidth: 3,
@@ -232,7 +211,7 @@
                             },
                             ticks: {
                                 callback: function (value) {
-                                    return '$' + value.toLocaleString();
+                                    return 'S/.' + value.toLocaleString();
                                 }
                             }
                         },
@@ -247,12 +226,13 @@
 
             // Gráfico de ingresos (dona)
             const incomeCtx = document.getElementById('sy-incomeChart').getContext('2d');
+            const incomeData = @Html.Raw(Json.Serialize(Model.Graficos.ResumenIngresos));
             const incomeChart = new Chart(incomeCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Salario', 'Inversiones', 'Freelance', 'Otros'],
+                    labels: incomeData.map(d => d.categoria),
                     datasets: [{
-                        data: [65, 15, 15, 5],
+                        data: incomeData.map(d => d.total),
                         backgroundColor: [
                             '#6C63FF',
                             '#00D4AA',
