@@ -1,4 +1,7 @@
 using EduBank.AppWeb.Models;
+using EduBank.DAL;
+using EduBank.DAL.DataContext;
+using EduBank.Models.ViewModel;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -10,19 +13,39 @@ namespace EduBank.AppWeb.Controllers
     [Authorize]
     public class HomeController : Controller
     {
-       
-        private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        private readonly ILogger<HomeController> _logger;
+        private readonly HomeRepository homeRepository;
+        private readonly EdubanckssrContext context;
+
+
+        public HomeController(ILogger<HomeController> logger, EdubanckssrContext context)
         {
             _logger = logger;
+            homeRepository = new HomeRepository(context);
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
-        }
+            var ingresosM = await homeRepository.ResumenMensualIngresos();
+            var gastosM = await homeRepository.ResumenMensualGastos();
+            var GastosIngresos = await homeRepository.GastosIngresos();
+            var recordatorios = await homeRepository.Recordatorio();
+            var home = new VMHome
+            {
+                GastoM = gastosM,
+                IngresoM = ingresosM,
+                GastosIngresos = GastosIngresos,
+                Recor = recordatorios
 
+            };
+
+            return View(home);
+        }
+        public async Task<IActionResult> ResumenIngresos()
+        {
+            return Json(new { mensaje = "hola" });
+        }
         public IActionResult Privacy()
         {
             return View();
@@ -38,7 +61,7 @@ namespace EduBank.AppWeb.Controllers
         public async Task<IActionResult> Salir()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("Login","Acceso");
+            return RedirectToAction("Login", "Acceso");
         }
 
 
