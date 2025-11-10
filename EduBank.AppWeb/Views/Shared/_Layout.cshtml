@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿﻿
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -226,14 +227,6 @@
             border-radius: 50%;
         }
 
-        .content-header {
-            background: white;
-            border-radius: 10px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        }
-
         /* ===== FOOTER ===== */
         .footer {
             background: white;
@@ -266,32 +259,30 @@
         }
 
         @@media (max-width: 768px) {
-            .sidebar
+            .sidebar {
+                transform: translateX(-100%);
+                width: var(--sidebar-width);
+            }
 
-        {
-            transform: translateX(-100%);
-            width: var(--sidebar-width);
-        }
+                .sidebar.mobile-visible {
+                    transform: translateX(0);
+                }
 
-        .sidebar.mobile-visible {
-            transform: translateX(0);
-        }
+            .main-content {
+                margin-left: 0 !important;
+                width: 100%;
+            }
 
-        .main-content {
-            margin-left: 0 !important;
-            width: 100%;
-        }
+            .footer {
+                width: 100% !important;
+            }
 
-        .footer {
-            width: 100% !important;
-        }
-
-        .mobile-toggle {
-            display: block;
-        }
-
+            .mobile-toggle {
+                display: block;
+            }
         }
     </style>
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
     <button class="mobile-toggle d-none" id="mobileToggle">
@@ -335,13 +326,13 @@
 
                 <a asp-area="" asp-controller="PagoHabitual" asp-action="Index" class="sidebar-link">
                     <i class="fas fa-repeat me-3"></i>
-                    <span class="hide-on-collapse">Pagos Habituales</span>
+                    <span class="hide-on-collapse">Pagos Habituales (Beta)</span>
                 </a>
-
+@* 
                 <a asp-area="" asp-controller="Recordatorios" asp-action="Index" class="sidebar-link">
                     <i class="fas fa-bell me-3"></i>
                     <span class="hide-on-collapse">Recordatorios</span>
-                </a>
+                </a> *@
             </div>
 
             <!-- Perfil -->
@@ -396,13 +387,15 @@
         </div>
     </footer>
 
+
+
     <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
-    <!-- Incluir el chatbot solo si el usuario está autenticado -->
+     <!-- Incluir el chatbot solo si el usuario está autenticado -->
     @if (User.Identity.IsAuthenticated)
     {
         <partial name="_Chatbot" />

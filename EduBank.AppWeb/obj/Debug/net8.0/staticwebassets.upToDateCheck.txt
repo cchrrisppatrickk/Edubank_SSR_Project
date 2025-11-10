@@ -1,3 +1,4 @@
+wwwroot\css\Home.css
 wwwroot\css\site.css
 wwwroot\favicon.ico
 wwwroot\img\3.jpg
@@ -10,9 +11,15 @@ wwwroot\js\categorias\index.js
 wwwroot\js\categorias\listar.js
 wwwroot\js\categorias\modales.js
 wwwroot\js\categorias\utils.js
+wwwroot\js\demo\chart-area-demo.js
+wwwroot\js\demo\chart-bar-demo.js
+wwwroot\js\demo\chart-pie-demo.js
+wwwroot\js\demo\datatables-demo.js
 wwwroot\js\movimientos\listas.js
 wwwroot\js\movimientos\movimientos-manager.js
 wwwroot\js\movimientos\utils.js
+wwwroot\js\sb-admin-2.js
+wwwroot\js\sb-admin-2.min.js
 wwwroot\js\site.js
 wwwroot\lib\bootstrap\dist\css\bootstrap.css
 wwwroot\lib\bootstrap\dist\css\bootstrap.css.map

@@ -452,6 +452,7 @@
             color: white;
         }
     </style>
+
 </head>
 <body>
     <button id="chatbot-toggler">
@@ -526,7 +527,7 @@
 
                 // Configuración de la API
                 // IMPORTANTE: Reemplaza con tu API Key real
-                const API_KEY = "TU API KEY DE GEMINIAI AQUI";
+                const API_KEY = "AIzaSyCEy8MRr3hDXTA8KEzWO0AUEklxU6B5uSs";
                 const ai = new GoogleGenAI({ apiKey: API_KEY });
 
                 // Crear sesión de chat
@@ -539,26 +540,28 @@
                     // Contexto específico para EduBank
                     context: `Eres un asistente especializado en finanzas personales para la aplicación EduBank.
 
-        EduBank es una aplicación que permite a los usuarios:
-        - Gestionar movimientos financieros (ingresos y gastos)
-        - Organizar categorías personalizadas
-        - Administrar múltiples cuentas bancarias
-        - Programar pagos habituales
-        - Ver estadísticas y reportes
+                    EduBank es una aplicación que permite a los usuarios:
+                    - Gestionar movimientos financieros (ingresos y gastos)
+                    - Organizar categorías personalizadas
+                    - Administrar múltiples cuentas bancarias
+                    - Programar pagos habituales
+                    - Ver estadísticas y reportes
 
-        Puedes ayudar con:
-        - Explicar cómo usar las diferentes funcionalidades
-        - Dar consejos sobre organización financiera
-        - Ayudar a interpretar reportes
-        - Sugerir mejores prácticas de presupuesto
+                    Puedes ayudar con:
+                    - Explicar cómo usar las diferentes funcionalidades
+                    - Dar consejos sobre organización financiera
+                    - Ayudar a interpretar reportes
+                    - Sugerir mejores prácticas de presupuesto
 
-        Sé amable, profesional y enfocado en ayudar con temas financieros.`
+                    Sé amable, profesional y enfocado en ayudar con temas financieros.`
                 });
 
                 // Datos del usuario
                 const userData = {
                     message: null
                 };
+
+                // ========== FUNCIONES DE UTILIDAD ==========
 
                 // Scroll al último mensaje
                 const scrollToLatestMessage = () => {
@@ -610,14 +613,152 @@
                     return thinkingDiv;
                 };
 
+                // ========== FUNCIONES DE INTEGRACIÓN CON BACKEND ==========
+
+                // Obtener datos del usuario desde el backend
+                const obtenerDatosUsuario = async () => {
+                    try {
+                        const response = await fetch('/Chatbot/ObtenerDatosUsuario');
+                        if (!response.ok) throw new Error('Error al obtener datos');
+                        return await response.json();
+                    } catch (error) {
+                        console.error('Error:', error);
+                        return null;
+                    }
+                };
+
+                // Obtener estadísticas
+                const obtenerEstadisticas = async () => {
+                    try {
+                        const response = await fetch('/Chatbot/ObtenerEstadisticas');
+                        if (!response.ok) throw new Error('Error al obtener estadísticas');
+                        return await response.json();
+                    } catch (error) {
+                        console.error('Error:', error);
+                        return null;
+                    }
+                };
+
+                // Obtener movimientos por período
+                const obtenerMovimientosPorPeriodo = async (periodo = 'mes') => {
+                    try {
+                        const response = await fetch(`/Chatbot/ObtenerMovimientosPorPeriodo?periodo=${periodo}`);
+                        if (!response.ok) throw new Error('Error al obtener movimientos');
+                        return await response.json();
+                    } catch (error) {
+                        console.error('Error:', error);
+                        return null;
+                    }
+                };
+
+                // Contexto específico para EduBank con acceso a datos reales
+                const actualizarContextoChatbot = async () => {
+                    const datosUsuario = await obtenerDatosUsuario();
+
+                    if (!datosUsuario) {
+                        return `Eres un asistente especializado en finanzas personales para la aplicación EduBank.
+
+                    EduBank es una aplicación que permite a los usuarios:
+                    - Gestionar movimientos financieros (ingresos y gastos)
+                    - Organizar categorías personalizadas
+                    - Administrar múltiples cuentas bancarias
+                    - Programar pagos habituales
+                    - Ver estadísticas y reportes
+
+                    Puedes ayudar con:
+                    - Explicar cómo usar las diferentes funcionalidades
+                    - Dar consejos sobre organización financiera
+                    - Ayudar a interpretar reportes
+                    - Sugerir mejores prácticas de presupuesto
+
+                    Sé amable, profesional y enfocado en ayudar con temas financieros.`;
+                                }
+
+                                return `Eres un asistente especializado en finanzas personales para la aplicación EduBank.
+
+                    INFORMACIÓN DEL USUARIO ACTUAL:
+                    - Saldo total: $${datosUsuario.saldoTotal}
+                    - Total ingresos: $${datosUsuario.totalIngresos}
+                    - Total gastos: $${datosUsuario.totalGastos}
+                    - Cuentas activas: ${datosUsuario.cuentas.filter(c => c.activo).length}
+                    - Categorías: ${datosUsuario.categorias.length}
+
+                    DATOS DISPONIBLES:
+                    - Movimientos recientes (últimos 50)
+                    - Todas las cuentas y categorías
+                    - Pagos habituales programados
+                    - Estadísticas detalladas
+
+                    FUNCIONALIDADES:
+                    1. Consultar saldos y movimientos
+                    2. Analizar gastos por categoría
+                    3. Revisar pagos programados
+                    4. Proporcionar insights financieros
+                    5. Sugerir optimizaciones de presupuesto
+
+                    INSTRUCCIONES ESPECÍFICAS:
+                    - Cuando el usuario pregunte sobre sus finanzas, usa los datos reales disponibles
+                    - Para consultas específicas, puedes acceder a movimientos, cuentas y categorías
+                    - Proporciona análisis basado en los patrones de gasto reales
+                    - Sugiere mejoras basadas en los datos históricos
+
+                    Sé preciso, útil y enfocado en ayudar al usuario a entender y mejorar su situación financiera.`;
+                };
+
+                // Procesar consultas financieras específicas
+                const procesarConsultaFinanciera = async (consulta) => {
+                    const consultaLower = consulta.toLowerCase();
+                    let datosEspecificos = null;
+                    let contextoAdicional = '';
+
+                    // Detectar tipo de consulta y obtener datos relevantes
+                    if (consultaLower.includes('saldo') || consultaLower.includes('cuánto tengo')) {
+                        datosEspecificos = await obtenerDatosUsuario();
+                        if (datosEspecificos) {
+                            contextoAdicional = `\n\nDATOS ACTUALES DE SALDOS:
+        - Saldo total: $${datosEspecificos.saldoTotal}
+        - Cuentas activas:
+        ${datosEspecificos.cuentas.filter(c => c.activo).map(c => `  • ${c.nombre}: $${c.saldo} ${c.moneda}`).join('\n')}`;
+                        }
+                    }
+                    else if (consultaLower.includes('gasto') || consultaLower.includes('gasté') || consultaLower.includes('egreso')) {
+                        datosEspecificos = await obtenerEstadisticas();
+                        if (datosEspecificos) {
+                            contextoAdicional = `\n\nANÁLISIS DE GASTOS:
+        - Total gastos recientes: $${datosEspecificos.gastosPorCategoria.reduce((sum, cat) => sum + cat.total, 0)}
+        - Distribución por categoría:
+        ${datosEspecificos.gastosPorCategoria.map(cat => `  • ${cat.categoriaNombre}: $${cat.total}`).join('\n')}`;
+                        }
+                    }
+                    else if (consultaLower.includes('movimiento') || consultaLower.includes('transacción')) {
+                        datosEspecificos = await obtenerMovimientosPorPeriodo('mes');
+                        if (datosEspecificos && datosEspecificos.length > 0) {
+                            const ultimosMovimientos = datosEspecificos.slice(0, 5);
+                            contextoAdicional = `\n\nÚLTIMOS MOVIMIENTOS:
+        ${ultimosMovimientos.map(m => `  • ${m.fechaOperacion.split('T')[0]} - ${m.tipo === 'G' ? 'GASTO' : 'INGRESO'}: $${m.monto} - ${m.comentario || 'Sin descripción'}`).join('\n')}`;
+                        }
+                    }
+
+                    return contextoAdicional;
+                };
+
+                // ========== FUNCIONES PRINCIPALES ==========
+
                 // Generar respuesta del bot
                 const generateBotResponse = async (thinkingElement) => {
                     const messageElement = thinkingElement.querySelector(".message-text");
 
                     try {
-                        // Enviar mensaje al chat
+                        // Procesar consulta y obtener contexto adicional
+                        const contextoAdicional = await procesarConsultaFinanciera(userData.message);
+
+                        // Actualizar contexto del chat con datos reales
+                        const contextoActualizado = await actualizarContextoChatbot();
+
+                        // Enviar mensaje al chat con contexto actualizado
                         const response = await chat.sendMessage({
-                            message: userData.message
+                            message: `${userData.message}\n\n${contextoAdicional}`,
+                            context: contextoActualizado
                         });
 
                         // Reemplazar el indicador de pensando con la respuesta real
@@ -628,7 +769,6 @@
                         messageElement.innerHTML = "Lo siento, hubo un error al procesar tu solicitud. Verifica tu conexión y API key.";
                         messageElement.classList.add("error");
                     } finally {
-                        // Limpiar datos y actualizar UI
                         thinkingElement.classList.remove("thinking");
                         scrollToLatestMessage();
                     }
@@ -658,6 +798,8 @@
                         generateBotResponse(thinkingElement);
                     }, 600);
                 };
+
+                // ========== EVENT LISTENERS ==========
 
                 // Enviar mensaje con Enter (sin Shift)
                 messageInput.addEventListener("keydown", (e) => {

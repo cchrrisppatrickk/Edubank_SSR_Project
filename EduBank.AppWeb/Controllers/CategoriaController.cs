@@ -1,4 +1,7 @@
-﻿using EduBank.BLL.Services;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using EduBank.BLL.Services;
 using EduBank.Models;
 using EduBank.Models.ViewModel;
 using Microsoft.AspNetCore.Authorization;
@@ -102,7 +105,7 @@ namespace EduBank.AppWeb.Controllers
             }
         }
 
-        [HttpGet]   
+        [HttpGet]
         public async Task<IActionResult> Lista()
         {
             try
