@@ -506,326 +506,455 @@
         </div>
     </div>
 
-    <!-- Importar el SDK de Google GenAI -->
-    <script type="importmap">
-        {
-            "imports": {
-                "@@google/genai": "https://esm.run/@@google/genai"
-            }
-        }
-    </script>
-
     <script type="module">
-                import { GoogleGenAI } from "@@google/genai";
+            // Elementos del DOM
+            const messagesContent = document.querySelector(".messages-content");
+            const messageInput = document.querySelector(".message-input");
+            const sendMessageButton = document.querySelector("#send-message");
+            const chatbotToggler = document.querySelector("#chatbot-toggler");
+            const closeChatbot = document.querySelector("#close-chatbot");
 
-                // Elementos del DOM
-                const messagesContent = document.querySelector(".messages-content");
-                const messageInput = document.querySelector(".message-input");
-                const sendMessageButton = document.querySelector("#send-message");
-                const chatbotToggler = document.querySelector("#chatbot-toggler");
-                const closeChatbot = document.querySelector("#close-chatbot");
+            // Configuración de OpenRouter
+            const OPENROUTER_API_KEY = "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";
+            const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
+            const SITE_URL = window.location.origin;
+            const SITE_NAME = "EduBank Chatbot";
 
-                // Configuración de la API
-                // IMPORTANTE: Reemplaza con tu API Key real
-                const API_KEY = "AIzaSyCEy8MRr3hDXTA8KEzWO0AUEklxU6B5uSs";
-                const ai = new GoogleGenAI({ apiKey: API_KEY });
+            // Cache de datos para evitar llamadas repetidas
+            let cacheDatos = {
+                usuario: null,
+                movimientos: null,
+                timestamp: null,
+                duracionCache: 30000 // 30 segundos
+            };
 
-                // Crear sesión de chat
-                const chat = ai.chats.create({
-                    model: "gemini-2.0-flash-exp",
-                    config: {
-                        temperature: 0.7,
-                        maxOutputTokens: 1000,
-                    },
-                    // Contexto específico para EduBank
-                    context: `Eres un asistente especializado en finanzas personales para la aplicación EduBank.
+            // Historial de conversación
+            let conversationHistory = [
+                {
+                    role: "system",
+                    content: `Eres un asistente especializado en finanzas personales para EduBank.
 
-                    EduBank es una aplicación que permite a los usuarios:
-                    - Gestionar movimientos financieros (ingresos y gastos)
-                    - Organizar categorías personalizadas
-                    - Administrar múltiples cuentas bancarias
-                    - Programar pagos habituales
-                    - Ver estadísticas y reportes
+        INSTRUCCIONES CRÍTICAS:
+        - Para análisis (mayor gasto, promedios, tendencias): Usa [CONTEXTO_ANALITICO] que contiene cálculos específicos
+        - Para listas completas (categorías): Muestra TODOS los elementos, no solo algunos
+        - Los datos son EN TIEMPO REAL desde la base de datos de EduBank
+        - Si el usuario pregunta por datos recientes, confirma que son actualizados al momento
 
-                    Puedes ayudar con:
-                    - Explicar cómo usar las diferentes funcionalidades
-                    - Dar consejos sobre organización financiera
-                    - Ayudar a interpretar reportes
-                    - Sugerir mejores prácticas de presupuesto
+        RESPUESTAS ESPERADAS:
+        • "categorías de gastos" → Lista COMPLETA de todas las categorías de gastos activas
+        • "mayor gasto" → Análisis del movimiento más alto con detalles específicos
+        • "datos actuales" → Confirmar que son datos en tiempo real
 
-                    Sé amable, profesional y enfocado en ayudar con temas financieros.`
-                });
+        NUNCA inventes información. Si no hay datos, di la verdad.`
+                }
+            ];
 
-                // Datos del usuario
-                const userData = {
-                    message: null
-                };
+            // Datos del usuario
+            const userData = {
+                message: null
+            };
 
-                // ========== FUNCIONES DE UTILIDAD ==========
+            // ========== FUNCIONES DE UTILIDAD ==========
 
-                // Scroll al último mensaje
-                const scrollToLatestMessage = () => {
-                    messagesContent.scrollTo({ top: messagesContent.scrollHeight, behavior: "smooth" });
-                };
+            // Scroll al último mensaje
+            const scrollToLatestMessage = () => {
+                messagesContent.scrollTo({ top: messagesContent.scrollHeight, behavior: "smooth" });
+            };
 
-                // Crear elemento de mensaje
-                const createMessageElement = (content, isUser = false) => {
-                    const messageDiv = document.createElement("div");
-                    messageDiv.classList.add("message", "new");
+            // Crear elemento de mensaje
+            const createMessageElement = (content, isUser = false) => {
+                const messageDiv = document.createElement("div");
+                messageDiv.classList.add("message", "new");
 
-                    if (isUser) {
-                        messageDiv.classList.add("user-message");
-                        messageDiv.innerHTML = `<div class="message-text">${content}</div>`;
-                    } else {
-                        messageDiv.classList.add("bot-message");
-                        messageDiv.innerHTML = `
-                            <div class="bot-avatar">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
-                                    <path d="M738.3 287.6H285.7c-59 0-106.8 47.8-106.8 106.8v303.1c0 59 47.8 106.8 106.8 106.8h81.5v111.1c0 .7.8 1.1 1.4.7l166.9-110.6 41.8-.8h117.4l43.6-.4c59 0 106.8-47.8 106.8-106.8V394.5c0-59-47.8-106.9-106.8-106.9zM351.7 448.2c0-29.5 23.9-53.5 53.5-53.5s53.5 23.9 53.5 53.5-23.9 53.5-53.5 53.5-53.5-23.9-53.5-53.5zm157.9 267.1c-67.8 0-123.8-47.5-132.3-109h264.6c-8.6 61.5-64.5 109-132.3 109zm110-213.7c-29.5 0-53.5-23.9-53.5-53.5s23.9-53.5 53.5-53.5 53.5 23.9 53.5 53.5-23.9 53.5-53.5 53.5zM867.2 644.5V453.1h26.5c19.4 0 35.1 15.7 35.1 35.1v121.1c0 19.4-15.7 35.1-35.1 35.1h-26.5zM95.2 609.4V488.2c0-19.4 15.7-35.1 35.1-35.1h26.5v191.3h-26.5c-19.4 0-35.1-15.7-35.1-35.1zM561.5 149.6c0 23.4-15.6 43.3-36.9 49.7v44.9h-30v-44.9c-21.4-6.5-36.9-26.3-36.9-49.7 0-28.6 23.3-51.9 51.9-51.9s51.9 23.3 51.9 51.9z"></path>
-                                </svg>
-                            </div>
-                            <div class="message-text">${content}</div>
-                        `;
-                    }
-
-                    return messageDiv;
-                };
-
-                // Crear elemento de "pensando"
-                const createThinkingElement = () => {
-                    const thinkingDiv = document.createElement("div");
-                    thinkingDiv.classList.add("message", "bot-message", "thinking");
-                    thinkingDiv.innerHTML = `
+                if (isUser) {
+                    messageDiv.classList.add("user-message");
+                    messageDiv.innerHTML = `<div class="message-text">${content}</div>`;
+                } else {
+                    messageDiv.classList.add("bot-message");
+                    messageDiv.innerHTML = `
                         <div class="bot-avatar">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
                                 <path d="M738.3 287.6H285.7c-59 0-106.8 47.8-106.8 106.8v303.1c0 59 47.8 106.8 106.8 106.8h81.5v111.1c0 .7.8 1.1 1.4.7l166.9-110.6 41.8-.8h117.4l43.6-.4c59 0 106.8-47.8 106.8-106.8V394.5c0-59-47.8-106.9-106.8-106.9zM351.7 448.2c0-29.5 23.9-53.5 53.5-53.5s53.5 23.9 53.5 53.5-23.9 53.5-53.5 53.5-53.5-23.9-53.5-53.5zm157.9 267.1c-67.8 0-123.8-47.5-132.3-109h264.6c-8.6 61.5-64.5 109-132.3 109zm110-213.7c-29.5 0-53.5-23.9-53.5-53.5s23.9-53.5 53.5-53.5 53.5 23.9 53.5 53.5-23.9 53.5-53.5 53.5zM867.2 644.5V453.1h26.5c19.4 0 35.1 15.7 35.1 35.1v121.1c0 19.4-15.7 35.1-35.1 35.1h-26.5zM95.2 609.4V488.2c0-19.4 15.7-35.1 35.1-35.1h26.5v191.3h-26.5c-19.4 0-35.1-15.7-35.1-35.1zM561.5 149.6c0 23.4-15.6 43.3-36.9 49.7v44.9h-30v-44.9c-21.4-6.5-36.9-26.3-36.9-49.7 0-28.6 23.3-51.9 51.9-51.9s51.9 23.3 51.9 51.9z"></path>
                             </svg>
                         </div>
-                        <div class="message-text">
-                            <div class="thinking-indicator">
-                                <div class="dot"></div>
-                                <div class="dot"></div>
-                                <div class="dot"></div>
-                            </div>
-                        </div>
+                        <div class="message-text">${content}</div>
                     `;
+                }
 
-                    return thinkingDiv;
+                return messageDiv;
+            };
+
+            // Crear elemento de "pensando"
+            const createThinkingElement = () => {
+                const thinkingDiv = document.createElement("div");
+                thinkingDiv.classList.add("message", "bot-message", "thinking");
+                thinkingDiv.innerHTML = `
+                    <div class="bot-avatar">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+                            <path d="M738.3 287.6H285.7c-59 0-106.8 47.8-106.8 106.8v303.1c0 59 47.8 106.8 106.8 106.8h81.5v111.1c0 .7.8 1.1 1.4.7l166.9-110.6 41.8-.8h117.4l43.6-.4c59 0 106.8-47.8 106.8-106.8V394.5c0-59-47.8-106.9-106.8-106.9zM351.7 448.2c0-29.5 23.9-53.5 53.5-53.5s53.5 23.9 53.5 53.5-23.9 53.5-53.5 53.5-53.5-23.9-53.5-53.5zm157.9 267.1c-67.8 0-123.8-47.5-132.3-109h264.6c-8.6 61.5-64.5 109-132.3 109zm110-213.7c-29.5 0-53.5-23.9-53.5-53.5s23.9-53.5 53.5-53.5 53.5 23.9 53.5 53.5-23.9 53.5-53.5 53.5zM867.2 644.5V453.1h26.5c19.4 0 35.1 15.7 35.1 35.1v121.1c0 19.4-15.7 35.1-35.1 35.1h-26.5zM95.2 609.4V488.2c0-19.4 15.7-35.1 35.1-35.1h26.5v191.3h-26.5c-19.4 0-35.1-15.7-35.1-35.1zM561.5 149.6c0 23.4-15.6 43.3-36.9 49.7v44.9h-30v-44.9c-21.4-6.5-36.9-26.3-36.9-49.7 0-28.6 23.3-51.9 51.9-51.9s51.9 23.3 51.9 51.9z"></path>
+                        </svg>
+                    </div>
+                    <div class="message-text">
+                        <div class="thinking-indicator">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
+                    </div>
+                `;
+
+                return thinkingDiv;
+            };
+
+            // ========== SISTEMA DE CACHE Y ACTUALIZACIÓN ==========
+
+            // Verificar si el cache está expirado
+            const isCacheExpirado = () => {
+                if (!cacheDatos.timestamp) return true;
+                return (Date.now() - cacheDatos.timestamp) > cacheDatos.duracionCache;
+            };
+
+            // Obtener datos con cache inteligente
+            const obtenerDatosUsuarioConCache = async (forzarActualizacion = false) => {
+                if (!forzarActualizacion && !isCacheExpirado() && cacheDatos.usuario) {
+                    return cacheDatos.usuario;
+                }
+
+                try {
+                    const response = await fetch('/Chatbot/ObtenerDatosUsuario');
+                    if (!response.ok) throw new Error('Error al obtener datos');
+                    const datos = await response.json();
+
+                    // Actualizar cache
+                    cacheDatos.usuario = datos;
+                    cacheDatos.timestamp = Date.now();
+
+                    return datos;
+                } catch (error) {
+                    console.error('Error:', error);
+                    return null;
+                }
+            };
+
+            // Obtener movimientos con cache
+            const obtenerMovimientosConCache = async (periodo = 'mes', forzarActualizacion = false) => {
+                if (!forzarActualizacion && !isCacheExpirado() && cacheDatos.movimientos) {
+                    return cacheDatos.movimientos;
+                }
+
+                try {
+                    const response = await fetch(`/Chatbot/ObtenerMovimientosPorPeriodo?periodo=${periodo}`);
+                    if (!response.ok) throw new Error('Error al obtener movimientos');
+                    const movimientos = await response.json();
+
+                    // Actualizar cache
+                    cacheDatos.movimientos = movimientos;
+                    cacheDatos.timestamp = Date.now();
+
+                    return movimientos;
+                } catch (error) {
+                    console.error('Error:', error);
+                    return null;
+                }
+            };
+
+            // Forzar actualización de datos
+            const forzarActualizacionDatos = async () => {
+                cacheDatos.timestamp = null;
+                cacheDatos.usuario = null;
+                cacheDatos.movimientos = null;
+                return await obtenerDatosUsuarioConCache(true);
+            };
+
+            // ========== ANÁLISIS AVANZADO DE DATOS ==========
+
+            // Calcular mayor gasto
+            const calcularMayorGasto = (movimientos) => {
+                if (!movimientos || movimientos.length === 0) return null;
+
+                const gastos = movimientos.filter(m => m.tipo === 'G' || m.tipo === 'Egreso');
+                if (gastos.length === 0) return null;
+
+                const mayorGasto = gastos.reduce((max, movimiento) => {
+                    return parseFloat(movimiento.monto) > parseFloat(max.monto) ? movimiento : max;
+                }, gastos[0]);
+
+                return {
+                    monto: parseFloat(mayorGasto.monto).toFixed(2),
+                    categoria: mayorGasto.categoria || mayorGasto.CategoriaNombre || 'Sin categoría',
+                    cuenta: mayorGasto.cuenta || mayorGasto.CuentaNombre || 'Sin cuenta',
+                    fecha: mayorGasto.fechaOperacion ? mayorGasto.fechaOperacion.split('T')[0] : 'Fecha no disponible',
+                    comentario: mayorGasto.comentario || ''
                 };
+            };
 
-                // ========== FUNCIONES DE INTEGRACIÓN CON BACKEND ==========
+            // Calcular promedios y estadísticas
+            const calcularEstadisticas = (movimientos) => {
+                if (!movimientos || movimientos.length === 0) return null;
 
-                // Obtener datos del usuario desde el backend
-                const obtenerDatosUsuario = async () => {
-                    try {
-                        const response = await fetch('/Chatbot/ObtenerDatosUsuario');
-                        if (!response.ok) throw new Error('Error al obtener datos');
-                        return await response.json();
-                    } catch (error) {
-                        console.error('Error:', error);
-                        return null;
-                    }
+                const gastos = movimientos.filter(m => m.tipo === 'G' || m.tipo === 'Egreso');
+                const ingresos = movimientos.filter(m => m.tipo === 'I' || m.tipo === 'Ingreso');
+
+                const totalGastos = gastos.reduce((sum, m) => sum + parseFloat(m.monto), 0);
+                const totalIngresos = ingresos.reduce((sum, m) => sum + parseFloat(m.monto), 0);
+                const promedioGastos = gastos.length > 0 ? totalGastos / gastos.length : 0;
+                const promedioIngresos = ingresos.length > 0 ? totalIngresos / ingresos.length : 0;
+
+                // Agrupar por categoría
+                const gastosPorCategoria = {};
+                gastos.forEach(m => {
+                    const categoria = m.categoria || m.CategoriaNombre || 'Sin categoría';
+                    gastosPorCategoria[categoria] = (gastosPorCategoria[categoria] || 0) + parseFloat(m.monto);
+                });
+
+                const categoriaMayorGasto = Object.keys(gastosPorCategoria).reduce((a, b) =>
+                    gastosPorCategoria[a] > gastosPorCategoria[b] ? a : b, '');
+
+                return {
+                    totalGastos: totalGastos.toFixed(2),
+                    totalIngresos: totalIngresos.toFixed(2),
+                    promedioGastos: promedioGastos.toFixed(2),
+                    promedioIngresos: promedioIngresos.toFixed(2),
+                    cantidadMovimientos: movimientos.length,
+                    cantidadGastos: gastos.length,
+                    cantidadIngresos: ingresos.length,
+                    categoriaMayorGasto: categoriaMayorGasto,
+                    montoCategoriaMayorGasto: gastosPorCategoria[categoriaMayorGasto]?.toFixed(2) || '0.00'
                 };
+            };
 
-                // Obtener estadísticas
-                const obtenerEstadisticas = async () => {
-                    try {
-                        const response = await fetch('/Chatbot/ObtenerEstadisticas');
-                        if (!response.ok) throw new Error('Error al obtener estadísticas');
-                        return await response.json();
-                    } catch (error) {
-                        console.error('Error:', error);
-                        return null;
+            // ========== PROCESAMIENTO MEJORADO DE CONSULTAS ==========
+
+            // Procesar consultas financieras específicas
+            const procesarConsultaFinanciera = async (consulta) => {
+                const consultaLower = consulta.toLowerCase();
+                let contextoAdicional = '';
+                let forzarActualizacion = consultaLower.includes('actual') ||
+                                         consultaLower.includes('recién') ||
+                                         consultaLower.includes('reciente') ||
+                                         consultaLower.includes('ahora');
+
+                // Obtener datos actualizados
+                const datosUsuario = await obtenerDatosUsuarioConCache(forzarActualizacion);
+                const movimientos = await obtenerMovimientosConCache('mes', forzarActualizacion);
+
+                if (!datosUsuario) {
+                    return '\n\n[ERROR] No se pudieron cargar los datos. Por favor, intenta nuevamente.';
+                }
+
+                // Análisis para consultas específicas
+                if (consultaLower.includes('mayor gasto') || consultaLower.includes('gasto más alto')) {
+                    const mayorGasto = calcularMayorGasto(movimientos);
+                    if (mayorGasto) {
+                        contextoAdicional = `\n\n[CONTEXTO_ANALITICO]
+        MAYOR GASTO REGISTRADO:
+        • Monto: $${mayorGasto.monto}
+        • Categoría: ${mayorGasto.categoria}
+        • Cuenta: ${mayorGasto.cuenta}
+        • Fecha: ${mayorGasto.fecha}
+        ${mayorGasto.comentario ? `• Comentario: ${mayorGasto.comentario}` : ''}
+        [/CONTEXTO_ANALITICO]`;
                     }
-                };
+                }
 
-                // Obtener movimientos por período
-                const obtenerMovimientosPorPeriodo = async (periodo = 'mes') => {
-                    try {
-                        const response = await fetch(`/Chatbot/ObtenerMovimientosPorPeriodo?periodo=${periodo}`);
-                        if (!response.ok) throw new Error('Error al obtener movimientos');
-                        return await response.json();
-                    } catch (error) {
-                        console.error('Error:', error);
-                        return null;
+                else if (consultaLower.includes('categoría') || consultaLower.includes('categoria')) {
+                    if (datosUsuario.categorias) {
+                        const categoriasGastos = datosUsuario.categorias.filter(c => c.tipo === 'G' && c.activo);
+                        const categoriasIngresos = datosUsuario.categorias.filter(c => c.tipo === 'I' && c.activo);
+
+                        contextoAdicional = `\n\n[CONTEXTO_CATEGORIAS_COMPLETO]
+        TODAS LAS CATEGORÍAS DE GASTOS (${categoriasGastos.length}):
+        ${categoriasGastos.map(c => `• ${c.nombre}`).join('\n')}
+
+        TODAS LAS CATEGORÍAS DE INGRESOS (${categoriasIngresos.length}):
+        ${categoriasIngresos.map(c => `• ${c.nombre}`).join('\n')}
+
+        Total categorías activas: ${categoriasGastos.length + categoriasIngresos.length}
+        [/CONTEXTO_CATEGORIAS_COMPLETO]`;
                     }
-                };
+                }
 
-                // Contexto específico para EduBank con acceso a datos reales
-                const actualizarContextoChatbot = async () => {
-                    const datosUsuario = await obtenerDatosUsuario();
-
-                    if (!datosUsuario) {
-                        return `Eres un asistente especializado en finanzas personales para la aplicación EduBank.
-
-                    EduBank es una aplicación que permite a los usuarios:
-                    - Gestionar movimientos financieros (ingresos y gastos)
-                    - Organizar categorías personalizadas
-                    - Administrar múltiples cuentas bancarias
-                    - Programar pagos habituales
-                    - Ver estadísticas y reportes
-
-                    Puedes ayudar con:
-                    - Explicar cómo usar las diferentes funcionalidades
-                    - Dar consejos sobre organización financiera
-                    - Ayudar a interpretar reportes
-                    - Sugerir mejores prácticas de presupuesto
-
-                    Sé amable, profesional y enfocado en ayudar con temas financieros.`;
-                                }
-
-                                return `Eres un asistente especializado en finanzas personales para la aplicación EduBank.
-
-                    INFORMACIÓN DEL USUARIO ACTUAL:
-                    - Saldo total: $${datosUsuario.saldoTotal}
-                    - Total ingresos: $${datosUsuario.totalIngresos}
-                    - Total gastos: $${datosUsuario.totalGastos}
-                    - Cuentas activas: ${datosUsuario.cuentas.filter(c => c.activo).length}
-                    - Categorías: ${datosUsuario.categorias.length}
-
-                    DATOS DISPONIBLES:
-                    - Movimientos recientes (últimos 50)
-                    - Todas las cuentas y categorías
-                    - Pagos habituales programados
-                    - Estadísticas detalladas
-
-                    FUNCIONALIDADES:
-                    1. Consultar saldos y movimientos
-                    2. Analizar gastos por categoría
-                    3. Revisar pagos programados
-                    4. Proporcionar insights financieros
-                    5. Sugerir optimizaciones de presupuesto
-
-                    INSTRUCCIONES ESPECÍFICAS:
-                    - Cuando el usuario pregunte sobre sus finanzas, usa los datos reales disponibles
-                    - Para consultas específicas, puedes acceder a movimientos, cuentas y categorías
-                    - Proporciona análisis basado en los patrones de gasto reales
-                    - Sugiere mejoras basadas en los datos históricos
-
-                    Sé preciso, útil y enfocado en ayudar al usuario a entender y mejorar su situación financiera.`;
-                };
-
-                // Procesar consultas financieras específicas
-                const procesarConsultaFinanciera = async (consulta) => {
-                    const consultaLower = consulta.toLowerCase();
-                    let datosEspecificos = null;
-                    let contextoAdicional = '';
-
-                    // Detectar tipo de consulta y obtener datos relevantes
-                    if (consultaLower.includes('saldo') || consultaLower.includes('cuánto tengo')) {
-                        datosEspecificos = await obtenerDatosUsuario();
-                        if (datosEspecificos) {
-                            contextoAdicional = `\n\nDATOS ACTUALES DE SALDOS:
-        - Saldo total: $${datosEspecificos.saldoTotal}
-        - Cuentas activas:
-        ${datosEspecificos.cuentas.filter(c => c.activo).map(c => `  • ${c.nombre}: $${c.saldo} ${c.moneda}`).join('\n')}`;
-                        }
+                else if (consultaLower.includes('estadística') || consultaLower.includes('promedio') || consultaLower.includes('análisis')) {
+                    const estadisticas = calcularEstadisticas(movimientos);
+                    if (estadisticas) {
+                        contextoAdicional = `\n\n[CONTEXTO_ANALITICO]
+        ESTADÍSTICAS DETALLADAS:
+        • Total movimientos: ${estadisticas.cantidadMovimientos}
+        • Gastos: ${estadisticas.cantidadGastos} movimientos ($${estadisticas.totalGastos})
+        • Ingresos: ${estadisticas.cantidadIngresos} movimientos ($${estadisticas.totalIngresos})
+        • Promedio por gasto: $${estadisticas.promedioGastos}
+        • Promedio por ingreso: $${estadisticas.promedioIngresos}
+        • Categoría con mayor gasto: ${estadisticas.categoriaMayorGasto} ($${estadisticas.montoCategoriaMayorGasto})
+        [/CONTEXTO_ANALITICO]`;
                     }
-                    else if (consultaLower.includes('gasto') || consultaLower.includes('gasté') || consultaLower.includes('egreso')) {
-                        datosEspecificos = await obtenerEstadisticas();
-                        if (datosEspecificos) {
-                            contextoAdicional = `\n\nANÁLISIS DE GASTOS:
-        - Total gastos recientes: $${datosEspecificos.gastosPorCategoria.reduce((sum, cat) => sum + cat.total, 0)}
-        - Distribución por categoría:
-        ${datosEspecificos.gastosPorCategoria.map(cat => `  • ${cat.categoriaNombre}: $${cat.total}`).join('\n')}`;
-                        }
-                    }
-                    else if (consultaLower.includes('movimiento') || consultaLower.includes('transacción')) {
-                        datosEspecificos = await obtenerMovimientosPorPeriodo('mes');
-                        if (datosEspecificos && datosEspecificos.length > 0) {
-                            const ultimosMovimientos = datosEspecificos.slice(0, 5);
-                            contextoAdicional = `\n\nÚLTIMOS MOVIMIENTOS:
-        ${ultimosMovimientos.map(m => `  • ${m.fechaOperacion.split('T')[0]} - ${m.tipo === 'G' ? 'GASTO' : 'INGRESO'}: $${m.monto} - ${m.comentario || 'Sin descripción'}`).join('\n')}`;
-                        }
+                }
+
+                // Contexto general para todas las consultas
+                contextoAdicional += `\n\n[CONTEXTO_GENERAL]
+        DATOS ACTUALIZADOS: ${new Date().toLocaleString()}
+        Total cuentas activas: ${datosUsuario.cuentas ? datosUsuario.cuentas.filter(c => c.activo).length : 0}
+        Saldo total: $${parseFloat(datosUsuario.saldoTotal || 0).toFixed(2)}
+        Movimientos cargados: ${movimientos ? movimientos.length : 0}
+        [/CONTEXTO_GENERAL]`;
+
+                return contextoAdicional;
+            };
+
+            // ========== FUNCIONES PRINCIPALES ==========
+
+            // Generar respuesta del bot usando OpenRouter
+            const generateBotResponse = async (thinkingElement) => {
+                const messageElement = thinkingElement.querySelector(".message-text");
+
+                try {
+                    // Procesar consulta y obtener contexto adicional
+                    const contextoAdicional = await procesarConsultaFinanciera(userData.message);
+
+                    // Agregar mensaje del usuario al historial
+                    conversationHistory.push({
+                        role: "user",
+                        content: `${userData.message}${contextoAdicional}`
+                    });
+
+                    // Hacer la petición a OpenRouter
+                    const response = await fetch(OPENROUTER_API_URL, {
+                        method: "POST",
+                        headers: {
+                            "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+                            "HTTP-Referer": SITE_URL,
+                            "X-Title": SITE_NAME,
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            "model": "google/gemini-2.5-flash-lite",
+                            "messages": conversationHistory,
+                            "temperature": 0.7,
+                            "max_tokens": 1500
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(`Error HTTP ${response.status}: ${errorText}`);
                     }
 
-                    return contextoAdicional;
-                };
+                    const data = await response.json();
 
-                // ========== FUNCIONES PRINCIPALES ==========
+                    // Obtener la respuesta del asistente
+                    if (data.choices && data.choices[0] && data.choices[0].message) {
+                        const botResponse = data.choices[0].message.content;
 
-                // Generar respuesta del bot
-                const generateBotResponse = async (thinkingElement) => {
-                    const messageElement = thinkingElement.querySelector(".message-text");
-
-                    try {
-                        // Procesar consulta y obtener contexto adicional
-                        const contextoAdicional = await procesarConsultaFinanciera(userData.message);
-
-                        // Actualizar contexto del chat con datos reales
-                        const contextoActualizado = await actualizarContextoChatbot();
-
-                        // Enviar mensaje al chat con contexto actualizado
-                        const response = await chat.sendMessage({
-                            message: `${userData.message}\n\n${contextoAdicional}`,
-                            context: contextoActualizado
+                        // Agregar respuesta al historial
+                        conversationHistory.push({
+                            role: "assistant",
+                            content: botResponse
                         });
 
-                        // Reemplazar el indicador de pensando con la respuesta real
-                        messageElement.innerHTML = response.text;
+                        // Limitar el historial para evitar tokens excesivos
+                        if (conversationHistory.length > 10) {
+                            conversationHistory = [
+                                conversationHistory[0],
+                                ...conversationHistory.slice(-8)
+                            ];
+                        }
 
-                    } catch (error) {
-                        console.error("Error:", error);
-                        messageElement.innerHTML = "Lo siento, hubo un error al procesar tu solicitud. Verifica tu conexión y API key.";
-                        messageElement.classList.add("error");
-                    } finally {
-                        thinkingElement.classList.remove("thinking");
-                        scrollToLatestMessage();
+                        // Mostrar respuesta
+                        messageElement.innerHTML = botResponse;
+                    } else {
+                        throw new Error("Respuesta inesperada de la API");
                     }
-                };
 
-                // Manejar mensaje saliente
-                const handleOutgoingMessage = (e) => {
-                    e.preventDefault();
-
-                    userData.message = messageInput.value.trim();
-                    if (!userData.message) return;
-
-                    // Limpiar campo de entrada
-                    messageInput.value = "";
-                    messageInput.style.height = "32px";
-
-                    // Crear y mostrar mensaje del usuario
-                    const userMessageElement = createMessageElement(userData.message, true);
-                    messagesContent.appendChild(userMessageElement);
+                } catch (error) {
+                    console.error("Error:", error);
+                    messageElement.innerHTML = "⚠️ Error al conectar con el servicio. Por favor, verifica tu conexión.";
+                    messageElement.classList.add("error");
+                } finally {
+                    thinkingElement.classList.remove("thinking");
                     scrollToLatestMessage();
+                }
+            };
 
-                    // Mostrar indicador de "pensando" y generar respuesta
-                    setTimeout(() => {
-                        const thinkingElement = createThinkingElement();
-                        messagesContent.appendChild(thinkingElement);
-                        scrollToLatestMessage();
-                        generateBotResponse(thinkingElement);
-                    }, 600);
-                };
+            // Manejar mensaje saliente
+            const handleOutgoingMessage = (e) => {
+                e.preventDefault();
 
-                // ========== EVENT LISTENERS ==========
+                userData.message = messageInput.value.trim();
+                if (!userData.message) return;
 
-                // Enviar mensaje con Enter (sin Shift)
-                messageInput.addEventListener("keydown", (e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                        e.preventDefault();
-                        handleOutgoingMessage(e);
-                    }
-                });
+                // Limpiar campo de entrada
+                messageInput.value = "";
+                messageInput.style.height = "32px";
 
-                // Enviar mensaje con el botón
-                sendMessageButton.addEventListener("click", handleOutgoingMessage);
+                // Crear y mostrar mensaje del usuario
+                const userMessageElement = createMessageElement(userData.message, true);
+                messagesContent.appendChild(userMessageElement);
+                scrollToLatestMessage();
 
-                // Alternar visibilidad del chatbot
-                chatbotToggler.addEventListener("click", () => {
-                    document.body.classList.toggle("show-chatbot");
-                });
+                // Mostrar indicador de "pensando" y generar respuesta
+                setTimeout(() => {
+                    const thinkingElement = createThinkingElement();
+                    messagesContent.appendChild(thinkingElement);
+                    scrollToLatestMessage();
+                    generateBotResponse(thinkingElement);
+                }, 600);
+            };
 
-                closeChatbot.addEventListener("click", () => {
-                    document.body.classList.remove("show-chatbot");
-                });
+            // ========== EVENT LISTENERS ==========
 
-                // Ajustar altura del campo de texto
-                messageInput.addEventListener("input", () => {
-                    messageInput.style.height = "32px";
-                    messageInput.style.height = `${Math.min(messageInput.scrollHeight, 80)}px`;
-                });
+            // Enviar mensaje con Enter (sin Shift)
+            messageInput.addEventListener("keydown", (e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleOutgoingMessage(e);
+                }
+            });
+
+            // Enviar mensaje con el botón
+            sendMessageButton.addEventListener("click", handleOutgoingMessage);
+
+            // Alternar visibilidad del chatbot
+            chatbotToggler.addEventListener("click", () => {
+                document.body.classList.toggle("show-chatbot");
+            });
+
+            closeChatbot.addEventListener("click", () => {
+                document.body.classList.remove("show-chatbot");
+            });
+
+            // Ajustar altura del campo de texto
+            messageInput.addEventListener("input", () => {
+                messageInput.style.height = "32px";
+                messageInput.style.height = `${Math.min(messageInput.scrollHeight, 80)}px`;
+            });
+
+            // Estilos para el indicador de pensamiento
+            const style = document.createElement('style');
+            style.textContent = `
+                .thinking-indicator {
+                    display: flex;
+                    gap: 4px;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 10px;
+                }
+                .dot {
+                    width: 8px;
+                    height: 8px;
+                    border-radius: 50%;
+                    background-color: #666;
+                    animation: dotPulse 1.4s ease-in-out infinite both;
+                }
+                .dot:nth-child(1) { animation-delay: -0.32s; }
+                .dot:nth-child(2) { animation-delay: -0.16s; }
+                @@keyframes dotPulse {
+                    0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+                    40% { transform: scale(1); opacity: 1; }
+                }
+                .message.error {
+                    color: #d32f2f;
+                }
+            `;
+            document.head.appendChild(style);
     </script>
 </body>
 </html>

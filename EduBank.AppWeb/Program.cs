@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<EdubanckssrContext>(optiones =>
@@ -54,6 +55,9 @@ builder.Services.AddScoped<IGenericRepository<Transferencia>, GenericRepository<
 // Registrar servicios de Pagos Habituales
 builder.Services.AddScoped<IPagoHabitualService, PagoHabitualService>();
 builder.Services.AddScoped<IPagoHabitualRepository, PagoHabitualRepository>();
+
+//cHATBOT
+
 
 var app = builder.Build();
 

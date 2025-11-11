@@ -117,39 +117,5 @@ namespace EduBank.AppWeb.Controllers
             }
         }
 
-        [HttpGet]
-        public async Task<IActionResult> ObtenerEstadisticas()
-        {
-            try
-            {
-                var usuarioId = ObtenerUsuarioId();
-
-                var totalesPorCategoria = await _movimientoService.ObtenerTotalesPorCategoria(usuarioId, 'G');
-                var movimientosRecientes = await _movimientoService.ObtenerRecientes(usuarioId, 10);
-                var saldoTotal = await _cuentaService.ObtenerSaldoTotal(usuarioId);
-
-                var estadisticas = new
-                {
-                    SaldoTotal = saldoTotal,
-                    GastosPorCategoria = totalesPorCategoria.Select(t => new {
-                        t.CategoriaNombre,
-                        t.Total
-                    }),
-                    MovimientosRecientes = movimientosRecientes.Select(m => new {
-                        m.Tipo,
-                        m.Monto,
-                        m.FechaOperacion,
-                        m.Comentario,
-                        Categoria = m.Categoria?.Nombre
-                    })
-                };
-
-                return Ok(estadisticas);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { error = "Error al obtener estadísticas" });
-            }
-        }
     }
 }
