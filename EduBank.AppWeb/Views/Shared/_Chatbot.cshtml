@@ -279,18 +279,15 @@
             }
 
         @@keyframes pulse {
-            0%, 100%
+            0%, 100% {
+                opacity: 0.4;
+                transform: translateY(0);
+            }
 
-        {
-            opacity: 0.4;
-            transform: translateY(0);
-        }
-
-        50% {
-            opacity: 1;
-            transform: translateY(-4px);
-        }
-
+            50% {
+                opacity: 1;
+                transform: translateY(-4px);
+            }
         }
 
         /* Chat Footer */
@@ -369,23 +366,20 @@
 
         /* Animations */
         @@keyframes bounce {
-            0%
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
 
-        {
-            transform: scale(0);
-            opacity: 0;
-        }
+            70% {
+                transform: scale(1.05);
+                opacity: 0.8;
+            }
 
-        70% {
-            transform: scale(1.05);
-            opacity: 0.8;
-        }
-
-        100% {
-            transform: scale(1);
-            opacity: 1;
-        }
-
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
 
         /* Scrollbar styling */
@@ -409,22 +403,19 @@
 
         /* Responsive */
         @@media (max-width: 500px) {
-            .chatbot-popup
+            .chatbot-popup {
+                width: calc(100vw - 40px);
+                height: 70vh;
+                right: 20px;
+                bottom: 90px;
+            }
 
-        {
-            width: calc(100vw - 40px);
-            height: 70vh;
-            right: 20px;
-            bottom: 90px;
-        }
-
-        #chatbot-toggler {
-            bottom: 20px;
-            right: 20px;
-            width: 50px;
-            height: 50px;
-        }
-
+            #chatbot-toggler {
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+            }
         }
 
         /* Estilos para mensajes de bienvenida y contenido */
@@ -515,7 +506,7 @@
             const closeChatbot = document.querySelector("#close-chatbot");
 
             // Configuración de OpenRouter
-            const OPENROUTER_API_KEY = "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";
+            const OPENROUTER_API_KEY = "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";
             const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
             const SITE_URL = window.location.origin;
             const SITE_NAME = "EduBank Chatbot";
@@ -534,18 +525,20 @@
                     role: "system",
                     content: `Eres un asistente especializado en finanzas personales para EduBank.
 
-        INSTRUCCIONES CRÍTICAS:
-        - Para análisis (mayor gasto, promedios, tendencias): Usa [CONTEXTO_ANALITICO] que contiene cálculos específicos
-        - Para listas completas (categorías): Muestra TODOS los elementos, no solo algunos
-        - Los datos son EN TIEMPO REAL desde la base de datos de EduBank
-        - Si el usuario pregunta por datos recientes, confirma que son actualizados al momento
+            INSTRUCCIONES CRÍTICAS:
+            - Para análisis (mayor gasto, mayor ingreso, promedios, tendencias): Usa [CONTEXTO_ANALITICO] que contiene cálculos específicos
+            - Para listas completas (categorías): Muestra TODOS los elementos, no solo algunos
+            - Los datos son EN TIEMPO REAL desde la base de datos de EduBank
+            - Si el usuario pregunta por datos recientes, confirma que son actualizados al momento
+            - Cuando hables de gastos grandes, ofrece ayuda adicional de forma natural
 
-        RESPUESTAS ESPERADAS:
-        • "categorías de gastos" → Lista COMPLETA de todas las categorías de gastos activas
-        • "mayor gasto" → Análisis del movimiento más alto con detalles específicos
-        • "datos actuales" → Confirmar que son datos en tiempo real
+            RESPUESTAS ESPERADAS:
+            • "categorías de gastos" → Lista COMPLETA de todas las categorías de gastos activas
+            • "mayor gasto" → Análisis del movimiento más alto con detalles específicos
+            • "mayor ingreso" → Análisis del ingreso más alto con detalles específicos
+            • "datos actuales" → Confirmar que son datos en tiempo real
 
-        NUNCA inventes información. Si no hay datos, di la verdad.`
+            NUNCA inventes información. Si no hay datos, di la verdad.`
                 }
             ];
 
@@ -606,6 +599,161 @@
                 return thinkingDiv;
             };
 
+            // ========== SISTEMA DE BOTONES INTERACTIVOS ==========
+
+            // Función para crear botones de seguimiento
+            const crearBotonesSeguimiento = (categoriaGasto, montoGasto) => {
+                const botonesHTML = `
+                    <div class="botones-seguimiento" data-categoria="${categoriaGasto}" data-monto="${montoGasto}">
+                        <div class="pregunta-seguimiento">¿Te gustaría recibir consejos personalizados para optimizar tus gastos en <strong>${categoriaGasto}</strong>?</div>
+                        <div class="botones-container">
+                            <button class="btn-seguimiento btn-si" data-respuesta="si">
+                                ✅ Sí, dame consejos
+                            </button>
+                            <button class="btn-seguimiento btn-no" data-respuesta="no">
+                                ❌ No, gracias
+                            </button>
+                        </div>
+                    </div>
+                `;
+                return botonesHTML;
+            };
+
+            // Función para manejar respuestas de botones
+            const manejarRespuestaBotones = async (respuesta, categoria, monto) => {
+                let mensajeRespuesta = '';
+
+                switch(respuesta) {
+                    case 'si':
+                        // Mostrar indicador de "pensando" para consejos
+                        const thinkingElement = createThinkingElement();
+                        messagesContent.appendChild(thinkingElement);
+                        scrollToLatestMessage();
+
+                        // Generar consejos personalizados con IA
+                        mensajeRespuesta = await generarConsejosPersonalizados(categoria, monto);
+
+                        // Remover el indicador de pensamiento
+                        thinkingElement.remove();
+                        break;
+                    case 'no':
+                        mensajeRespuesta = 'De acuerdo. Si cambias de opinión, estaré aquí para ayudarte con consejos de ahorro. 💰';
+                        break;
+                }
+
+                return mensajeRespuesta;
+            };
+
+            // Función para generar consejos personalizados con IA
+            const generarConsejosPersonalizados = async (categoria, monto) => {
+                try {
+                    const datosUsuario = await obtenerDatosUsuarioConCache();
+                    const movimientos = await obtenerMovimientosConCache('mes');
+
+                    // Crear contexto específico para consejos
+                    const contextoConsejos = `
+        CONTEXTO PARA CONSEJOS DE AHORRO:
+        - Categoría a analizar: ${categoria}
+        - Monto del gasto más alto: $${monto}
+        - Total de gastos del mes: $${datosUsuario?.totalGastos || 'No disponible'}
+        - Total de ingresos del mes: $${datosUsuario?.totalIngresos || 'No disponible'}
+        - Saldo total actual: $${parseFloat(datosUsuario?.saldoTotal || 0).toFixed(2)}
+
+        INSTRUCCIONES:
+        Proporciona 3-4 consejos ESPECÍFICOS y PERSONALIZADOS para optimizar gastos en ${categoria}.
+        Los consejos deben ser:
+        • Prácticos y accionables
+        • Basados en el monto específico ($${monto})
+        • Adaptados a la categoría ${categoria}
+        • Realistas y fáciles de implementar
+        • Enfocados en ahorro sostenible
+
+        Formato: Lista concisa con emojis, máximo 500 caracteres.`;
+
+                    // Hacer petición a OpenRouter para consejos
+                    const response = await fetch(OPENROUTER_API_URL, {
+                        method: "POST",
+                        headers: {
+                            "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+                            "HTTP-Referer": SITE_URL,
+                            "X-Title": SITE_NAME,
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            "model": "google/gemini-2.5-flash-lite",
+                            "messages": [
+                                {
+                                    role: "system",
+                                    content: "Eres un experto en finanzas personales y ahorro. Proporciona consejos prácticos, específicos y personalizados para optimizar gastos."
+                                },
+                                {
+                                    role: "user",
+                                    content: contextoConsejos
+                                }
+                            ],
+                            "temperature": 0.8,
+                            "max_tokens": 500
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Error HTTP ${response.status}`);
+                    }
+
+                    const data = await response.json();
+
+                    if (data.choices && data.choices[0] && data.choices[0].message) {
+                        return `💡 **Consejos personalizados para ${categoria}:**\n\n${data.choices[0].message.content}\n\n¿Te gustaría profundizar en alguno de estos consejos?`;
+                    } else {
+                        throw new Error("Respuesta inesperada de la API");
+                    }
+
+                } catch (error) {
+                    console.error("Error generando consejos:", error);
+                    return `💡 **Consejos generales para ${categoria}:**
+        • Analiza si este gasto es esencial o puede optimizarse
+        • Busca alternativas más económicas sin sacrificar calidad
+        • Considera si puedes espaciar la frecuencia de este gasto
+        • Establece un presupuesto mensual específico para esta categoría
+
+        ¿Te gustaría que analice más a fondo tus patrones de gasto en ${categoria}?`;
+                }
+            };
+
+            // Agregar event listeners a los botones
+            const agregarEventListenersBotones = () => {
+                const botones = document.querySelectorAll('.btn-seguimiento');
+
+                botones.forEach(boton => {
+                    boton.addEventListener('click', async function() {
+                        const respuesta = this.getAttribute('data-respuesta');
+                        const botonesContainer = this.closest('.botones-seguimiento');
+                        const categoria = botonesContainer.getAttribute('data-categoria');
+                        const monto = botonesContainer.getAttribute('data-monto');
+
+                        // Deshabilitar botones mientras se procesa
+                        botones.forEach(btn => btn.disabled = true);
+
+                        // Obtener mensaje de respuesta
+                        const mensajeRespuesta = await manejarRespuestaBotones(respuesta, categoria, monto);
+
+                        // Crear y mostrar mensaje del bot
+                        const respuestaElement = createMessageElement(mensajeRespuesta, false);
+                        messagesContent.appendChild(respuestaElement);
+                        scrollToLatestMessage();
+
+                        // Remover los botones después de la selección
+                        botonesContainer.remove();
+
+                        // Agregar al historial de conversación
+                        conversationHistory.push({
+                            role: "assistant",
+                            content: mensajeRespuesta
+                        });
+                    });
+                });
+            };
+
             // ========== SISTEMA DE CACHE Y ACTUALIZACIÓN ==========
 
             // Verificar si el cache está expirado
@@ -658,14 +806,6 @@
                 }
             };
 
-            // Forzar actualización de datos
-            const forzarActualizacionDatos = async () => {
-                cacheDatos.timestamp = null;
-                cacheDatos.usuario = null;
-                cacheDatos.movimientos = null;
-                return await obtenerDatosUsuarioConCache(true);
-            };
-
             // ========== ANÁLISIS AVANZADO DE DATOS ==========
 
             // Calcular mayor gasto
@@ -688,6 +828,26 @@
                 };
             };
 
+            // Calcular mayor ingreso
+            const calcularMayorIngreso = (movimientos) => {
+                if (!movimientos || movimientos.length === 0) return null;
+
+                const ingresos = movimientos.filter(m => m.tipo === 'I' || m.tipo === 'Ingreso');
+                if (ingresos.length === 0) return null;
+
+                const mayorIngreso = ingresos.reduce((max, movimiento) => {
+                    return parseFloat(movimiento.monto) > parseFloat(max.monto) ? movimiento : max;
+                }, ingresos[0]);
+
+                return {
+                    monto: parseFloat(mayorIngreso.monto).toFixed(2),
+                    categoria: mayorIngreso.categoria || mayorIngreso.CategoriaNombre || 'Sin categoría',
+                    cuenta: mayorIngreso.cuenta || mayorIngreso.CuentaNombre || 'Sin cuenta',
+                    fecha: mayorIngreso.fechaOperacion ? mayorIngreso.fechaOperacion.split('T')[0] : 'Fecha no disponible',
+                    comentario: mayorIngreso.comentario || ''
+                };
+            };
+
             // Calcular promedios y estadísticas
             const calcularEstadisticas = (movimientos) => {
                 if (!movimientos || movimientos.length === 0) return null;
@@ -707,8 +867,17 @@
                     gastosPorCategoria[categoria] = (gastosPorCategoria[categoria] || 0) + parseFloat(m.monto);
                 });
 
+                const ingresosPorCategoria = {};
+                ingresos.forEach(m => {
+                    const categoria = m.categoria || m.CategoriaNombre || 'Sin categoría';
+                    ingresosPorCategoria[categoria] = (ingresosPorCategoria[categoria] || 0) + parseFloat(m.monto);
+                });
+
                 const categoriaMayorGasto = Object.keys(gastosPorCategoria).reduce((a, b) =>
                     gastosPorCategoria[a] > gastosPorCategoria[b] ? a : b, '');
+
+                const categoriaMayorIngreso = Object.keys(ingresosPorCategoria).reduce((a, b) =>
+                    ingresosPorCategoria[a] > ingresosPorCategoria[b] ? a : b, '');
 
                 return {
                     totalGastos: totalGastos.toFixed(2),
@@ -719,7 +888,9 @@
                     cantidadGastos: gastos.length,
                     cantidadIngresos: ingresos.length,
                     categoriaMayorGasto: categoriaMayorGasto,
-                    montoCategoriaMayorGasto: gastosPorCategoria[categoriaMayorGasto]?.toFixed(2) || '0.00'
+                    montoCategoriaMayorGasto: gastosPorCategoria[categoriaMayorGasto]?.toFixed(2) || '0.00',
+                    categoriaMayorIngreso: categoriaMayorIngreso,
+                    montoCategoriaMayorIngreso: ingresosPorCategoria[categoriaMayorIngreso]?.toFixed(2) || '0.00'
                 };
             };
 
@@ -743,17 +914,44 @@
                 }
 
                 // Análisis para consultas específicas
-                if (consultaLower.includes('mayor gasto') || consultaLower.includes('gasto más alto')) {
+                if (consultaLower.includes('mayor gasto') || consultaLower.includes('gasto más alto') || consultaLower.includes('más gasté')) {
                     const mayorGasto = calcularMayorGasto(movimientos);
                     if (mayorGasto) {
                         contextoAdicional = `\n\n[CONTEXTO_ANALITICO]
-        MAYOR GASTO REGISTRADO:
-        • Monto: $${mayorGasto.monto}
-        • Categoría: ${mayorGasto.categoria}
-        • Cuenta: ${mayorGasto.cuenta}
-        • Fecha: ${mayorGasto.fecha}
-        ${mayorGasto.comentario ? `• Comentario: ${mayorGasto.comentario}` : ''}
-        [/CONTEXTO_ANALITICO]`;
+            MAYOR GASTO REGISTRADO:
+            • Monto: $${mayorGasto.monto}
+            • Categoría: ${mayorGasto.categoria}
+            • Cuenta: ${mayorGasto.cuenta}
+            • Fecha: ${mayorGasto.fecha}
+            ${mayorGasto.comentario ? `• Comentario: ${mayorGasto.comentario}` : ''}
+
+            [SEGUIMIENTO_DISPONIBLE]
+            ¿Necesitas consejos personalizados para optimizar gastos en "${mayorGasto.categoria}"?
+            [/SEGUIMIENTO_DISPONIBLE]
+            [/CONTEXTO_ANALITICO]`;
+                    }
+                }
+
+                // Análisis para mayor ingreso
+                else if (consultaLower.includes('mayor ingreso') ||
+                         consultaLower.includes('ingreso más alto') ||
+                         consultaLower.includes('más ingresé') ||
+                         consultaLower.includes('mayor ingreso del mes')) {
+
+                    const mayorIngreso = calcularMayorIngreso(movimientos);
+                    if (mayorIngreso) {
+                        contextoAdicional = `\n\n[CONTEXTO_ANALITICO]
+            MAYOR INGRESO REGISTRADO:
+            • Monto: $${mayorIngreso.monto}
+            • Categoría: ${mayorIngreso.categoria}
+            • Cuenta: ${mayorIngreso.cuenta}
+            • Fecha: ${mayorIngreso.fecha}
+            ${mayorIngreso.comentario ? `• Comentario: ${mayorIngreso.comentario}` : ''}
+            [/CONTEXTO_ANALITICO]`;
+                    } else {
+                        contextoAdicional = `\n\n[CONTEXTO_ANALITICO]
+            NO SE ENCONTRARON INGRESOS en el período actual.
+            [/CONTEXTO_ANALITICO]`;
                     }
                 }
 
@@ -763,14 +961,14 @@
                         const categoriasIngresos = datosUsuario.categorias.filter(c => c.tipo === 'I' && c.activo);
 
                         contextoAdicional = `\n\n[CONTEXTO_CATEGORIAS_COMPLETO]
-        TODAS LAS CATEGORÍAS DE GASTOS (${categoriasGastos.length}):
-        ${categoriasGastos.map(c => `• ${c.nombre}`).join('\n')}
+            TODAS LAS CATEGORÍAS DE GASTOS (${categoriasGastos.length}):
+            ${categoriasGastos.map(c => `• ${c.nombre}`).join('\n')}
 
-        TODAS LAS CATEGORÍAS DE INGRESOS (${categoriasIngresos.length}):
-        ${categoriasIngresos.map(c => `• ${c.nombre}`).join('\n')}
+            TODAS LAS CATEGORÍAS DE INGRESOS (${categoriasIngresos.length}):
+            ${categoriasIngresos.map(c => `• ${c.nombre}`).join('\n')}
 
-        Total categorías activas: ${categoriasGastos.length + categoriasIngresos.length}
-        [/CONTEXTO_CATEGORIAS_COMPLETO]`;
+            Total categorías activas: ${categoriasGastos.length + categoriasIngresos.length}
+            [/CONTEXTO_CATEGORIAS_COMPLETO]`;
                     }
                 }
 
@@ -778,24 +976,25 @@
                     const estadisticas = calcularEstadisticas(movimientos);
                     if (estadisticas) {
                         contextoAdicional = `\n\n[CONTEXTO_ANALITICO]
-        ESTADÍSTICAS DETALLADAS:
-        • Total movimientos: ${estadisticas.cantidadMovimientos}
-        • Gastos: ${estadisticas.cantidadGastos} movimientos ($${estadisticas.totalGastos})
-        • Ingresos: ${estadisticas.cantidadIngresos} movimientos ($${estadisticas.totalIngresos})
-        • Promedio por gasto: $${estadisticas.promedioGastos}
-        • Promedio por ingreso: $${estadisticas.promedioIngresos}
-        • Categoría con mayor gasto: ${estadisticas.categoriaMayorGasto} ($${estadisticas.montoCategoriaMayorGasto})
-        [/CONTEXTO_ANALITICO]`;
+            ESTADÍSTICAS DETALLADAS:
+            • Total movimientos: ${estadisticas.cantidadMovimientos}
+            • Gastos: ${estadisticas.cantidadGastos} movimientos ($${estadisticas.totalGastos})
+            • Ingresos: ${estadisticas.cantidadIngresos} movimientos ($${estadisticas.totalIngresos})
+            • Promedio por gasto: $${estadisticas.promedioGastos}
+            • Promedio por ingreso: $${estadisticas.promedioIngresos}
+            • Categoría con mayor gasto: ${estadisticas.categoriaMayorGasto} ($${estadisticas.montoCategoriaMayorGasto})
+            ${estadisticas.categoriaMayorIngreso ? `• Categoría con mayor ingreso: ${estadisticas.categoriaMayorIngreso} ($${estadisticas.montoCategoriaMayorIngreso})` : ''}
+            [/CONTEXTO_ANALITICO]`;
                     }
                 }
 
                 // Contexto general para todas las consultas
                 contextoAdicional += `\n\n[CONTEXTO_GENERAL]
-        DATOS ACTUALIZADOS: ${new Date().toLocaleString()}
-        Total cuentas activas: ${datosUsuario.cuentas ? datosUsuario.cuentas.filter(c => c.activo).length : 0}
-        Saldo total: $${parseFloat(datosUsuario.saldoTotal || 0).toFixed(2)}
-        Movimientos cargados: ${movimientos ? movimientos.length : 0}
-        [/CONTEXTO_GENERAL]`;
+            DATOS ACTUALIZADOS: ${new Date().toLocaleString()}
+            Total cuentas activas: ${datosUsuario.cuentas ? datosUsuario.cuentas.filter(c => c.activo).length : 0}
+            Saldo total: $${parseFloat(datosUsuario.saldoTotal || 0).toFixed(2)}
+            Movimientos cargados: ${movimientos ? movimientos.length : 0}
+            [/CONTEXTO_GENERAL]`;
 
                 return contextoAdicional;
             };
@@ -842,24 +1041,32 @@
 
                     // Obtener la respuesta del asistente
                     if (data.choices && data.choices[0] && data.choices[0].message) {
-                        const botResponse = data.choices[0].message.content;
+                        let botResponse = data.choices[0].message.content;
 
-                        // Agregar respuesta al historial
+                        // Detectar si es una respuesta sobre mayor gasto y agregar botones
+                        if (userData.message.toLowerCase().includes('mayor gasto') ||
+                            userData.message.toLowerCase().includes('gasto más alto') ||
+                            userData.message.toLowerCase().includes('más gasté')) {
+
+                            // Extraer la categoría y monto del gasto del contexto
+                            const mayorGasto = calcularMayorGasto(await obtenerMovimientosConCache('mes'));
+                            if (mayorGasto) {
+                                botResponse += crearBotonesSeguimiento(mayorGasto.categoria, mayorGasto.monto);
+                            }
+                        }
+
+                        messageElement.innerHTML = botResponse;
+
+                        // Agregar event listeners a los botones después de renderizar
+                        setTimeout(() => {
+                            agregarEventListenersBotones();
+                        }, 100);
+
                         conversationHistory.push({
                             role: "assistant",
                             content: botResponse
                         });
 
-                        // Limitar el historial para evitar tokens excesivos
-                        if (conversationHistory.length > 10) {
-                            conversationHistory = [
-                                conversationHistory[0],
-                                ...conversationHistory.slice(-8)
-                            ];
-                        }
-
-                        // Mostrar respuesta
-                        messageElement.innerHTML = botResponse;
                     } else {
                         throw new Error("Respuesta inesperada de la API");
                     }
@@ -927,7 +1134,9 @@
                 messageInput.style.height = `${Math.min(messageInput.scrollHeight, 80)}px`;
             });
 
-            // Estilos para el indicador de pensamiento
+            // ========== ESTILOS CSS ==========
+
+            // Agregar estilos para los botones y animaciones
             const style = document.createElement('style');
             style.textContent = `
                 .thinking-indicator {
@@ -952,6 +1161,82 @@
                 }
                 .message.error {
                     color: #d32f2f;
+                }
+
+                /* Estilos para botones de seguimiento */
+                .botones-seguimiento {
+                    margin: 15px 0;
+                    padding: 12px;
+                    background: #f8f9fa;
+                    border-radius: 12px;
+                    border-left: 4px solid #4CAF50;
+                }
+
+                .pregunta-seguimiento {
+                    font-size: 14px;
+                    margin-bottom: 10px;
+                    color: #333;
+                    font-weight: 500;
+                    text-align: center;
+                }
+
+                .botones-container {
+                    display: flex;
+                    gap: 8px;
+                    flex-wrap: wrap;
+                    justify-content: center;
+                }
+
+                .btn-seguimiento {
+                    padding: 8px 16px;
+                    border: none;
+                    border-radius: 20px;
+                    font-size: 12px;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    font-weight: 500;
+                    min-width: 120px;
+                }
+
+                .btn-seguimiento:disabled {
+                    opacity: 0.6;
+                    cursor: not-allowed;
+                }
+
+                .btn-si {
+                    background: #4CAF50;
+                    color: white;
+                }
+
+                .btn-no {
+                    background: #f44336;
+                    color: white;
+                }
+
+                .btn-seguimiento:hover:not(:disabled) {
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                }
+
+                .consejo-ahorro {
+                    background: #E8F5E8;
+                    border-left: 4px solid #4CAF50;
+                    padding: 12px;
+                    border-radius: 8px;
+                    margin: 10px 0;
+                }
+
+                /* Responsive */
+                @@media (max-width: 480px) {
+                    .botones-container {
+                        flex-direction: column;
+                        align-items: center;
+                    }
+
+                    .btn-seguimiento {
+                        width: 100%;
+                        max-width: 200px;
+                    }
                 }
             `;
             document.head.appendChild(style);
